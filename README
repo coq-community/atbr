@@ -1,0 +1,159 @@
+
+                ATBR
+                ====
+
+Thomas Braibant & Damien Pous
+
+Laboratoire d'Informatique de Grenoble (UMR 5217), INRIA, CNRS, France
+
+Webpage of the project: http://proton.inrialpes.fr/~braibant/atbr/
+
+This library is distributed under the terms of the GNU Lesser General
+Public License version 3. See files LICENSE and COPYING. The files
+from directory CoLoR come from the CoLoR library (http://color.inria.fr/), 
+they are distributed according to the CeCILL license (see corresponding 
+files in directory CoLoR/).
+ 
+
+
+INSTALLATION.
+=============
+
+	run 'make' to compile the library (please note that it takes
+	quite a long time -- about ten minutes with a recent computer;
+	this should be improved in forthcoming releases)
+
+	the subversion version of Coq v8.2 is required: 
+	some bugs have been fixed since the official release.
+	(it is known to compile with Coq 8.2 revisions 12109, 12122, and 12142)
+
+
+DOCUMENTATION. 
+==============
+
+        Here is a succinct description of each file. 
+	The user can also refer to Examples.v, Commutation.v, and Tests.v.
+
+0- Library files
+Structures		Export all relevant modules, except those related to matrices
+Matrices		Export all relevant modules, including those related to matrices
+
+
+1- Algebraic hierarchy
+Classes   	       	Definitions of all algebraic classes of the development	
+Graph 			Lemmas and hints about the base class (carrier with equality)
+Monoid			Monoids, free monoids, finite iterations over a monoid, various tactics
+SemiLattice		Idempotent semi-lattices, tactics: normalise, reflexivity, rewrite 
+SemiRing		Idempotent semirings, tactics: normalise, reflexivity, rewrite 
+KleeneAlgebra 		Kleene algebras quote (typed reification), and various properties
+Converse 		Structures with converse (semirings and Kleene Algebras)
+
+
+2- Models
+BoolAlg  		Kleene Algebra of booleans, with optimised operations
+RelAlg			Kleene Algebra of binary relations
+PropAlg			Kleene Algebra of propositions
+
+
+3- Matrices
+MxGraph			matrices without operations; blocks definitions
+MxSemiLattice		semi-lattices of matrices
+MxSemiRing		semiring of matrices
+MxKleeneAlgebra	        Kleene algebra of matrices (definition of the star operation)
+
+
+4- Efficient decision algorithm
+DKA_Sets		Constructions of FSets required to define the algorithms and study their properties
+DKA_Algo 		Decision algorithm for equational theory of Kleene algebras
+DKA_Annexe		Preliminary definitions for the correctness proof of Kleene_reflexivity
+DKA_Convert		Lemmas about the injection of boolean into a Kleene algebra
+DKA_Thompson		Thompson's construction without going through booleans matrices
+DKA_Determinisation	Correctness of the determinisation algorithm
+DKA_SimpleMinimisation  Correctness of the simple minimisation algorithm
+DKA_Minimisation	Correctness of minimisation (algebraic part)
+DecideKleeneAlgebra     Kozen's initiality proof, definition of the kleene_reflexivity tactic
+
+
+5- Examples
+Examples 	  	Small tutorial file, that goes through our set of tactics
+Commutation 	  	Simple usages of kleene_reflexivity to prove commutation properties
+Tests			Test cases for our tactics w.r.t. matrices
+
+
+6- Misc.
+Common			Shared simple tactics 
+Force			Functional memoization
+Quote			Generic typed reification, using Ltac
+Functors		Functors between the various algebraic structures
+MxFunctors		Extension of these functors to matrices
+Isomorphism		Isomorphims between nat and finite sets of nats 
+ListOrderedType 	Lists seen as a lexicographically ordered type
+
+
+7- CoLoR utils		The termination of the minimisation algorithm requires us to go through 
+   	 		a multi-set well-founded ordering. This is why we imported utility files 
+			from the CoLoR library. 
+
+
+TACTICS.
+========
+
+1- Reflexive tactics:
+
+[aci_reflexivity]	solve an (in)equation modulo associativity, commutativity and idempotence of (+,0)
+
+[aci_normalize]		simplify an (in)equation modulo associativity, commutativity and idempotence of (+,0)
+
+[monoid_reflexivity]	solve an (in)equation modulo associativity  of (*,1)
+[monoid_normalize]	simplify an (in)equation modulo associativity  of (*,1)
+
+[semiring_reflexivity]	solve an (in)equation on the idempotent semiring (*,+,1,0)
+[semiring_normalize]	simplify an (in)equation on the idempotent semiring (*,+,1,0)
+[semiring_clean]	simplify 0 and 1
+[semiring_cleanassoc]	simplify 0 and 1, normalize the parentheses
+
+[kleene_reflexivity]	solve an (in)equation in Kleene Algebras
+
+2- Rewriting tactics:
+
+[ac_rewrite H]		rewrite a closed equality modulo (AC) of (+)
+[monoid_rewrite H]   	rewrite a closed equality modulo (A) of (*)
+
+3- Other tactics:
+
+[conv_down]		push converses down to terms leaves
+[switch]		add converses to the goal and push them down to terms leaves
+
+
+REMARKS.
+========
+
+We largely use FSets in our development. Using FSetAVLs only improves
+the efficiency of our tactic marginally, while it renders the build
+process far slower. Therefore, we currently settle on using FSetLists.
+
+In DKA_Algo.v, we provide two implementations of the minimisation
+algorithm: Hopcroft minimisation algorithm and a slightly simpler
+one. We did not yet prove Hopcroft's algorithm, so that our tactic
+uses the simpler algorithm ; performances are not so much affected.
+
+We rely on two axioms from the standard library:
+- JMeq_eq : forall (A : Type) (x y : A), [x : (A)]= [y : (A)] -> x = y
+- Eqdep.Eq_rect_eq.eq_rect_eq : forall (U : Type) (p : U) 
+                                (Q : U -> Type) (x : Q p) 
+                                (h : p = p), x = eq_rect p Q x p h
+The first one seems to be required by our approach (this is related to 
+our untyping theorems, as described in 
+http://hal.archives-ouvertes.fr/hal-00383070/fr/ ); the second one is 
+used for technical reasons, it might be removed at some point.
+
+
+ACKNOWLEDGEMENTS.
+=================
+
+We would like to thank Guilhem Moulin and Sebastion Briais, 
+who participated to a preliminary version of this project.
+
+We are also grateful to Assia Mahboubi, Bruno Barras, and Hugo
+Herbelin for highly stimulating discussions, as well as numerous hints
+for solving various problems.
