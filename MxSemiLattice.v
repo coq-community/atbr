@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: MxSemiLattice.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 Require Import Classes.
@@ -58,7 +58,7 @@ Section Props.
   Qed.
 
   Global Instance makeMat_blocks_incr A B x y n m:
-  Morphism (
+  Proper (
     (Mleq (x,A) (y,B))   ==>
     (Mleq (x,A) (m,B))  ==>
     (Mleq (n,A) (y,B))  ==>
@@ -66,7 +66,7 @@ Section Props.
     (Mleq ((x+n)%nat,A) ((y+m)%nat,B)))
   (@makeMat_blocks G A B x y n m).
   Proof.  
-    unfold Morphism, respectful, leq; intros.
+    unfold Proper, respectful, leq; intros.
     rewrite addMat_blocks.
     apply makeMat_blocks_compat; assumption.
   Qed.
