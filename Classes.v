@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: Classes.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 
@@ -109,14 +109,14 @@ Section Structures.
   Context {G: Graph}.
 
   Class Monoid {Mo: Monoid_Ops} := {
-    dot_compat: forall A B C, Morphism ((equal A B) ==> (equal B C) ==> (equal A C)) (dot A B C);
+    dot_compat: forall A B C, Proper ((equal A B) ==> (equal B C) ==> (equal A C)) (dot A B C);
     dot_assoc: forall A B C D (x: X A B) y (z: X C D), x*(y*z) == (x*y)*z;
     dot_neutral_left:  forall A B (x: X A B), 1*x == x;
     dot_neutral_right:  forall A B (x: X A B), x*1 == x
   }.
   
   Class SemiLattice {SLo: SemiLattice_Ops} := {
-    plus_compat: forall A B, Morphism ((equal A B) ==> (equal A B) ==> (equal A B)) (plus A B);
+    plus_compat: forall A B, Proper ((equal A B) ==> (equal A B) ==> (equal A B)) (plus A B);
     plus_neutral_left: forall A B (x: X A B), 0+x == x;
     plus_idem: forall A B (x: X A B), x+x == x;
     plus_assoc: forall A B (x y z: X A B), x+(y+z) == (x+y)+z;
@@ -155,7 +155,7 @@ Section Structures.
   
   Class ActionLattice {Mo: Monoid_Ops} {SLo: SemiLattice_Ops} {Ro: Residual_Ops} {Ko: Star_Op} {Io: Inf_Op} := {
     AL_AA :> ActionAlgebra;
-    inf_compat: forall A B, Morphism ((equal A B) ==> (equal A B) ==> (equal A B)) (inf A B);
+    inf_compat: forall A B, Proper ((equal A B) ==> (equal A B) ==> (equal A B)) (inf A B);
     inf_idem: forall A B (x:X A B), x^x == x;
     inf_assoc: forall A B (x y z: X A B), (x^y)^z == x^(y^z);
     inf_com: forall A B (x y: X A B), x^y == y^x
@@ -182,13 +182,13 @@ Section Structures.
     CISR_SL:> SemiLattice;
 
     (* pas besoin des *_right, on n'hérite donc pas de Monoid/IdemSemiRing directement *)
-    dot_compat_c: forall A B C, Morphism ((equal A B) ==> (equal B C) ==> (equal A C)) (dot A B C);
+    dot_compat_c: forall A B C, Proper ((equal A B) ==> (equal B C) ==> (equal A C)) (dot A B C);
     dot_assoc_c: forall A B C D (x: X A B) y (z: X C D), x*(y*z) == (x*y)*z;
     dot_neutral_left_c:  forall A B (x: X A B), 1*x == x;
     dot_ann_left_c:  forall A B C (x: X B C), zero A B * x == 0;
     dot_distr_left_c:  forall A B C (x y: X A B) (z: X B C), (x+y)*z == x*z + y*z;
 
-    conv_compat: forall A B, Morphism ((equal A B) ==> (equal B A)) (conv A B);
+    conv_compat: forall A B, Proper ((equal A B) ==> (equal B A)) (conv A B);
     conv_invol: forall A B (x: X A B), x`` == x;
     conv_dot:  forall A B C (x: X A B) (y: X B C), (x*y)` == y`*x`;
     conv_plus:  forall A B (x y: X A B), (x+y)` == y`+x`

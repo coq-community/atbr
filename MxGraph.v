@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: MxGraph.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 Require Import Classes.
@@ -111,8 +111,8 @@ Section Props.
   Lemma mx_force_id n m (M: MX (n,A) (m,B)): mx_force M == M.
   Proof. repeat intro; unfold mx_force. simpl. rewrite Force.id2_id by assumption. reflexivity. Qed.
 
-  Global Instance mx_force_compat n m: Morphism (Mequal(n,A)(m,B) ==> Mequal(n,A)(m,B)) (@mx_force n m).
-  Proof. unfold Morphism, respectful. intros. rewrite 2 mx_force_id. assumption. Qed.
+  Global Instance mx_force_compat n m: Proper (Mequal(n,A)(m,B) ==> Mequal(n,A)(m,B)) (@mx_force n m).
+  Proof. unfold Proper, respectful. intros. rewrite 2 mx_force_id. assumption. Qed.
 
 
   (* sous-matrices *)
@@ -121,7 +121,7 @@ Section Props.
     := box n m (fun i j => !M (x+i)%nat (y+j)%nat).
 (*
   Global Instance subMat_compat x y n m:
-  Morphism (Mequal(x+n,A)%nat(y+m,B)%nat ==> Mequal(n,A)(m,B))
+  Proper (Mequal(x+n,A)%nat(y+m,B)%nat ==> Mequal(n,A)(m,B))
   (subMat x y n m).
   Proof. repeat intro. simpl. auto with omega. Qed.
 *)
@@ -134,13 +134,13 @@ Section Props.
       Definition sub10 := subMat x 0 n y M.
       Definition sub11 := subMat x y n m M.
     End Def.
-    Global Instance sub00_compat: Morphism (Mequal(x+n,A)%nat(y+m,B)%nat ==> Mequal(x,A)(y,B)) sub00.
+    Global Instance sub00_compat: Proper (Mequal(x+n,A)%nat(y+m,B)%nat ==> Mequal(x,A)(y,B)) sub00.
     Proof. repeat intro. simpl. apply H; auto with omega. Qed.
-    Global Instance sub01_compat: Morphism (Mequal(x+n,A)%nat(y+m,B)%nat ==> Mequal(x,A)(m,B)) sub01.
+    Global Instance sub01_compat: Proper (Mequal(x+n,A)%nat(y+m,B)%nat ==> Mequal(x,A)(m,B)) sub01.
     Proof. repeat intro. simpl. apply H; auto with omega. Qed.
-    Global Instance sub10_compat: Morphism (Mequal(x+n,A)%nat(y+m,B)%nat ==> Mequal(n,A)(y,B)) sub10.
+    Global Instance sub10_compat: Proper (Mequal(x+n,A)%nat(y+m,B)%nat ==> Mequal(n,A)(y,B)) sub10.
     Proof. repeat intro. simpl. apply H; auto with omega. Qed.
-    Global Instance sub11_compat: Morphism (Mequal(x+n,A)%nat(y+m,B)%nat ==> Mequal(n,A)(m,B)) sub11.
+    Global Instance sub11_compat: Proper (Mequal(x+n,A)%nat(y+m,B)%nat ==> Mequal(n,A)(m,B)) sub11.
     Proof. repeat intro. simpl. apply H; auto with omega. Qed.
   End Subs.
 (*    
@@ -183,7 +183,7 @@ Section Props.
         end). 
 
     Global Instance makeMat_blocks_compat:
-    Morphism (
+    Proper (
       (Mequal (x,A) (y,B))   ==>
       (Mequal (x,A) (m,B))  ==>
       (Mequal (n,A) (y,B))  ==>
@@ -262,11 +262,11 @@ Section Props.
   Definition Mat_to_scal (M: MX(1%nat,A)(1%nat,B)): X A B := !M O O.
   
   Global Instance scal_to_Mat_compat: 
-  Morphism ((equal A B) ==> (Mequal (1%nat,A) (1%nat,B))) scal_to_Mat.
+  Proper ((equal A B) ==> (Mequal (1%nat,A) (1%nat,B))) scal_to_Mat.
   Proof. repeat intro. simpl. trivial. Qed.
   
   Global Instance Mat_to_scal_compat: 
-  Morphism ((Mequal (1%nat,A) (1%nat,B)) ==> (equal A B)) Mat_to_scal.
+  Proper ((Mequal (1%nat,A) (1%nat,B)) ==> (equal A B)) Mat_to_scal.
   Proof. repeat intro. simpl. apply H; auto. Qed.
 
   Lemma scal_to_Mat_morph (M: MX(1%nat,A)(1%nat,B)):
@@ -290,7 +290,7 @@ Section Props.
   Definition transpose n m (M : MX(n,A)(m,B)): MX(m,A)(n,B) := box m n (fun i j => !M j i).
   
   Global Instance transpose_compat n m: 
-  Morphism (Mequal (n,A)(m,B) ==> Mequal (m,A)(n,B)) (@transpose n m).
+  Proper (Mequal (n,A)(m,B) ==> Mequal (m,A)(n,B)) (@transpose n m).
   Proof. repeat intro. simpl. apply H; trivial. Qed.
 
   Lemma transpose_blocks x y n m (a: MX(x,A)(y,B)) b c (d: MX(n,A)(m,B)):

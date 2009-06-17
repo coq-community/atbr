@@ -52,7 +52,7 @@ Section Protect.
     SemiLattice.sum 0 k (fun i => dot_scal_left (var i) (convert (f i))).
     
   Global Instance convert_compat (n m : nat):
-  Morphism (
+  Proper (
     (@equal (@mx_Graph bool_Graph) (n,tt) (m,tt))   ==>
     (@equal (@mx_Graph KAF_Graph)  (n,tt) (m,tt)))
   (@convert n m).

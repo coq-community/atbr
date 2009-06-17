@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: DKA_Sets.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 
@@ -410,7 +410,7 @@ destruct z; destruct y; destruct x; intuition auto.
   destruct p1; destruct p0; destruct p; eauto.
 Defined.
 
-Global Instance stateset_is_empty_compat : Morphism (StateSet.eq ==> @eq bool) (StateSet.is_empty).
+Global Instance stateset_is_empty_compat : Proper (StateSet.eq ==> @eq bool) (StateSet.is_empty).
 Proof.
   repeat intro. rewrite H. reflexivity.
 Qed.
@@ -420,7 +420,7 @@ Definition stateset_X_stateset_eq a b : Prop :=
   StateSet.eq (snd a) (snd b).
 
 Global Instance partition_compat  : 
-Morphism ((pointwise_relation StateSet.elt (@eq bool) ) ==>   StateSet.eq ==>  stateset_X_stateset_eq) (StateSet.partition).
+Proper ((pointwise_relation StateSet.elt (@eq bool) ) ==>   StateSet.eq ==>  stateset_X_stateset_eq) (StateSet.partition).
 Proof.
   unfold stateset_X_stateset_eq.
   repeat intro. 

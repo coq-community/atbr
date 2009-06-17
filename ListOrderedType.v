@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: ListOrderedType.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 Require Import FSets.
 Require Import List.

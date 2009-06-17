@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: DKA_Thompson.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 Require Import Classes.
@@ -114,19 +114,19 @@ Section Protect.
   Local Hint Resolve X_to_bAut_wf.
 
 
-  Instance MPlus_compat: Morphism (MAut_eq ==> MAut_eq ==> MAut_eq) MPlus.
+  Instance MPlus_compat: Proper (MAut_eq ==> MAut_eq ==> MAut_eq) MPlus.
   Proof.
     intros A A' HA B B' HB. destruct HA. destruct HB.
     constructor; simpl; change (S O) with (1+0)%nat; apply (makeMat_blocks_compat (G:=KAF_Graph)); trivial. 
   Qed.
 
-  Instance MDot_compat: Morphism (MAut_eq ==> MAut_eq ==> MAut_eq) MDot.
+  Instance MDot_compat: Proper (MAut_eq ==> MAut_eq ==> MAut_eq) MDot.
   Proof.
     intros A A' HA B B' HB. destruct HA. destruct HB.
     constructor; simpl; change (S O) with (1+0)%nat; apply (makeMat_blocks_compat (G:=KAF_Graph)); auto with compat. 
   Qed.
 
-  Instance MpStar_copmat: Morphism (MAut_eq ==> MAut_eq) MpStar.
+  Instance MpStar_copmat: Proper (MAut_eq ==> MAut_eq) MpStar.
   Proof.
     intros A A' HA. destruct HA. 
     constructor; simpl; auto with compat.

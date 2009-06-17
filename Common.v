@@ -7,12 +7,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: Common.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 Require Export Arith.
 Require Export Omega.
 Require Export Coq.Program.Equality.
 Require Export Setoid.
+Require Export Morphisms.
 
 (* resolution des contradictions *)
 Ltac omega_false := elimtype False; unfold fst in *; omega.

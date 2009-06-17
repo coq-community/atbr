@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: DecideKleeneAlgebra.v 880 2009-06-09 14:44:47Z pous $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 Require Import Classes.

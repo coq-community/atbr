@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: SemiLattice.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 Require        FSets.
 
@@ -46,7 +46,6 @@ Section leq.
   Qed.
 End leq.
 
-Typeclasses Opaque leq_refl leq_trans equal_leq equal_geq leq_antisym.
 Hint Extern 0 (leq _ _ _ _) => apply leq_refl.
 
 
@@ -132,7 +131,7 @@ Module Free.
 
   Section Protect.
 
-  Instance plus_compat_free: Morphism (equal ==> equal ==> equal) plus := plus_compat.
+  Instance plus_compat_free: Proper (equal ==> equal ==> equal) plus := plus_compat.
   Typeclasses Opaque plus_compat_free.
 
   Lemma Is_zero x: is_zero x = true <-> x = zero.
@@ -315,20 +314,19 @@ Section Params.
       repeat match goal with 
                | H : eval _ _ ?x _ |- _ => eval_inversion_aux H x 
              end
-      with eval_inversion_aux H x :=
+      with eval_inversion_aux hyp t :=
         let H1 := fresh in 
-          match x with 
-            | Free.zero => pose proof (eval_zero_inv H); subst
-            | Free.plus _ _ => destruct (eval_plus_inv H) as (?x & ?y & H1 & ?H & ?H); try rewrite H1
-            | Free.var _ => destruct (eval_var_inv H) as (H1 & ?H & ?H); subst; try rewrite H1
-          end; clear H.
+          match t with 
+            | Free.zero => pose proof (eval_zero_inv hyp); subst
+            | Free.plus _ _ => destruct (eval_plus_inv hyp) as (?x & ?y & H1 & ?H & ?H); try rewrite H1
+            | Free.var _ => destruct (eval_var_inv hyp) as (H1 & ?H & ?H); subst; try rewrite H1
+          end; clear hyp.
 
     (* semi-injectivité du typage de l'evalutation : pour les nettoyés seulement *)
     Lemma eval_type_inj_left: forall A A' B x z z', eval A B x z -> eval A' B x z' -> A=A' \/ Free.is_zero (Free.clean x) = true.
     Proof.
       intros A A' B x z z' H; revert A' z'; induction H; intros A' z' H';
-        eval_inversion; auto. 
-
+        eval_inversion; auto.
       destruct (IHeval2 _ _ H3) as [|Hx]; auto.
       destruct (IHeval1 _ _ H2) as [|Hy]; auto.
       right; simpl. rewrite Hy. assumption.
@@ -843,7 +841,7 @@ Section Props1.
     
 
   Global Instance plus_incr:
-  Morphism ((leq A B) ==> (leq A B) ==> (leq A B)) (plus A B).
+  Proper ((leq A B) ==> (leq A B) ==> (leq A B)) (plus A B).
   Proof. 
     unfold leq; intros x x' Hx y y' Hy.
     rewrite <- Hy at 2; rewrite <- Hx at 2.
@@ -854,7 +852,6 @@ Section Props1.
     reflexivity.
 *)
   Qed.
-  Typeclasses Opaque plus_incr.
 
   Lemma sup_def: forall (x y: X A B), (forall z, x <== z <-> y <== z) -> x==y.
   Proof.
@@ -880,9 +877,8 @@ Section Props1.
   Qed.
 
   Global Instance sum_compat' i k: 
-  Morphism ((pointwise_relation nat (equal A B)) ==> (equal A B)) (sum i k).
+  Proper ((pointwise_relation nat (equal A B)) ==> (equal A B)) (sum i k).
   Proof. repeat intro; auto using sum_compat. Qed.
-  Typeclasses Opaque sum_compat'.
    
   Lemma sum_zero i k (f: nat -> X A B):
     (forall n, n<k -> f (i+n)%nat == 0) -> sum i k f == 0.
@@ -965,15 +961,11 @@ Section Props1.
   Qed.
     
   Global Instance sum_incr' i k: 
-  Morphism ((pointwise_relation nat (leq A B)) ==> (leq A B)) (sum i k).
+  Proper ((pointwise_relation nat (leq A B)) ==> (leq A B)) (sum i k).
   Proof. repeat intro; auto using sum_incr. Qed.
-  Typeclasses Opaque sum_incr'.
 
 End Props1.
 Implicit Arguments sum_cut_nth [[G] [SLo] [SL] A B].
-
-Typeclasses Opaque sum plus_incr sum_compat' sum_incr.
-
 
 (*begintests
 Section tests_rewrite.

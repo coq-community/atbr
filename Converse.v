@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: Converse.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 Require Import Classes.
@@ -72,7 +72,7 @@ Section ISR.
   Qed.
 
   Global Instance conv_incr:
-  Morphism ((leq A B) ==> (leq B A)) (conv A B).
+  Proper ((leq A B) ==> (leq B A)) (conv A B).
   Proof.
     unfold leq.
     intros A B x y H.

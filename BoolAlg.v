@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: BoolAlg.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 (** Booleans form a Kleene Algebra, and we can define efficient
 functions for computation on boolean matrices *)
@@ -142,7 +142,7 @@ Section Def.
 
   Notation is_true := (@equal bool_Graph tt tt 1). 
 
-(*   Global Instance is_true_compat: Morphism (@equal bool_Graph tt tt ==> iff) is_true. *)
+(*   Global Instance is_true_compat: Proper (@equal bool_Graph tt tt ==> iff) is_true. *)
 (*   Proof. *)
 (*     vm_compute; intros; subst; split; trivial. *)
 (*   Qed. *)

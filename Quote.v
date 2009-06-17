@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: Quote.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 Require Import Classes.
@@ -81,28 +81,30 @@ Section Make.
 
 End Make.
 
+Implicit Arguments EVAL [].
+
 Ltac build_eval E := 
   solve [
     repeat constructor; 
-      repeat (apply (cons_eval _ E) || eapply (tail_eval _ E _ _ _ _ _ _ _ _ _ _))
+      repeat (apply (cons_eval E) || eapply (tail_eval E _ _ _ _ _ _ _ _ _ _))
   ] || (print_goal; fail 1 "could not build an evaluation").
 
 Ltac close_eval :=
   lazymatch goal with
-    | |- Keep ?G ?A ?B ?T' ?x ?f => 
+    | |- Keep ?A ?B ?T' ?x ?f => 
       instantiate; instantiate (1 := fun _ => x); apply keep
     | _ => print_goal; fail 2 "could not close the environment"
   end.
 
 Ltac quote_ E p := 
   first [
-    eapply (extend_2 _ E _ _ p); [
+    eapply (extend_2 E _ _ p); [
       build_eval E |
       build_eval E |
       close_eval   |
       instantiate
     ] |
-    eapply (extend_1 _ E _ _ p); [
+    eapply (extend_1 E _ _ p); [
       build_eval E |
       close_eval   |
       instantiate
@@ -122,7 +124,7 @@ Ltac compute_term :=
 (* TODO: voir comment inserer des abstract ici *)
 Ltac reduce E p := 
   first [
-    eapply (n_extend_2 _ E _ _ _ p); [
+    eapply (n_extend_2 E _ _ _ p); [
       build_eval E |
       build_eval E |
       close_eval   |
@@ -130,7 +132,7 @@ Ltac reduce E p :=
       compute_term; build_eval E |
       unfold tcons, fcons; instantiate
     ] |
-    eapply (n_extend_1 _ E _ _ _ p); [
+    eapply (n_extend_1 E _ _ _ p); [
       build_eval E |
       close_eval   |
       compute_term; build_eval E |

@@ -46,12 +46,12 @@ Fixpoint theta x l :=
   (***********************************************************)
 
    Global Instance theta_compat :
-Morphism (
+Proper (
   eqA ==>
   (@eq (list A))  ==>
   @eq nat) (theta).
 Proof.
-  unfold Morphism, respectful. repeat intro. 
+  unfold Proper, respectful. repeat intro. 
   subst. 
 
   induction y0. simpl. reflexivity.

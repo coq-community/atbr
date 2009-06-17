@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: DKA_Annexe.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 Require Import Classes.
@@ -84,7 +84,7 @@ Section Protect.
   (*   Print Assumptions MAut_eq_Eq. *)
 
   Global Instance eval_M_compat: 
-    Morphism (MAut_eq ==> equal (Graph:=@mx_Graph KAF_Graph) (1%nat,tt) (1%nat,tt)) eval_M.
+    Proper (MAut_eq ==> equal (Graph:=@mx_Graph KAF_Graph) (1%nat,tt) (1%nat,tt)) eval_M.
   Proof.
     intros A B H. destruct H. auto with compat. 
   Qed.
@@ -251,7 +251,7 @@ Section Protect.
     intros. constructor; simpl; trivial.
   Qed.
 
-  Global Instance change_initial_M_compat: Morphism (MAut_eq ==> @eq nat ==> MAut_eq) change_initial_M.
+  Global Instance change_initial_M_compat: Proper (MAut_eq ==> @eq nat ==> MAut_eq) change_initial_M.
   Proof.
     intros A B H v u Hu; subst.
     destruct H. constructor; trivial.

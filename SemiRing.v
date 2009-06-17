@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: SemiRing.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 Require        ListOrderedType.
 Require        FSets.
@@ -135,8 +135,8 @@ Module Free.
       transitivity proved by equal_trans
         as free_equal_setoid_relation.
 
-  Instance dot_compat': Morphism (equal ==> equal ==> equal) dot := dot_compat.
-  Instance plus_compat': Morphism (equal ==> equal ==> equal) plus := plus_compat.
+  Instance dot_compat': Proper (equal ==> equal ==> equal) dot := dot_compat.
+  Instance plus_compat': Proper (equal ==> equal ==> equal) plus := plus_compat.
   Typeclasses Opaque dot_compat' plus_compat'.
 
   Fixpoint norm_aux n b a x y := 
@@ -656,15 +656,15 @@ Section Params.
       repeat match goal with 
                | H : eval _ _ ?x _ |- _ => eval_inversion_aux H x 
              end
-      with eval_inversion_aux H x :=
+      with eval_inversion_aux hyp t :=
         let H1 := fresh in let H2 := fresh in
-          match x with 
-            | Free.one => destruct (eval_one_inv H) as [H1 H2]; destruct_or_rewrite H2; destruct_or_rewrite H1
-            | Free.zero => rewrite (eval_zero_inv H)
-            | Free.dot _ _ => destruct (eval_dot_inv H) as (?B & ?x & ?y & H1 & ?H & ?H); destruct_or_rewrite H1
-            | Free.plus _ _ => destruct (eval_plus_inv H) as (?x & ?y & H1 & ?H & ?H); destruct_or_rewrite H1
-            | Free.var _ => destruct (eval_var_inv H) as (H1 & ?H & ?H); destruct_or_rewrite H1
-          end; clear H.
+          match t with 
+            | Free.one => destruct (eval_one_inv hyp) as [H1 H2]; destruct_or_rewrite H2; destruct_or_rewrite H1
+            | Free.zero => rewrite (eval_zero_inv hyp)
+            | Free.dot _ _ => destruct (eval_dot_inv hyp) as (?B & ?x & ?y & H1 & ?H & ?H); destruct_or_rewrite H1
+            | Free.plus _ _ => destruct (eval_plus_inv hyp) as (?x & ?y & H1 & ?H & ?H); destruct_or_rewrite H1
+            | Free.var _ => destruct (eval_var_inv hyp) as (H1 & ?H & ?H); destruct_or_rewrite H1
+          end; clear hyp.
   
 
     (* semi-injectivité du typage de l'evalutation : pour les nettoyés seulement *)
@@ -966,7 +966,7 @@ Section Props.
   Context `{ISR: IdemSemiRing}.
 
   Global Instance dot_incr A B C: 
-  Morphism ((leq A B) ==> (leq B C) ==> (leq A C)) (dot A B C).
+  Proper ((leq A B) ==> (leq B C) ==> (leq A C)) (dot A B C).
   Proof.
     intros until C; unfold leq; intros x y E x' y' E'.
     rewrite <- E, <- E'; semiring_reflexivity.
@@ -1024,9 +1024,6 @@ Ltac r_semiring_clean :=
 |  |- context [?x + 0] => setoid_rewrite plus_neutral_right
   
 end.
-
-Typeclasses Opaque dot_incr.
-
 
 Lemma sum_distr_left `{ISR: IdemSemiRing} A B C (x: X B A) (f: nat -> X C B):
   forall i k, sum i k f * x == sum i k (fun u => f u * x).

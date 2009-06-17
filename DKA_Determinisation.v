@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: DKA_Determinisation.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 Require Import Classes.
@@ -225,7 +225,7 @@ Section Termination.
   Lemma bbool_view b1 b2: (b1=true <-> b2=true) -> b1=b2.
   Proof. intros [|] [|]; intuition. Qed.
 
-  Lemma for_all_compat f: Morphism (StateSet.Equal ==> @eq bool) (StateSet.for_all f).
+  Lemma for_all_compat f: Proper (StateSet.Equal ==> @eq bool) (StateSet.for_all f).
   Proof. 
     intros f x y H.
     apply bbool_view.
@@ -403,7 +403,7 @@ Section Correction.
 
   Definition delta_set' a q := delta_set A q a.
 
-  Instance delta_set_compat a: Morphism (StateSet.Equal ==> StateSet.Equal) (delta_set' a).
+  Instance delta_set_compat a: Proper (StateSet.Equal ==> StateSet.Equal) (delta_set' a).
   Proof.
     intros a s t H. unfold delta_set', delta_set.
     rewrite StateSetOrdProp.fold_equal. reflexivity. 3: assumption. 
@@ -817,7 +817,7 @@ Section Correction.
   Lemma eq_symm: forall (i j: bool), i = j <-> j = i.
   Proof. firstorder. Qed.
 
-  Lemma map_filter i (P: stateset -> bool) (HP: Morphism (StateSet.Equal ==> @eq bool) P):
+  Lemma map_filter i (P: stateset -> bool) (HP: Proper (StateSet.Equal ==> @eq bool) P):
    StateSet.In i
      (StateSetMap.fold
         (fun p np acc =>

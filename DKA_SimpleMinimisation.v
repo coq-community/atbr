@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: DKA_SimpleMinimisation.v 878 2009-06-09 14:11:54Z pous $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 Require Import Functors MxFunctors.
@@ -119,7 +119,7 @@ Section splittable.
 
   Variable DFA : DFA.
 
-Global Instance splittable_compat : Morphism ( StateSet.eq  ==> StateSet.eq ==> (Label.eq) ==> eq_option_stateset_X_stateset) (splittable DFA).
+Global Instance splittable_compat : Proper ( StateSet.eq  ==> StateSet.eq ==> (Label.eq) ==> eq_option_stateset_X_stateset) (splittable DFA).
 Proof.
   rintro.
   unfold splittable. 
@@ -431,7 +431,7 @@ Proof.
   constructor ; eauto with multisets.
 Qed.
 
-Instance P2mset_compat : Morphism (StateSetSet.Equal ==> meq) P2mset.
+Instance P2mset_compat : Proper (StateSetSet.Equal ==> meq) P2mset.
 Proof.
   intros x y Hxy. unfold P2mset. 
   apply (StateSetSetOrdProp.fold_equal meq_Equivalence); auto.
@@ -689,10 +689,10 @@ Proof.
 Qed.
 
 Global Instance refine_compat:
-Morphism ( 
+Proper ( 
   StateSetSet.eq ==> StateSetSet.eq ==> iff) refine.
 Proof. 
-  unfold Morphism, respectful, pointwise_relation. intros x y Heq1 x' y' Heq2.
+  unfold Proper, respectful, pointwise_relation. intros x y Heq1 x' y' Heq2.
   unfold refine.  intuition.
   rewrite <- Heq1 in H. specialize (H0 x0 H). destruct H0. exists x1. rewrite ? Heq1 , Heq2 in *. intuition fsetdec.
   rewrite <- Heq2 in H. specialize (H1 x0 a H H2). destruct H1. exists x1. rewrite <- ? Heq1 , Heq2 in *. intuition fsetdec.
@@ -792,7 +792,7 @@ Definition disjoint P :=
   forall x y, StateSetSet.In x P -> StateSetSet.In y P -> (StateSet.eq x y) \/ (StateSet.Empty (StateSet.inter x y )).
 
 
-Instance disjoint_compat : Morphism (StateSetSet.eq ==> iff) disjoint.
+Instance disjoint_compat : Proper (StateSetSet.eq ==> iff) disjoint.
 Proof.
 rintro. unfold disjoint. split; intros. apply H0; rewrite H; auto. apply H0; rewrite <- H; auto.
 Defined.
@@ -934,7 +934,7 @@ Definition split_prop P L :=
   (forall p q a uv,  a < max_label  -> In_P p P -> In_P q P -> splittable DFA p q a =o= Some uv  -> In_L (a,q) L).
 
 Instance split_prop_compat :
-Morphism ( StateSetSet.eq  ==> Label_x_StateSetSet.eq ==> iff) (split_prop).
+Proper ( StateSetSet.eq  ==> Label_x_StateSetSet.eq ==> iff) (split_prop).
 Proof.
   unfold split_prop.
   rintro; intuition. rewrite <- H0.
@@ -971,7 +971,7 @@ Definition split_prop_partial P Q L q a :=
 .
 
 Instance split_prop_partial_compat :
-Morphism ( StateSetSet.eq  ==> StateSetSet.eq ==> Label_x_StateSetSet.eq ==> (StateSet.eq) ==> (@eq nat)  ==>  iff) (split_prop_partial).
+Proper ( StateSetSet.eq  ==> StateSetSet.eq ==> Label_x_StateSetSet.eq ==> (StateSet.eq) ==> (@eq nat)  ==>  iff) (split_prop_partial).
 Proof.
   unfold split_prop_partial.
   rintro; intuition. 
@@ -1057,10 +1057,10 @@ Qed.
 
 Section f.
 Variable f: nat -> Label_x_StateSetSet.t -> Label_x_StateSetSet.t.
-Hypothesis Hf: Morphism (@eq nat ==> Label_x_StateSetSet.Equal ==> Label_x_StateSetSet.Equal) f.
+Hypothesis Hf: Proper (@eq nat ==> Label_x_StateSetSet.Equal ==> Label_x_StateSetSet.Equal) f.
 Hypothesis Hf': forall i j acc, i<>j -> Label_x_StateSetSet.Equal (f i (f j acc)) (f j (f i acc)).
 
-Lemma fold_labels_compat i: Morphism (Label_x_StateSetSet.Equal ==> Label_x_StateSetSet.Equal) (fold_labels (fun a => f (S a)) i).
+Lemma fold_labels_compat i: Proper (Label_x_StateSetSet.Equal ==> Label_x_StateSetSet.Equal) (fold_labels (fun a => f (S a)) i).
 Proof.
   induction i; intros x y H.
   trivial.
@@ -1083,7 +1083,7 @@ End f.
 
 Section f'.
   Variable f: nat -> Label_x_StateSetSet.t -> Label_x_StateSetSet.t.
-  Hypothesis Hf: Morphism (@eq nat ==> Label_x_StateSetSet.Equal ==> Label_x_StateSetSet.Equal) f.
+  Hypothesis Hf: Proper (@eq nat ==> Label_x_StateSetSet.Equal ==> Label_x_StateSetSet.Equal) f.
   Hypothesis Hf': forall i j acc, i<>j -> Label_x_StateSetSet.Equal (f i (f j acc)) (f j (f i acc)).
 
   Lemma fold_labels_eq a acc: Label_x_StateSetSet.Equal (fold_labels' _ f a acc) (fold_labels f a acc).
@@ -1098,7 +1098,7 @@ Section f'.
   Qed.
   
   Variable P: nat -> Label_x_StateSetSet.t -> Prop.
-  Hypothesis HP: Morphism (@eq nat ==> Label_x_StateSetSet.Equal ==> iff) P.
+  Hypothesis HP: Proper (@eq nat ==> Label_x_StateSetSet.Equal ==> iff) P.
 
   Lemma fold_labels_rec: forall a acc,
     P O acc -> (forall n acc ,  P n acc -> P (S n) (f n acc)) -> 
@@ -1113,7 +1113,7 @@ End f'.
 
 Section f''.
   Variable f: nat -> Label_x_StateSetSet.t -> Label_x_StateSetSet.t.
-  Hypothesis Hf: Morphism (@eq nat ==> Label_x_StateSetSet.Equal ==> Label_x_StateSetSet.Equal) f.
+  Hypothesis Hf: Proper (@eq nat ==> Label_x_StateSetSet.Equal ==> Label_x_StateSetSet.Equal) f.
   Hypothesis Hf': forall i j acc, i<>j -> Label_x_StateSetSet.Equal (f i (f j acc)) (f j (f i acc)).
   
   Lemma slicing_is_preserving: compat_eq f -> preserving f -> slicing f .

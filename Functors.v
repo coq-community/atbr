@@ -25,7 +25,7 @@ Section Defs.
   Context {G1: Graph} {G2: Graph}.
 
   Class graph_functor (F: functor G1 G2) := 
-    functor_compat: forall A B, Morphism ((equal A B) ==> (equal _ _)) (F A B).
+    functor_compat: forall A B, Proper ((equal A B) ==> (equal _ _)) (F A B).
   
   Definition faithful (F: functor G1 G2) :=
     forall A B x y, F A B x == F A B y -> x == y.
@@ -48,7 +48,7 @@ Section Defs.
   }.
   
   Lemma  functor_incr `{SL1: SemiLattice (G:=G1)} `{SL2: SemiLattice (G:=G2)} {F: functor G1 G2} {HF: semilattice_functor F}:
-    forall A B, Morphism ((leq A B) ==> (leq _ _)) (F A B).
+    forall A B, Proper ((leq A B) ==> (leq _ _)) (F A B).
   Proof.
     intros. intros x y H. unfold leq. rewrite <- functor_plus. apply functor_compat. trivial.
   Qed.

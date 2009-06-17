@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: Utils_WF.v 878 2009-06-09 14:11:54Z pous $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 Set Implicit Arguments.

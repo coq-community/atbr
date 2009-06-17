@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: Monoid.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 Require Import Classes.
@@ -71,7 +71,7 @@ Module Free.
   Definition norm := norm_aux one.
 
   Section Protect.
-  Instance dot_compat': Morphism (equal ==> equal ==> equal) dot := dot_compat.
+  Instance dot_compat': Proper (equal ==> equal ==> equal) dot := dot_compat.
 
   Lemma insert q: forall x, equal (dot q x) (norm_aux q x).
   Proof.
@@ -144,13 +144,13 @@ Section Params.
       repeat match goal with 
                | H : eval _ _ ?x _ |- _ => eval_inversion_aux H x 
              end
-      with eval_inversion_aux H x :=
+      with eval_inversion_aux hyp t :=
         let H1 := fresh in 
-          match x with 
-            | Free.one => destruct (eval_one_inv H) as [H1 ?H]; subst; try rewrite H1
-            | Free.dot _ _ => destruct (eval_dot_inv H) as (?B & ?x & ?y & H1 & ?H & ?H); subst; try rewrite H1
-            | Free.var _ => destruct (eval_var_inv H) as (H1 & ?H & ?H); subst; try rewrite H1
-          end; clear H.
+          match t with 
+            | Free.one => destruct (eval_one_inv hyp) as [H1 ?H]; subst; try rewrite H1
+            | Free.dot _ _ => destruct (eval_dot_inv hyp) as (?B & ?x & ?y & H1 & ?H & ?H); subst; try rewrite H1
+            | Free.var _ => destruct (eval_var_inv hyp) as (H1 & ?H & ?H); subst; try rewrite H1
+          end; clear hyp.
 
   
     (* semi-injectivité du typage de l'evalutation (ça ne marche que grâce à l'absence de zero) *)
@@ -319,7 +319,7 @@ Section monoid_rewrite_leq.
   (* Damien: je mets ce morphisme ici, bien qu'il soit dans [SemiRing] : 
      il le faut pour prouver les continuations sur leq *)
   Instance dot_incr_temp A B C: 
-  Morphism ((leq A B) ==> (leq B C) ==> (leq A C)) (dot A B C).
+  Proper ((leq A B) ==> (leq B C) ==> (leq A C)) (dot A B C).
   Proof.
     intros until C; unfold leq; intros x y E x' y' E'.
     rewrite <- E, <- E'.
@@ -474,7 +474,7 @@ Section monoid_rewrite_tests.
   Hypothesis H4:  a*(b+e)*c <== c.
 
   Instance dot_incr_temp' A B C: 
-  Morphism ((leq A B) ==> (leq B C) ==> (leq A C)) (dot A B C).
+  Proper ((leq A B) ==> (leq B C) ==> (leq A C)) (dot A B C).
   Proof.
     intros until C; unfold leq; intros x y E x' y' E'.
     rewrite <- E, <- E'.

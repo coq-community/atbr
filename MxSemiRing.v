@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: MxSemiRing.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 Require Import Classes.
@@ -156,11 +156,11 @@ Section Props1.
   Context {M: Monoid}.
 
   Global Instance dot_scal_right_compat (n m : nat) (A B C: T):
-  Morphism ((Mequal(n,A)(m,B)) ==> (equal B C)  ==> (Mequal(n,A)(m,C))) (@dot_scal_right A B C n m).
+  Proper ((Mequal(n,A)(m,B)) ==> (equal B C)  ==> (Mequal(n,A)(m,C))) (@dot_scal_right A B C n m).
   Proof. repeat intro. simpl. auto with compat. Qed.
   
   Global Instance dot_scal_left_compat (n m : nat) (A B C: T):
-  Morphism ((equal A B) ==> (Mequal(n,B)(m,C)) ==> (Mequal(n,A)(m,C))) (@dot_scal_left A B C n m).
+  Proper ((equal A B) ==> (Mequal(n,B)(m,C)) ==> (Mequal(n,A)(m,C))) (@dot_scal_left A B C n m).
   Proof. repeat intro. simpl. auto with compat. Qed.
 
 End Props1.
