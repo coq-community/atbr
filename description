@@ -1,14 +1,11 @@
 Name: ATBR
 Title: A tactic for deciding Kleene algebras
-URL: http://sardes.inrialpes.fr/~braibant/atbr
+Url: http://sardes.inrialpes.fr/~braibant/atbr
 Description: This library provides algebraic tools for working with  
 binary relations. The main tactic we provide is a reflexive tactic for  
 solving (in)equations in an arbitrary Kleene algebra. The decision  
 procedure goes through standard finite automata constructions, that we  
 formalized.
-Keywords: Kleene algebra, finite automata, semiring, matrices,  
-decision procedures, reflexive tactic
-Category: Decision procedures
 Author: Thomas Braibant
 Email: thomas.braibant@gmail.com
 Homepage: http://sardes.inrialpes.fr/~braibant
@@ -17,3 +14,7 @@ Author: Damien Pous
 Email: damien.pous@inria.fr
 Homepage: http://sardes.inrialpes.fr/~pous
 Institution: CNRS - LIG
+Keywords: Kleene algebra, finite automata, semiring, matrices,  
+decision procedures, reflexive tactic
+Category: Computer Science/Decision Procedures and Certified Algorithms/Decision procedures
+Require: CoLoR
