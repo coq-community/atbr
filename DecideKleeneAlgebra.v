@@ -7,13 +7,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: DecideKleeneAlgebra.v 880 2009-06-09 14:44:47Z pous $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 Require Import Classes.
 Require Import SemiLattice.
 Require Import Monoid.
-Require Import SemiRing.
+Require Import ATBR.SemiRing.
 Require Import KleeneAlgebra.
 Require Import MxGraph.
 Require Import MxSemiLattice.

@@ -7,12 +7,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: DKA_Minimisation.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 Require Import Classes.
 Require Import SemiLattice.
-Require Import SemiRing.
+Require Import ATBR.SemiRing.
 Require Import Monoid.
 Require Import KleeneAlgebra.
 Require Import MxGraph.

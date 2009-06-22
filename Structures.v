@@ -15,7 +15,7 @@ Require Export Classes.
 Require Export Graph.
 Require Export Monoid.
 Require Export SemiLattice.
-Require Export SemiRing.
+Require Export ATBR.SemiRing.
 Require Export KleeneAlgebra.
 Require Export Converse.
 

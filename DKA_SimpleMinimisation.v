@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: DKA_SimpleMinimisation.v 878 2009-06-09 14:11:54Z pous $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 Require Import Functors MxFunctors.
@@ -18,7 +18,7 @@ Require Import DKA_Sets.
 
         Import SimpleMyhillNerode.
 
-Require CoLoR.MultisetNat.
+Require CoLoR.Util.Multiset.MultisetNat.
 
 Module Label_x_StateSetSetDecide := FSetDecide.Decide(Label_x_StateSetSet).
 Module Label_x_StateSetSetFact := FSetFacts.Facts(Label_x_StateSetSet).
@@ -419,7 +419,7 @@ End splittable.
 Module StateSetSetOrdProp := FSetProperties.OrdProperties(StateSetSet).
 Section Termination.
 
-Import CoLoR.MultisetNat.
+Import CoLoR.Util.Multiset.MultisetNat.
 Open Scope msets_scope.
 
 Variable DFA: DFA.

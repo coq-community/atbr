@@ -7,7 +7,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: BoolAlg.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 (** Booleans form a Kleene Algebra, and we can define efficient
 functions for computation on boolean matrices *)
@@ -15,7 +15,7 @@ functions for computation on boolean matrices *)
 Require Import Common.
 Require Import Classes.
 Require Import SemiLattice.
-Require Import SemiRing.
+Require Import ATBR.SemiRing.
 Require Import KleeneAlgebra.
 Require Import MxGraph.
 Require Import MxSemiRing.

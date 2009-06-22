@@ -7,12 +7,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(*i $Id: FreeKleeneAlg.v 875 2009-06-09 11:53:22Z braibant $ i*)
+(*i $Id$ i*)
 
 Require Import Common.
 Require Import Classes.
 Require        SemiLattice.
-Require        SemiRing.
+Require        ATBR.SemiRing.
 Require        KleeneAlgebra.
 Require Import MxGraph.
 Require Import MxSemiRing.
