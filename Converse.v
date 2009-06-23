@@ -12,7 +12,7 @@
 Require Import Common.
 Require Import Classes.
 Require Import SemiLattice.
-Require Import SemiRing.
+Require Import ATBR.SemiRing.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

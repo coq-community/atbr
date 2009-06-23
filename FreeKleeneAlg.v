@@ -12,7 +12,7 @@
 Require Import Common.
 Require Import Classes.
 Require        SemiLattice.
-Require        SemiRing.
+Require        ATBR.SemiRing.
 Require        KleeneAlgebra.
 Require Import MxGraph.
 Require Import MxSemiRing.

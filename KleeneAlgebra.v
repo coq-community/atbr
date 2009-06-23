@@ -14,7 +14,7 @@ Require Import Classes.
 Require Import Graph.
 Require Import Monoid.
 Require Import SemiLattice.
-Require Import SemiRing.
+Require Import ATBR.SemiRing.
 Require        Quote.
 Set Implicit Arguments.
 Unset Strict Implicit.
