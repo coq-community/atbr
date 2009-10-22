@@ -224,7 +224,7 @@ endtests*)
 
   Let Hpc: SetoidList.compat_op VLst.eq equal fplus.
   Proof. 
-    intros i j x y H H'; unfold fplus.
+    intros i j H x y H'; unfold fplus.
     destruct_tests; rewrite (VLst_to_X_compat H); auto with compat.
      rewrite <- H'. symmetry; constructor.
      rewrite H'. constructor.

@@ -142,7 +142,7 @@ Module Free.
 
   Let Hc: SetoidList.compat_op (@eq nat) equal f.
   Proof. 
-    intros i j x y H H'; subst; unfold f. 
+    intros i j H x y H'; subst; unfold f. 
     case_eq (is_zero x); intro Hx; 
     case_eq (is_zero y); intro Hy. 
     constructor.
