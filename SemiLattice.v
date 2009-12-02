@@ -141,7 +141,7 @@ Module Free.
 
 
   Let Hc: SetoidList.compat_op (@eq nat) equal f.
-  Proof. 
+  Proof.
     intros i j H x y H'; subst; unfold f. 
     case_eq (is_zero x); intro Hx; 
     case_eq (is_zero y); intro Hy. 
@@ -293,16 +293,11 @@ Section Params.
     | e_var: forall i, @eval (s i) (t i) (Free.var i) (f i).
     Implicit Arguments eval [].
     Local Hint Constructors eval.
-  
-
-    (* besoin de l'astuce de Mathieu Sozeau pour faire passer les lemmes d'inversion ci-dessous *)
-    Tactic Notation "dependent" "destruction" ident(H) :=
-      do_depind' ltac:(fun hyp => (*elim_case hyp ||*) case hyp) H.
-  
+    
     Lemma eval_plus_inv: forall A B x y z, eval A B (Free.plus x y) z -> 
       exists x', exists y', z=x'+y' /\ eval A B x x' /\ eval A B y y'.
     Proof. intros. dependent destruction H. eauto. Qed.
-  
+
     Lemma eval_zero_inv: forall A B z, eval A B Free.zero z -> z=0. 
     Proof. intros. dependent destruction H. auto. Qed.
   
@@ -319,7 +314,8 @@ Section Params.
           match t with 
             | Free.zero => pose proof (eval_zero_inv hyp); subst
             | Free.plus _ _ => destruct (eval_plus_inv hyp) as (?x & ?y & H1 & ?H & ?H); try rewrite H1
-            | Free.var _ => destruct (eval_var_inv hyp) as (H1 & ?H & ?H); subst; try rewrite H1
+            | Free.var _ => destruct (eval_var_inv hyp) as (H1 & ?H & ?H); subst; try apply JMeq_eq in H1; 
+              try rewrite H1
           end; clear hyp.
 
     (* semi-injectivité du typage de l'evalutation : pour les nettoyés seulement *)
@@ -374,11 +370,9 @@ Section Params.
 
     (* injectivité de l'évaluation *)
     Lemma eval_inj: forall A B x y z, eval A B x y -> eval A B x z -> y=z.
-    Proof.
-      intros A B x y z H; revert z; induction H; intros; eval_inversion; try reflexivity.
-      rewrite (IHeval1 _ H3), (IHeval2 _ H4); reflexivity.
+    Proof. intros. dependent induction H; depelim H0; auto. 
+      rewrite (IHeval1 x'0), (IHeval2 y'0); auto.
     Qed.
-
 
     Lemma and_idem: forall (A: Prop), A -> A/\A.
     Proof. auto. Qed.
@@ -403,10 +397,10 @@ Section Params.
       intros x y H.
       cut ((forall A B x', eval A B x x' -> exists2 y', eval A B y y' & x'==y')
               /\ (forall A B y', eval A B y y' -> exists2 x', eval A B x x' & y'==x')); [tauto| ].
-      induction H; (apply and_idem || split); intros A B xe Hx; 
+      induction H; (apply and_idem || split); intros A B xe Hx;
         eval_inversion; split_IHeval;
         eauto with algebra; eauto 3 using equal_trans.
-
+      
       (* plus idem *)
       eexists; eauto.
       rewrite (eval_inj H0 H1); apply plus_idem.
@@ -435,7 +429,7 @@ Section Params.
   Proof.
     intros; split; intro.
     apply eval_var_inv; assumption.
-    intuition; subst; rewrite H0; constructor.
+    intuition; subst. apply JMeq_eq in H0. rewrite H0; constructor.
   Defined.
 End Params.
 End FreeEval.

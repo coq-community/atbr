@@ -605,10 +605,6 @@ Section Params.
     Implicit Arguments eval [].
     Hint Local Constructors eval.
   
-    (* besoin de l'astuce de Mathieu Sozeau pour faire passer les lemmes d'inversion ci-dessous *)
-    Tactic Notation "dependent" "destruction" ident(H) :=
-      do_depind' ltac:(fun hyp => (*elim_case hyp ||*) case hyp) H.
-  
     (* lemmes d'inversion du prédicat d'évaluation *)
     Lemma eval_dot_inv: forall A C x y z, eval A C (Free.dot x y) z -> 
       exists B, exists x', exists y', JMeq z (x'*y') /\ eval A B x x' /\ eval B C y y'.
@@ -649,7 +645,7 @@ Section Params.
     Ltac destruct_or_rewrite H := 
     (* c'est pas tres satisfaisant, mais un coup il faut faire destruct, un coup case, 
        un coup rewrite, et parfois subst...  *)
-      subst; try ((rewrite H || case H); clear H).
+      subst; try apply JMeq_eq in H; try ((rewrite H || case H); clear H).
   
     (* inversion récursive d'hypothèses d'évaluation *)
     Ltac eval_inversion :=

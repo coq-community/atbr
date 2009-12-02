@@ -118,12 +118,7 @@ Section Params.
     | e_var: forall i, @eval (s i) (t i) (Free.var i) (f i).
     Implicit Arguments eval [].
     Hint Local Constructors eval.
-  
-
-    (* besoin de l'astuce de Mathieu Sozeau pour faire passer les lemmes d'inversion ci-dessous *)
-    Tactic Notation "dependent" "destruction" ident(H) :=
-      do_depind' ltac:(fun hyp => (*elim_case hyp ||*) case hyp) H.
-  
+    
     Lemma eval_dot_inv: forall A C x y z, eval A C (Free.dot x y) z -> 
       exists B, exists x', exists y', JMeq z (x'*y') /\ eval A B x x' /\ eval B C y y'.
     Proof. intros. dependent destruction H. eauto 6. Qed.
@@ -147,9 +142,12 @@ Section Params.
       with eval_inversion_aux hyp t :=
         let H1 := fresh in 
           match t with 
-            | Free.one => destruct (eval_one_inv hyp) as [H1 ?H]; subst; try rewrite H1
-            | Free.dot _ _ => destruct (eval_dot_inv hyp) as (?B & ?x & ?y & H1 & ?H & ?H); subst; try rewrite H1
-            | Free.var _ => destruct (eval_var_inv hyp) as (H1 & ?H & ?H); subst; try rewrite H1
+            | Free.one => destruct (eval_one_inv hyp) as [H1 ?H]; subst; 
+              try (apply JMeq_eq in H1; rewrite H1)
+            | Free.dot _ _ => destruct (eval_dot_inv hyp) as (?B & ?x & ?y & H1 & ?H & ?H); subst; 
+              try (apply JMeq_eq in H1; rewrite H1)
+            | Free.var _ => destruct (eval_var_inv hyp) as (H1 & ?H & ?H); subst; try 
+              (apply JMeq_eq in H1; rewrite H1)
           end; clear hyp.
 
   
@@ -221,8 +219,8 @@ Section Params.
   }.
   Proof.
     intros; split; intro.
-    apply eval_var_inv; assumption.
-    intuition; subst; rewrite H0; constructor.
+    apply eval_var_inv; assumption. 
+    intuition; subst. apply JMeq_eq in H0; subst. constructor.
   Defined.
 End Params.
 End FreeEval.

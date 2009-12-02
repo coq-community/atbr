@@ -782,10 +782,10 @@ Section Correction.
   Proof.
     apply theta_rho; eauto using rho_wf, initiaux_initial. 
   Qed.
-
+  
   Lemma eq_nat_dec_eq i j: is_true (eq_nat_dec i j) <-> i=j. 
   Proof.
-    intros i j. destruct_nat_dec; simpl; firstorder. discriminate.
+    intros i j. destruct_nat_dec; simpl. firstorder. firstorder. inversion H.
   Qed.
 
   Lemma and_com P Q: P /\ Q <-> Q /\P.

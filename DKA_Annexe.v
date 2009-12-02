@@ -76,7 +76,7 @@ Section Protect.
     destruct x. constructor; reflexivity.
     destruct H. constructor; auto.
     destruct H. 
-    (* do_depind' ltac:(fun hyp => case hyp) H0. *)
+    (* do_depind ltac:(fun hyp => case hyp) H0. *)
      dependent destruction H0.
      constructor; eauto using (Graph.equal_trans (G:=@mx_Graph KAF_Graph)).
   Qed.
