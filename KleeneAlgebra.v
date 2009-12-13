@@ -390,7 +390,7 @@ Section Params.
     Ltac destruct_or_rewrite H := 
     (* c'est pas tres satisfaisant, mais un coup il faut faire destruct, un coup case, 
        un coup rewrite, et parfois subst...  *)
-      subst; try apply JMeq_eq in H; try ((rewrite H || case H); clear H).
+      subst; try ((rewrite H || case H); clear H).
   
     (* inversion récursive d'hypothèses d'évaluation *)
     Ltac eval_inversion :=
@@ -556,7 +556,7 @@ Section Params.
       (* star_destruct_left lr *)
       eexists; eauto. eval_injection.
       apply star_destruct_left; unfold leq. 
-      destruct (proj1 IHsequal _ _ (x2*y+y)) as [ y1 ? Hy1 ]; auto.
+      destruct (proj1 IHsequal _ _ (x0*y+y)) as [ y1 ? Hy1 ]; auto.
       rewrite Hy1. eval_injection. reflexivity.
 
       (* star_destruct_left rl *)
@@ -565,12 +565,12 @@ Section Params.
       destruct (eval_type_inj_left H4 H6) as [HB | Hz]; [ destruct HB | rewrite Hz in H; discriminate ].
       eexists; eauto. eval_injection.
       symmetry; apply star_destruct_left; unfold leq.
-      rewrite <- H2. symmetry; assumption.
+      symmetry; assumption.
 
       (* star_destruct_right lr *)
       eexists; eauto. eval_injection.
       apply star_destruct_right; unfold leq. 
-      destruct (proj1 IHsequal _ _ (x1*x2+x1)) as [ y1 ? Hy1 ]; auto.
+      destruct (proj1 IHsequal _ _ (x1*x0+x1)) as [ y1 ? Hy1 ]; auto.
       rewrite Hy1. eval_injection. reflexivity.
 
       (* star_destruct_left rl *)
@@ -579,7 +579,7 @@ Section Params.
       destruct (eval_type_inj_right H4 H5) as [HB | Hz]; [ destruct HB | rewrite Hz in H; discriminate ].
       eexists; eauto. eval_injection.
       symmetry; apply star_destruct_right; unfold leq.
-      rewrite <- H2. symmetry; assumption.
+      symmetry; assumption.
 
       (* sequal_trans *)
       split_IHeval; eauto using equal_trans.

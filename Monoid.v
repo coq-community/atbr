@@ -220,7 +220,7 @@ Section Params.
   Proof.
     intros; split; intro.
     apply eval_var_inv; assumption. 
-    intuition; subst. apply JMeq_eq in H0; subst. constructor.
+    intuition; subst; rewrite H0; constructor.
   Defined.
 End Params.
 End FreeEval.

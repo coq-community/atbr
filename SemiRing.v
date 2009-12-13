@@ -645,7 +645,7 @@ Section Params.
     Ltac destruct_or_rewrite H := 
     (* c'est pas tres satisfaisant, mais un coup il faut faire destruct, un coup case, 
        un coup rewrite, et parfois subst...  *)
-      subst; try apply JMeq_eq in H; try ((rewrite H || case H); clear H).
+      subst; try ((rewrite H || case H); clear H).
   
     (* inversion récursive d'hypothèses d'évaluation *)
     Ltac eval_inversion :=

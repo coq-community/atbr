@@ -314,8 +314,7 @@ Section Params.
           match t with 
             | Free.zero => pose proof (eval_zero_inv hyp); subst
             | Free.plus _ _ => destruct (eval_plus_inv hyp) as (?x & ?y & H1 & ?H & ?H); try rewrite H1
-            | Free.var _ => destruct (eval_var_inv hyp) as (H1 & ?H & ?H); subst; try apply JMeq_eq in H1; 
-              try rewrite H1
+            | Free.var _ => destruct (eval_var_inv hyp) as (H1 & ?H & ?H); subst; try rewrite H1
           end; clear hyp.
 
     (* semi-injectivité du typage de l'evalutation : pour les nettoyés seulement *)
@@ -429,7 +428,7 @@ Section Params.
   Proof.
     intros; split; intro.
     apply eval_var_inv; assumption.
-    intuition; subst. apply JMeq_eq in H0. rewrite H0; constructor.
+    intuition; subst; rewrite H0; constructor.
   Defined.
 End Params.
 End FreeEval.
