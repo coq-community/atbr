@@ -63,7 +63,7 @@ Section Defs.
 
      apply mxgraph_functor.
  
-     simpl. intros. destruct B as [m B]; simpl fst in *.
+     simpl. intros. destruct B as [m B]; simpl @fst in *.
      rewrite functor_sum. apply sum_compat. intros. apply functor_dot. 
 
      simpl. intros. destruct_nat_dec.
@@ -115,7 +115,7 @@ Section Defs.
 
      change (S n) with (1+n)%nat.
      rewrite functor_makeMat_blocks. 
-     rewrite functor_plus. 
+     rewrite functor_plus.
      rewrite !functor_dot.
      rewrite !functor_scal_to_Mat.
      rewrite functor_star.

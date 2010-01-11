@@ -46,7 +46,9 @@ Section Protect.
 
   Definition var i : KAF := Free.var i.
 
-  Definition convert n m: BMX(n,m) -> KMX(n,m) := mxF convert (n,tt) (m,tt).
+  Definition bool_convert := (BoolAlg.convert (G:=KAF_Graph) (t:=tt)).
+
+  Definition convert n m: BMX(n,m) -> KMX(n,m) := mxF bool_convert (n,tt) (m,tt).
 
   Definition convert_sum n k (f: nat -> BMX(n,n)) := 
     SemiLattice.sum 0 k (fun i => dot_scal_left (var i) (convert (f i))).
@@ -57,7 +59,7 @@ Section Protect.
     (@equal (@mx_Graph KAF_Graph)  (n,tt) (m,tt)))
   (@convert n m).
   Proof.
-    intros. apply (functor_compat (F:=mxF (BoolAlg.convert (G:=KAF_Graph) (t:=tt))) (A:=(n,tt)) (B:=(m,tt))).
+    intros. refine (functor_compat (F:=mxF bool_convert) (A:=_) (B:=_)). 
   Qed.
 
   Lemma convert_blocks : forall n m p q ( a : BMX (n,p)) (b : BMX (n,q)) (c : BMX (m,p)) (d: BMX(m,q)) , 
@@ -68,26 +70,26 @@ Section Protect.
   
   Lemma convert_plus n m (a b : BMX(n,m)) : convert (a + b) == convert a + convert b. 
   Proof.
-    intros. apply (functor_plus (F:=mxF (BoolAlg.convert (G:=KAF_Graph) (t:=tt))) a b).
+    intros. apply (functor_plus (F:=mxF bool_convert) a b).
   Qed.
   
   Lemma convert_dot n m p (a : BMX(n,m))  (b : BMX(m,p)): convert (a * b) == convert a * convert b.
-    intros. apply (functor_dot (F:=mxF (BoolAlg.convert (G:=KAF_Graph) (t:=tt))) a b).
+    intros. apply (functor_dot (F:=mxF bool_convert) a b).
   Qed.
   
   Lemma convert_star n (a : BMX (n,n)): convert (a#) == (convert a) #.
   Proof.
-    intros. apply (functor_star (F:=mxF (BoolAlg.convert (G:=KAF_Graph) (t:=tt))) a).
+    intros. apply (functor_star (F:=mxF bool_convert) a).
   Qed.
   
   Lemma convert_zero n m : convert (0 : BMX (n,m)) == 0.
   Proof. 
-    intros. apply (functor_zero (F:=mxF (BoolAlg.convert (G:=KAF_Graph) (t:=tt))) (n,tt) (m,tt)).
+    intros. apply (functor_zero (F:=mxF bool_convert) (n,tt) (m,tt)).
   Qed.
   
   Lemma convert_one n : convert (1 : BMX (n,n)) == 1.
   Proof. 
-    intros. apply (functor_one (F:=mxF (BoolAlg.convert (G:=KAF_Graph) (t:=tt))) (n,tt)).
+    intros. apply (functor_one (F:=mxF bool_convert) (n,tt)).
   Qed.
 
   

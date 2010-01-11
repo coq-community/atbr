@@ -349,16 +349,14 @@ Section Correction.
   Notation finaux := (N_finaux A).
   Notation max_label := (N_max_label A).
 
-
   (* d contient la transition np -a-> nq *)
   Definition MapsTo2 (np: state) (a: label) (nq: state) (d: Delta) := 
     (exists2 dp, StateMap.MapsTo np dp d & LabelMap.MapsTo a nq dp).
-  
+
   (* égalité sur les listes (SetoiList.InA inliné) *)
   Inductive In_list: Todo -> list Todo -> Prop :=
   | In_head: forall p p' np q, StateSet.Equal p p' -> In_list (p,np) ((p',np)::q)
   | In_tail: forall pnp x q, In_list pnp q -> In_list pnp (x::q).
-
 
   (* invariant de la fonction explore *)
   Record invariant_explore next table todo d := {
@@ -408,7 +406,7 @@ Section Correction.
     intros a s t H. unfold delta_set', delta_set.
     rewrite StateSetOrdProp.fold_equal. reflexivity. 3: assumption. 
     constructor; repeat intro; stateset_dec.
-    intros x x' y y' <- Hy. rewrite Hy. reflexivity. 
+    intros x x' -> y y' Hy. rewrite Hy. reflexivity. 
   Qed.  
 
 
@@ -465,7 +463,7 @@ Section Correction.
        intros a nq Ha.
        rewrite StateMapFact.add_mapsto_iff in Ha. intuition. subst. assumption.
 
-      (* on ajoute un nouvel etat *)
+       (* on ajoute un nouvel etat *)
       inversion Heqit. subst. clear Heqit.
       destruct IH. destruct iel_ie0. constructor. constructor.  
        (* table_wf *)
@@ -785,7 +783,7 @@ Section Correction.
   
   Lemma eq_nat_dec_eq i j: is_true (eq_nat_dec i j) <-> i=j. 
   Proof.
-    intros i j. destruct_nat_dec; simpl. firstorder. firstorder. inversion H.
+    intros i j. destruct_nat_dec; simpl. firstorder. firstorder. 
   Qed.
 
   Lemma and_com P Q: P /\ Q <-> Q /\P.
@@ -899,7 +897,7 @@ Section Correction.
     split.
     
      intros (p&Hpi&Hp).
-     setoid_rewrite <- StateSetFact.exists_iff in Hp. 2:(unfold compat_bool; intuition stateset_dec).
+     setoid_rewrite <- StateSetFact.exists_iff in Hp. 2:(unfold compat_bool, Proper; intuition stateset_dec).
      destruct Hp as (j&Hj&Hj').
      rewrite <- StateSetFact.mem_iff in Hj'. 
      exists j. repeat split; trivial.
@@ -909,12 +907,12 @@ Section Correction.
      intros (j&Hj&Hji&Hjf).
      exists (theta i). split.
       apply rho_theta. trivial.
-      rewrite <- StateSetFact.exists_iff. 2:(unfold compat_bool; intuition stateset_dec).
+      rewrite <- StateSetFact.exists_iff. 2:(unfold compat_bool, Proper; intuition stateset_dec).
       exists j. split; trivial.
       rewrite <- StateSetFact.mem_iff. trivial.
 
     intros s t H. apply bbool_view. 
-    rewrite <- 2StateSetFact.exists_iff by (unfold compat_bool; intuition stateset_dec).
+    rewrite <- 2StateSetFact.exists_iff by (unfold compat_bool, Proper; intuition stateset_dec).
     (split; intros [x Hx]; exists x); [rewrite <- H| rewrite H]; auto.  
   Qed.
   

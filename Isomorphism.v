@@ -112,8 +112,8 @@ Proof.
   destruct eqA_dec. 
   inversion H0; subst. elim H3. 
   (* setoid_rewrite manquant dans InA *)
-  eapply InA_eqA. auto. auto. apply e. 
-  apply In_InA. auto. apply nth_In. simpl in H. apply lt_S_n. auto.
+  rewrite <- e. apply In_InA. constructor; eauto. apply nth_In.
+  apply lt_S_n. auto.
   rewrite IHL. reflexivity. inversion H0. auto. omega.
 Qed.
 

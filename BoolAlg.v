@@ -181,7 +181,7 @@ Section Def.
     Lemma bool_sum_spec i k (f : nat -> @X bool_Graph tt tt): is_true (sum i k f) <-> exists j, (i <= j /\ j < i+k /\ is_true (f j)).
     Proof.
       intros i k f. revert i. induction k; intro i.
-      split; intros. discriminate. destruct H; intuition. elimtype False; omega.
+      split; intros. discriminate. destruct H; intuition. 
 
       rewrite sum_enter_right.
       rewrite bool_plus_spec.
@@ -192,18 +192,6 @@ Section Def.
        intros (j&?&?&?). destruct (eq_nat_dec j (i+k)).
         subst. auto.
         left. exists j; auto with omega.
-
-(*       simpl. *)
-(*       split; intros. *)
-(*       induction k. discriminate. *)
-  
-(*       apply bool_plus_one in H. *)
-(*       destruct H. *)
-(*        intuition. destruct H0 as [j ?]. exists j; intuition omega. *)
-(*        exists (i+k)%nat. auto with omega. *)
-      
-(*       apply leq_antisym. destruct (sum i k f); reflexivity.  *)
-(*       apply leq_sum. destruct H. exists x. intuition. *)
     Qed.
 
   End bool_sum.
@@ -291,12 +279,12 @@ Section Def.
       unfold star_rec; fold star_rec.
       unfold star, bool_Star_Op, star_build.
       change (S n) with (1+n)%nat.
-      rewrite <- scal_to_Mat_one.
+      rewrite <- scal_to_Mat_one at -1.
       apply makeMat_blocks_compat; unfold fst, snd.
-       reflexivity.
+        reflexivity.
        (* bizarre, les trois sous-buts se condensaient mieux avant *)
        rewrite dot_neutral_left. rewrite mx_force_id. rewrite mxbool_dot_dot, mx_force_id, IHn. reflexivity.      
-       rewrite dot_neutral_right. rewrite mx_force_id. rewrite mxbool_dot_dot, mx_force_id, IHn. reflexivity.      
+       rewrite dot_neutral_right. rewrite mx_force_id. rewrite mxbool_dot_dot, mx_force_id, IHn. reflexivity.
        rewrite dot_neutral_right, mxbool_plus_plus. rewrite mxbool_dot_dot. rewrite mx_force_id at 1.
        rewrite mx_force_id at 1. rewrite mxbool_dot_dot. rewrite mx_force_id at 1. rewrite IHn at 1 2. 
        rewrite mx_force_id at 1. rewrite mxbool_dot_dot. rewrite mx_force_id at 1. rewrite IHn. reflexivity.

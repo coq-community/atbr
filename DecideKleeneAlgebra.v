@@ -153,7 +153,7 @@ Section Protect.
     intros [a J M U V k]. unfold eval_b, eval_M, bAut_to_MAut; simpl.
     repeat apply dot_compat; trivial.
     rewrite mx_force_id. rewrite mxbool_dot_dot. rewrite mx_force_id. rewrite mxbool_star_star. reflexivity.
-    apply star_compat, plus_compat; trivial.
+    apply star_compat. apply plus_compat. trivial.
     apply sum_compat. intros n H.
     refine (dot_scal_left_compat _ _); auto with typeclass_instances.  
     rewrite Force.id_id by assumption. 

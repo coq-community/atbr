@@ -39,7 +39,7 @@ Section Protect.
   }.
 
   Instance Prop_Converse_Op: Converse_Op := { 
-    converse A B x := x
+    conv A B x := x
   }.
   
   Instance Prop_SemiLattice: SemiLattice.

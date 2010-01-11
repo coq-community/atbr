@@ -232,7 +232,7 @@ Section Protect.
      setoid_rewrite convert_blocks. setoid_rewrite convert_zero.
      rewrite sum_enter_right. rewrite sum_zero. rewrite dot_scal_left_compat_blocks. rewrite 2 plus_neutral_left.
      refine (makeMat_blocks_compat _ _ _ _); try apply (dot_scal_left_zero (G:=KAF_Graph)).
-     rewrite dot_scal_left_is_dot. rewrite <- (dot_neutral_right (scal_to_Mat (var a))) at 2.
+     rewrite dot_scal_left_is_dot. rewrite <- (dot_neutral_right (scal_to_Mat (var a))).
      apply dot_compat; trivial. Transparent equal. intros [|] [|] Hi Hj; try omega_false. Opaque equal.
      simpl. destruct_nat_dec. compute. reflexivity. 
      intros m Hm. simpl. destruct_nat_dec. simpl. rewrite convert_zero.

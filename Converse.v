@@ -71,7 +71,7 @@ Section ISR.
     intros. switch. apply dot_distr_left_c.
   Qed.
 
-  Global Instance conv_incr:
+  Global Instance conv_incr A B:
   Proper ((leq A B) ==> (leq B A)) (conv A B).
   Proof.
     unfold leq.

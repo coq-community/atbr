@@ -356,7 +356,6 @@ Proof.
   remember (f a) as b; destruct b.  left. auto with set. 
   right. apply (StateSet.filter_3 (f:= fun x => negb (f x))); auto. 
   revert H. StateSetFact.set_iff. intuition  (eapply StateSet.filter_1; [| eassumption]; repeat intro; subst; auto).
-  rewrite <- H. reflexivity. 
 Qed.
 
 Lemma inter_partition : forall f x t u, compat_bool (@eq StateSet.elt ) f -> 
@@ -373,7 +372,8 @@ Proof.
   rewrite <- Ht, <-Hu in H. clear Ht Hu.
   set (g := fun x => negb (f x)).
   
-  assert (Hdiscr : f a = true /\ g a = true).   destruct H as [Haf Hag]; split;  eapply StateSet.filter_2; eauto.
+  assert (Hdiscr : f a = true /\ g a = true).
+  destruct H as [Haf Hag]; split;  eapply StateSet.filter_2; subst g; eauto. 
   subst g. destruct Hdiscr as [Haf Hag]. destruct Haf. destruct (f a); simpl in Hag; discriminate.
 Qed.
 
@@ -399,15 +399,17 @@ Definition eq_option_stateset_X_stateset (a b : (option (StateSet.t * StateSet.t
   end.
 
 Hint Unfold eq_option_stateset_X_stateset.
+Hint Extern 5 (StateSet.eq _ _) => now symmetry.
+Hint Unfold compat_bool.
 
 Global Instance eq_option_stateset_X_stateset_compat : Equivalence eq_option_stateset_X_stateset.
-Opaque StateSet.eq.
-split; compute; intuition. 
-destruct x; intuition auto. 
-destruct y; destruct x; intuition auto.
+Opaque StateSet.eq. unfold eq_option_stateset_X_stateset.
+split; red; intros.
+destruct x; intuition auto.
+destruct y; destruct x; intuition auto. 
 destruct z; destruct y; destruct x; intuition auto.
-  destruct p1; destruct p0; destruct p; eauto.
-  destruct p1; destruct p0; destruct p; eauto.
+  transitivity (fst p0); auto.
+  transitivity (snd p0); auto.
 Defined.
 
 Global Instance stateset_is_empty_compat : Proper (StateSet.eq ==> @eq bool) (StateSet.is_empty).
@@ -425,9 +427,9 @@ Proof.
   unfold stateset_X_stateset_eq.
   repeat intro. 
   split. rewrite 2 StateSet.partition_1; auto.
-  apply StateSetFact.filter_ext; auto.
-  rewrite 2 StateSet.partition_2; auto.
   apply StateSetFact.filter_ext; auto. 
+  rewrite 2 StateSet.partition_2; auto.
+  apply StateSetFact.filter_ext; auto. intro. intros. subst. auto.
   intros. rewrite H. reflexivity.
 Qed.
 
@@ -463,7 +465,6 @@ Proof.
     right. eapply StateSet.filter_3; auto. 
     
   revert H. StateSetFact.set_iff. intuition  (eapply StateSet.filter_1; [| eassumption]; repeat intro; subst; auto).
-  rewrite H. reflexivity. 
 Qed.
 
 Lemma partition_inter f p :  compat_bool StateSet.E.eq f ->

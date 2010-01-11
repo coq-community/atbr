@@ -249,7 +249,7 @@ Proof.
   case_eq (StateSet.is_empty u); 
   case_eq (StateSet.is_empty v); intros Heu Hev; rewrite Heu, Hev in H; simpl in H; 
     try solve [
-      (unfold eq_option_stateset_X_stateset in H; simpl in H; intuition)].
+      (unfold eq_option_stateset_X_stateset in H; simpl in H; intuition auto)].
   
   assert (StateSet.Empty p). 
   rewrite H2. clear - Heu Hev.  
@@ -283,7 +283,7 @@ Proof.
   
   case_eq (StateSet.is_empty (fst part));
   case_eq (StateSet.is_empty (snd part));
-  intros; unfold orb; intuition (reflexivity || auto with set). 
+  intros; unfold orb; intuition (reflexivity || auto with set).
   apply StateSet.is_empty_1 in H2. rewrite H2 in H0. discriminate.
   apply StateSet.is_empty_1 in H2. rewrite H2 in H. discriminate.
 Qed.
@@ -435,7 +435,7 @@ Instance P2mset_compat : Proper (StateSetSet.Equal ==> meq) P2mset.
 Proof.
   intros x y Hxy. unfold P2mset. 
   apply (StateSetSetOrdProp.fold_equal meq_Equivalence); auto.
-  intros a b u v Hab Huv. apply union_morph; auto with multisets. apply singleton_morph. rewrite Hab. reflexivity.
+  intros a b Hab u v Huv. apply union_morph; auto with multisets. apply singleton_morph. rewrite Hab. reflexivity.
 Qed.
 
 Lemma P2mset_add_1 x P :~In_P x P -> P2mset (sadd x P)  =mul= {{StateSet.cardinal x}} + P2mset P.
@@ -443,7 +443,7 @@ Proof.
 intros. 
 unfold P2mset at 1. rewrite StateSetSetProp.fold_add. reflexivity.  
 apply meq_Equivalence.
-intros a b u v Hab Huv. apply union_morph; auto with multisets. apply singleton_morph. rewrite Hab. reflexivity.
+intros a b Hab u v Huv. apply union_morph; auto with multisets. apply singleton_morph. rewrite Hab. reflexivity.
 unfold transpose. intros.  setoid_rewrite union_assoc. apply union_morph; auto with multisets.  
 auto.
 Qed.
@@ -453,7 +453,7 @@ Proof.
 intros. 
 unfold P2mset at 1. rewrite StateSetSetProp.add_fold. reflexivity.  
 apply meq_Equivalence.
-intros a b u v Hab Huv. apply union_morph; auto with multisets. apply singleton_morph. rewrite Hab. reflexivity.
+intros a b Hab u v Huv. rewrite Hab, Huv. reflexivity.
 unfold transpose. intros. setoid_rewrite union_assoc. apply union_morph; auto with multisets.  
 auto.
 Qed.
@@ -1151,7 +1151,7 @@ End f''.
 Lemma preserving_update_splitters  p pf pt : preserving (f_update_splitters p pf pt).
   unfold preserving.
   unfold f_update_splitters; intros; Label_x_StateSetSet_Fact.set_iff; simpl.
-  assert (forall a b c q, (a /\ (b \/ c))\/ q <-> ((a /\ b) \/ ((a /\c) \/ q))) by firstorder.
+  assert (forall a b c q, (a /\ (b \/ c))\/ q <-> ((a /\ b) \/ ((a /\c) \/ q))) by firstorder auto.
   setoid_rewrite <- H0.
   split; [intros [[H' _] | [H' _]] ; intuition | intro; right; intuition]. 
    
@@ -1161,10 +1161,10 @@ Lemma compat_eq_update_splitters p pf pt : compat_eq (f_update_splitters p pf pt
 Proof. 
   unfold compat_eq.
   unfold f_update_splitters; intros; Label_x_StateSetSet_Fact.set_iff; simpl.
-  assert (or_iff :forall a b c , (b <-> c) -> ( a \/ b <-> a \/ c)) by firstorder.
+  assert (or_iff :forall a b c , (b <-> c) -> ( a \/ b <-> a \/ c)) by firstorder auto.
     
   do 2 apply or_iff.
-  assert (and_iff : forall a b c , (b <-> c) -> ( b /\ a <-> c /\ a)) by firstorder. 
+  assert (and_iff : forall a b c , (b <-> c) -> ( b /\ a <-> c /\ a)) by firstorder auto. 
   apply and_iff. 
   apply H.
 Qed.
@@ -1187,7 +1187,7 @@ Proof.
   intros x y H u v H'. subst. unfold f_update_splitters. rewrite H'. reflexivity.
   intros i j acc H. unfold f_update_splitters.
   intros [k l]. Label_x_StateSetSet_Fact.set_iff. unfold fst, snd.
-  assert (forall a b c q, (a /\ (b \/ c))\/ q <-> ((a /\ b) \/ ((a /\c) \/ q))) by firstorder.
+  assert (forall a b c q, (a /\ (b \/ c))\/ q <-> ((a /\ b) \/ ((a /\c) \/ q))) by firstorder auto.
   setoid_rewrite <- H0.   setoid_rewrite <- H0. clear H0.
  
  
@@ -1264,7 +1264,7 @@ Proof.
   (* It remains to show what happens when p \in {s,t} *)
   assert (StateSetSet.E.eq p s \/ StateSetSet.E.eq p t). clear - Hp HxQ Hp' Hp''. fsetsetdec. 
 
-  destruct (Label_x_StateSetSet.E.eq_dec  (a,q) (b,r)).
+  destruct (Label_x_StateSetSet.E.eq_dec  (a,q) (b,r)) as [e|n]. 
   destruct e as [Hab Hqr]; simpl in Hab, Hqr. rewrite <- Hab , <- Hqr in Huv; clear Hab Hqr.
   byContradiction. elim H; intro H'; change StateSetSet.E.eq with StateSet.eq in H'; rewrite H' in Huv.
   apply splittable_4 in Hst. destruct Hst as [Hs _].  rewrite Hs in Huv. clear - Huv. auto.
@@ -1301,7 +1301,7 @@ Proof.
   destruct (StateSetSetProp.In_dec r P).
   assert (In_L (b,r) (ladd (a,q) L)). eapply (Hspp p); eauto. fsetsetdec. 
   revert H. Label_x_StateSetSetFact.set_iff. intros [Heq | Hneq]. left. assumption. right. eapply In_update_splitters. apply Hr. auto. intros. assumption.
-  destruct (Label_x_StateSetSet.E.eq_dec (a,q) (b,r) );
+  destruct (Label_x_StateSetSet.E.eq_dec (a,q) (b,r) ) as [e|n'];
   Label_x_StateSetSetFact.set_iff. left. apply e. 
   right. eapply In_update_splitters; auto. apply Hr. intro. byContradiction. auto.
 Qed.
@@ -1330,7 +1330,7 @@ Proof.
   assert (In_L (b,r) (ladd (a,q) L)). eapply (Hspp p); eauto.  
     rewrite <- Hxp. auto.
     
-  destruct (Label_x_StateSetSet.E.eq_dec  (a,q) (b,r)).
+  destruct (Label_x_StateSetSet.E.eq_dec  (a,q) (b,r)) as [e|n].
     byContradiction. assert (None =o= Some uv). rewrite <- Hsplit, <- Huv. clear Hsplit Huv. rewrite Hxp.
       unfold Label_x_StateSetSet.E.eq in e. simpl in e. rewrite (proj1 e) , (proj2 e). reflexivity. auto.
     revert H; Label_x_StateSetSetFact.set_iff. intros [e | Hbr]; [byContradiction | auto]. apply n. apply e.
