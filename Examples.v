@@ -229,7 +229,6 @@ Section Matrices.
   (** Dummy lemma, notice overloading of notations for [*] *)
   Lemma square_constant A (a: X A A): constant a * constant a == constant (a*a).
   Proof. 
-    intros A a.
     (** since the dimensions are known (and finite), the matricial product can be computed *)
     simpl.                     
     (** the [mx_intros] simple tactic introduce indices to prove a
@@ -253,7 +252,6 @@ Section Matrices.
   Lemma square_triangular_blocks A n m (M: MX(n,A)(n,A)) (N: MX(n,A)(m,A)) (P: MX(m,A)(m,A)):
     makeMat_blocks M N 0 P * makeMat_blocks M N 0 P == makeMat_blocks (M*M) (M*N+N*P) 0 (P*P).
   Proof.
-    intros.
     rewrite Mat_blocks_dot.
     apply makeMat_blocks_compat; semiring_reflexivity.
   Qed.

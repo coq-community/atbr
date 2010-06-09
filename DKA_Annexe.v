@@ -185,7 +185,7 @@ Section Protect.
 
   Lemma merge_DFAs_wf A B: DFA_wf A -> DFA_wf B -> D_max_label A = D_max_label B -> DFA_wf (merge_DFAs A B).
   Proof.
-    intros A B (HAi&HAf&HAd) (HBi&HBf&HBd) H.
+    intros (HAi&HAf&HAd) (HBi&HBf&HBd) H.
     repeat split; simpl.
     omega.
     apply merge_below; assumption.
@@ -214,7 +214,7 @@ Section Protect.
 
   Lemma eval_empty_initial A: eval_M (empty_initial_M A) == 0.
   Proof.
-    intro. unfold eval_M. simpl. semiring_reflexivity.
+    unfold eval_M. simpl. semiring_reflexivity.
   Qed.
 
   Lemma merge_DFAs_b A B u: DFA_wf A -> D_max_label A = D_max_label B -> 
@@ -222,7 +222,7 @@ Section Protect.
       (DFA_to_bAut (change_initial_D (merge_DFAs A B) u))
       (change_initial_b (bPlus (DFA_to_bAut A) (DFA_to_bAut B)) u).
   Proof.
-    intros A B u (HAi&HAf&HAd) H. constructor; trivial; simpl.
+    intros (HAi&HAf&HAd) H. constructor; trivial; simpl.
     apply (zero_makeMat_blocks (G:=bool_Graph)).
     rewrite <- H, Max.max_l by trivial.
     intros a Ha. 
@@ -248,7 +248,7 @@ Section Protect.
       (change_initial_M (bAut_to_MAut A) u) 
       (bAut_to_MAut (change_initial_b A u)).
   Proof.
-    intros. constructor; simpl; trivial.
+    constructor; simpl; trivial.
   Qed.
 
   Global Instance change_initial_M_compat: Proper (MAut_eq ==> @eq nat ==> MAut_eq) change_initial_M.

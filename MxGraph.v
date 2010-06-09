@@ -252,7 +252,7 @@ Section Props.
   Lemma makeMat_blocks_degenerate_00 (a: MX(S O,A)(S O,B)) b c (d: MX(O,A)(O,B)):
     makeMat_blocks a b c d == a.
   Proof.
-    intros a b c d [|] [|] Hi Hj; try omega_false. reflexivity. 
+    intros [|] [|] Hi Hj; try omega_false. reflexivity.
   Qed.
 
 

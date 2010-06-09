@@ -91,7 +91,7 @@ Section Defs.
 
   Lemma mx_star_compat nA: forall (M N: MX nA nA), M==N -> M# == N# .
   Proof.
-    intros [n A] M N; unfold star, mx_Star_Op; induction n; intro.
+    destruct nA as [n A]; intros M N; unfold star, mx_Star_Op; induction n; intro.
     assumption.
     unfold fst, snd in *.
     simpl star_rec. unfold star_build.
@@ -122,7 +122,7 @@ Section Defs.
     prop_star_make_left sn ->
     prop_star_make_left (@star_build A x n sx sn).
   Proof.
-    intros x n A sx sn Hx Hn M.
+    intros Hx Hn M.
     unfold star_build.
     set (a := sub00 M).
     set (b := sub01 M).
@@ -157,8 +157,8 @@ Section Defs.
 
   Lemma mx_star_make_left nA (M: MX nA nA): 1 + M# * M == M#. 
   Proof.
-    intros [n A]; unfold star, mx_Star_Op, fst, snd.
-    induction n.
+    destruct nA as [n A]; unfold star, mx_Star_Op, fst, snd.
+    revert M; induction n.
 
     intros M i j Hi Hj; inversion Hi.
  
@@ -173,7 +173,6 @@ Section Defs.
   Lemma mx_star_block_make_left A x n (M: MX(x+n,A)%nat(x+n,A)%nat):
     Mone(_,A) + mx_star_block M * M == mx_star_block M. 
   Proof.
-    intros A x n.
     apply build_star_make_left; intro; unfold snd; apply mx_star_make_left.
   Qed.
 
@@ -186,8 +185,8 @@ Section Defs.
       let y := sub11 (y:=0) Y in
         a*z <== z /\ b*y <== z /\ c*z <== y /\ d*y <== y.
   Proof.
-    intros A B x n m. change m with (0+m)%nat.
-    intros. split; intro H.
+    change m with (0+m)%nat in *.
+    split; intro H.
     rewrite (decomposeMat_blocks Y) in H at 2.
     rewrite (decomposeMat_blocks Y) in H at 1.
     rewrite Mat_blocks_dot in H.
@@ -216,7 +215,7 @@ Section Defs.
     prop_star_destruct_left sn ->
     prop_star_destruct_left (@star_build A x n sx sn).
   Proof.
-    intros x n A sx sn Hx Hn [m B] M Y H.
+    intros Hx Hn [m B] M Y H.
     
     unfold star_build.
     set (a := sub00 M).
@@ -311,7 +310,7 @@ Section Defs.
         y * a <== y /\ z * c <== y /\
         y * b <== z  /\ z * d <== z.
   Proof.
-    intros A x n [m B].  change m with (0+m)%nat.
+    destruct mB as [m B].  change m with (0+m)%nat in *.
     intros. split; intro H. 
     rewrite (decomposeMat_blocks Y) in H at 2.
     rewrite (decomposeMat_blocks Y) in H at 1.
@@ -343,7 +342,7 @@ Section Defs.
     prop_star_destruct_right sn ->
     prop_star_destruct_right (@star_build A x n sx sn).
   Proof.
-    intros x n A sx sn Hx Hn [m B] M Y H.
+    intros Hx Hn [m B] M Y H.
     
     unfold star_build.
     set (a := sub00 M).
@@ -497,7 +496,7 @@ Section Defs.
 
   Lemma scal_to_Mat_compat_star (a : X A A) : scal_to_Mat (a #) ==  (scal_to_Mat a) #.
   Proof.
-    intros a [|] [|] Hi Hj; try omega_false.
+    intros [|] [|] Hi Hj; try omega_false.
     simpl. destruct_blocks. 
     rewrite plus_neutral_right. reflexivity.
     discriminate H.

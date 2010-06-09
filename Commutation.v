@@ -36,7 +36,7 @@ Section Props1.
   Theorem SemiConfluence_is_WeakConfluence A:
     forall (a b : X A A), b * a# <== a# * b#  <->  b# * a# <== a# * b#.
   Proof.
-    intros A a b; split.
+    intros a b; split.
      apply wsemicomm_iter_left. 
      intro H. rewrite <- H. kleene_reflexivity.
   Qed.
@@ -44,7 +44,7 @@ Section Props1.
   Theorem WeakConfluence_is_ChurchRosser A:
     forall (a b : X A A), b * a# <== a# * b#  <->  (a+b)# <== a# * b#.
   Proof.
-    intros A a b; split; intro H.
+    intros a b; split; intro H.
 
     star_left_induction.
     semiring_normalize. 

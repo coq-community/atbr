@@ -75,7 +75,7 @@ Module Free.
 
   Lemma insert q: forall x, equal (dot q x) (norm_aux q x).
   Proof.
-    intros q x; revert q; induction x; intro q; simpl.
+    intros x; revert q; induction x; intro q; simpl.
     rewrite dot_assoc, IHx1; apply IHx2.
     apply dot_neutral_right.
     destruct q; try reflexivity. 
@@ -319,7 +319,7 @@ Section monoid_rewrite_leq.
   Instance dot_incr_temp A B C: 
   Proper ((leq A B) ==> (leq B C) ==> (leq A C)) (dot A B C).
   Proof.
-    intros until C; unfold leq; intros x y E x' y' E'.
+    unfold leq; intros x y E x' y' E'.
     rewrite <- E, <- E'.
     rewrite dot_distr_left, 2 dot_distr_right; aci_reflexivity.
   Qed.
@@ -540,7 +540,7 @@ Qed.
 
 Lemma iter_compat `{Monoid} n A (a b: X A A): a==b -> iter a n == iter b n.
 Proof.
-  intros until n; intros A a b E; induction n; simpl.
+  intro E; induction n; simpl.
   reflexivity.
   rewrite IHn, E; reflexivity.
 Qed.

@@ -467,7 +467,7 @@ Qed.
 
 Lemma P2mset_remove P z : In_P z P -> P2mset P =mul= P2mset (StateSetSet.remove z P) + {{StateSet.cardinal z}}.
 Proof.
-  intros P z HPz.
+  intros HPz.
   rewrite <- (StateSetSetProp.add_remove HPz) at 1.
   rewrite P2mset_add_1. auto with multisets. 
   clear. fsetsetdec.
@@ -476,7 +476,6 @@ Qed.
 
 Lemma P2mset_add_3 P x y :    P2mset (sadd x (sadd y P)) =mul= P2mset P + P2mset (sadd x (StateSetSet.singleton y)[\]P).
 Proof.
-  intros P x y.
   destruct (StateSetSetProp.In_dec y P);
     destruct (StateSetSetProp.In_dec x P).
   
@@ -509,7 +508,6 @@ Notation "m << n" := (MultisetGt gt n m) (at level 70).
 
 Lemma mlt_carac m n: m<<n <-> MultisetGT gt n m.
 Proof. 
-  intros.
   apply red_eq_direct.
   compute. intros. eapply lt_trans; eassumption. 
   compute. firstorder. 
@@ -524,7 +522,7 @@ Lemma mlt_sadd_rem x y z P:
 (*   ~(StateSet.Equal x y) -> *)  (* on peut éventuellement demander ça, et le prouver dans split_lt *)
   P2mset (sadd x (sadd y (StateSetSet.remove z P))) << P2mset P.
 Proof.
-  intros x y z P Hzp Hxz Hyz.
+  intros Hzp Hxz Hyz.
   apply <- mlt_carac.
   apply MSetGT with 
     {{StateSet.cardinal z}} 
@@ -668,7 +666,7 @@ Definition refine P P' :=
 
 (** refine is a partial order *)
 Lemma refine_trans P Q R : refine P Q -> refine Q R -> refine P R.
-  unfold refine. intros P Q R [H_P_Q H_Q_P] [H_Q_R H_R_Q]. split; intros. 
+  unfold refine. intros [H_P_Q H_Q_P] [H_Q_R H_R_Q]. split; intros.
   unfold StateSetSet.Exists in *. intuition.  intuition (eauto 200).
   specialize (H_P_Q x H).  destruct H_P_Q as [xQ [In_x_Q In_xQ_Qc]].
   specialize (H_Q_R xQ In_x_Q). destruct H_Q_R.
@@ -827,7 +825,8 @@ Lemma disjoint_splittable_partition P x q u t a:
 Proof.
   
   unfold disjoint. 
-  intros P x q u v a HxP Hsplit Hdisj y z.
+  rename t into v.
+  intros HxP Hsplit Hdisj y z.
 
   assert (StateSet.Empty( StateSet.inter u v)). apply (splittable_3 DFA x q a u v); auto.
   assert (StateSet.Subset u x /\ StateSet.Subset v x).  apply (splittable_2 DFA x q a u v); auto. 
@@ -861,7 +860,6 @@ Lemma do_split_disjoint_refine P PL a q :
   (forall x, In_P x P -> In_P x (fst PL)) ->
   (disjoint_refine  (fst (do_split DFA a q P PL ))  P). 
 Proof.
-  intros P PL  a q.
   intros Hdisj Hin.
   set (Pred := fun Q (acc : T) => (forall x, In_P x ( P[\]Q) -> In_P x (fst acc)) /\ disjoint_refine (fst acc) P).
   assert (Pred P (do_split DFA a q P PL)).
@@ -1021,7 +1019,7 @@ Qed.
 
 Lemma partial_to_split_prop P L q a   : split_prop_partial P StateSetSet.empty L q a -> split_prop P L .
 Proof.
-  intros P L q a H.
+  intros H.
   destruct H as [ H _]. 
   
   unfold split_prop. 
@@ -1049,7 +1047,7 @@ Fixpoint fold_labels' T f a (acc: T) {struct a} : T :=
 
 Lemma fold_labels'_aux T a f (acc: T): fold_labels' T f (S a) acc = fold_labels' T (fun a => f (S a)) a (f 0 acc).
 Proof.
-  intros U. induction a; intros g acc.
+  revert f acc; induction a; intros g acc.
   reflexivity.
   simpl in IHa. simpl fold_labels' at 1.
   rewrite IHa. reflexivity.
@@ -1072,7 +1070,7 @@ Qed.
 Lemma fold_labels_aux a acc: 
   Label_x_StateSetSet.Equal (fold_labels f (S a) acc) (fold_labels (fun a => f (S a)) a (f 0 acc)).
 Proof.
-  induction a; intros acc.
+  induction a in acc |- *.
   reflexivity.
   simpl in *.
   rewrite IHa.
@@ -1088,7 +1086,7 @@ Section f'.
 
   Lemma fold_labels_eq a acc: Label_x_StateSetSet.Equal (fold_labels' _ f a acc) (fold_labels f a acc).
   Proof.
-    intro a. revert f Hf Hf'. induction a; intros f Hf Hf' acc.
+    revert f Hf Hf' acc. induction a; intros f Hf Hf' acc.
     reflexivity.
     rewrite fold_labels'_aux. 
     rewrite IHa; trivial. simpl.
@@ -1214,8 +1212,8 @@ Qed.
    if (b,r) is in L, then it will be in the updated version of L
    and if r == u \/ r == v, then (b,r) will be in the updated version of L wrt to (u,v)
 *)
-Lemma In_update_splitters P L x u v max_label: 
- forall r b, In_P r (sadd u (sadd v (StateSetSet.remove x P))) -> b < max_label ->  (In_P r P -> In_L (b,r) L) -> In_L (b,r) (update_splitters x u v max_label L  )
+Lemma In_update_splitters P L x u v:
+ forall max_label r b, In_P r (sadd u (sadd v (StateSetSet.remove x P))) -> b < max_label ->  (In_P r P -> In_L (b,r) L) -> In_L (b,r) (update_splitters x u v max_label L  )
 .
 Proof.
   intros.
@@ -1228,7 +1226,7 @@ Proof.
    simpl; intuition.
 Qed.
 
-Lemma In_update_splitters_2 L r b max_label x u v: 
+Lemma In_update_splitters_2 L r b : forall max_label x u v,
   b < max_label -> (StateSet.eq r u \/  StateSet.eq r v) ->  In_L (b,r) (update_splitters x u v max_label L).
 Proof.
   intros.
@@ -1248,8 +1246,8 @@ Lemma split_prop_partital_Some P Q x L q a u v :
   split_prop_partial (sadd u (sadd v (StateSetSet.remove x P))) (StateSetSet.remove x Q) (update_splitters x u v (D_max_label DFA) L) q a
   .
 Proof.
-
-  intros P Q x L q a s t HxQ Hspp Hst.
+  rename u into s; rename v into t.
+  intros HxQ Hspp Hst.
   split; intros p r b uv Hp Hr Hb Huv.
 
   (* Four cases : p in [P \ Q, {t}, {s}, Q\{x}] the last one being a contradiction with Hp *)
@@ -1312,7 +1310,7 @@ Lemma split_prop_partial_None P Q  x L q a  :
    splittable DFA x q a =o= None ->
    split_prop_partial P (StateSetSet.remove x Q) L q a. 
 Proof. 
-  intros P Q x L q a HxQ Hspp Hsplit.
+  intros HxQ Hspp Hsplit.
   split; intros p r b uv Hp Hr Hb Huv. 
   
   (* Three cases : p in [P \ Q, {x}, Q\{x}] the last one being a contradiction with Hp *)
@@ -1344,7 +1342,7 @@ Lemma do_split_split_prop_partial P L P' L' Q q a :  split_prop_partial P Q L q 
   (P',L') = do_split DFA a q  Q (P,L) -> split_prop_partial P' StateSetSet.empty L' q a.
 Proof.
 
-  intros P L P' L' Q q a HPL.
+  intros HPL.
   unfold do_split.
   set (f := (fun (p : StateSetSet.elt) (acc : T) =>
           match splittable DFA p q a with

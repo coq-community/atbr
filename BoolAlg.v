@@ -180,7 +180,7 @@ Section Def.
 
     Lemma bool_sum_spec i k (f : nat -> @X bool_Graph tt tt): is_true (sum i k f) <-> exists j, (i <= j /\ j < i+k /\ is_true (f j)).
     Proof.
-      intros i k f. revert i. induction k; intro i.
+      revert i. induction k; intro i.
       split; intros. discriminate. destruct H; intuition. 
 
       rewrite sum_enter_right.

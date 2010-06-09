@@ -136,7 +136,7 @@ Module Free.
 
   Lemma Is_zero x: is_zero x = true <-> x = zero.
   Proof.
-    intro x; destruct x; simpl; intuition discriminate.
+    destruct x; simpl; intuition discriminate.
   Qed.
 
 
@@ -797,7 +797,7 @@ Section FSumDef.
   Lemma sum_enter_right i k (f: nat -> X A B):
     sum i (S k) f == sum i k f + f (i+k)%nat.
   Proof. 
-    intros i k f; revert i; induction k; intro i.
+    revert i; induction k; intro i.
     simpl. rewrite plus_0_r; apply plus_com.
     change (sum i (S (S k)) f) with (f i + sum (S i) (S k) f).
     rewrite IHk, plus_assoc. simpl. auto with compat.
@@ -876,7 +876,7 @@ Section Props1.
   Lemma sum_zero i k (f: nat -> X A B):
     (forall n, n<k -> f (i+n)%nat == 0) -> sum i k f == 0.
   Proof.
-    intros until f; induction k; intro E; simpl_sum_r.
+    induction k; intro E; simpl_sum_r.
     reflexivity.
     rewrite IHk, E by auto with arith.  
     apply plus_idem.
@@ -886,13 +886,13 @@ Section Props1.
   Lemma sum_fun_zero i k : 
     sum i k (fun _ =>(0 : X A B)) == 0.
   Proof.
-    intros. rewrite sum_zero; auto. 
+    rewrite sum_zero; auto.
   Qed.
   
   Lemma sum_cut k' i k (f: nat -> X A B):
     sum i (k'+k) f == sum i k f + sum (k+i) k' f.
   Proof.
-    intros; induction k'; simpl_sum_r.
+    induction k'; simpl_sum_r.
     aci_reflexivity.
     rewrite IHk', plus_assoc.
     auto with compat omega.
@@ -901,7 +901,7 @@ Section Props1.
   Lemma sum_cut_fun i k (f g: nat -> X A B):
     sum i k (fun u => f u + g u) == sum i k f + sum i k g.
   Proof.
-    intros; induction k; simpl_sum_r.
+    induction k; simpl_sum_r.
     aci_reflexivity.
     rewrite IHk.
     aci_reflexivity.  
@@ -937,7 +937,7 @@ Section Props1.
   Lemma leq_sum (f: nat -> X A B) i k x:
     (exists n, i<=n /\ n<i+k /\ x == f n) -> x <== sum i k f.
   Proof. 
-    intros f i k x [n [? [? E]]].
+    intros [n [? [? E]]].
     rewrite E, (sum_cut_nth (n-i))  by omega. 
     replace (i+(n-i))%nat with n by auto with arith. 
     aci_reflexivity. 
