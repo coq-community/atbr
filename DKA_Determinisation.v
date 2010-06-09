@@ -72,7 +72,7 @@ Section Termination.
 
   Lemma below0_empty p: below p 0 -> StateSet.Empty p.
   Proof.
-    intros p H.
+    intros H.
     rewrite StateSetProp.elements_Empty.
     remember (StateSet.elements p) as l. destruct l as [|i l]. trivial.
     lpose (H i) as H'. 
@@ -90,7 +90,7 @@ Section Termination.
     Lemma statesetset_map_in p:
       StateSetSet.In p (statesetset_map f t0) -> exists2 q, StateSetSet.In q t0 & StateSet.Equal (f q) p.
     Proof.
-      intro p. unfold statesetset_map.
+      unfold statesetset_map.
       apply StateSetSetProp.fold_rec_nodep.  statesetset_dec.
       intros q a Hq IH.  StateSetSetFact.set_iff. intros [Hp|Hp]; eauto. 
     Qed.
@@ -119,7 +119,7 @@ Section Termination.
 
   Lemma card_pset s t: (forall p, StateSetSet.In p t -> below p s) -> StateSetSet.cardinal t <= power s.
   Proof. 
-    induction s; intros t H; simpl.
+    induction s in t |- *; intros H; simpl.
     (* il ne peut y avoir que l'ensemble vide dans la table *)
      destruct (StateSetSetProp.cardinal_0 t) as (l&Hl&Hlt&->).
      setoid_rewrite Hlt in H. clear Hlt.
@@ -203,7 +203,6 @@ Section Termination.
   
   Lemma cardinal_domain t: StateSetSet.cardinal (domain t) = StateSetMap.cardinal t.
   Proof.
-    intro t.
     refine (proj2 (StateSetMapProp.fold_rec_bis 
       (P:=fun t a => (forall p, StateSetSet.In p a <-> StateSetMap.In p t) /\  
                      StateSetSet.cardinal a = StateSetMap.cardinal t) _ _ _)). 
@@ -223,11 +222,11 @@ Section Termination.
         t).
 
   Lemma bbool_view b1 b2: (b1=true <-> b2=true) -> b1=b2.
-  Proof. intros [|] [|]; intuition. Qed.
+  Proof. destruct b1 as [|], b2 as [|]; intuition. Qed.
 
   Lemma for_all_compat f: Proper (StateSet.Equal ==> @eq bool) (StateSet.for_all f).
   Proof. 
-    intros f x y H.
+    intros x y H.
     apply bbool_view.
     rewrite <- 2StateSetFact.for_all_iff by (repeat intro; subst; trivial). 
     (split; intros Ht i); [rewrite <- H| rewrite H]; auto.  
@@ -403,7 +402,7 @@ Section Correction.
 
   Instance delta_set_compat a: Proper (StateSet.Equal ==> StateSet.Equal) (delta_set' a).
   Proof.
-    intros a s t H. unfold delta_set', delta_set.
+    intros s t H. unfold delta_set', delta_set.
     rewrite StateSetOrdProp.fold_equal. reflexivity. 3: assumption. 
     constructor; repeat intro; stateset_dec.
     intros x x' -> y y' Hy. rewrite Hy. reflexivity. 
@@ -605,7 +604,7 @@ Section Correction.
   Lemma explore_labels_increase_table p np nttdp: forall q nq, 
     StateSetMap.MapsTo q nq (get_table nttdp) -> StateSetMap.MapsTo q nq (get_table (explore_labels A p np nttdp)).
   Proof.
-    intros p np. unfold explore_labels. 
+    revert nttdp. unfold explore_labels.
     induction (N_max_label A) as [| b IHb]; simpl; trivial. 
     intros [[[next table] todo] dp] q nq H; simpl.
     apply IHb. clear IHb. 
@@ -619,7 +618,6 @@ Section Correction.
   Lemma explore_increase_table nttd: forall q nq, 
     StateSetMap.MapsTo q nq (get_table nttd) -> StateSetMap.MapsTo q nq (get_table (explore nttd)).
   Proof.
-    intros nttd.
     functional induction (explore nttd); trivial.
     intros q nq H. apply IHn1. clear IHn1. simpl in H.
     destruct ntt as [[next' table'] todo']. simpl.
@@ -704,13 +702,13 @@ Section Correction.
 
   Lemma rho_theta i: i<size' -> rho (theta i) i. 
   Proof. 
-    intros i Hi. unfold theta. destruct (le_lt_dec size' i). omega_false.
+    intros Hi. unfold theta. destruct (le_lt_dec size' i). omega_false.
     destruct (ie_table_surj invariant_nttd l). assumption.
   Qed.
 
   Lemma theta_rho i: i<size' -> forall p, rho p i -> StateSet.Equal p (theta i). 
   Proof. 
-    intros i Hi p Hp.
+    intros Hi p Hp.
     eapply (ie_table_inj (invariant_nttd)). eassumption.
     apply rho_theta. assumption.
   Qed.
@@ -783,7 +781,7 @@ Section Correction.
   
   Lemma eq_nat_dec_eq i j: is_true (eq_nat_dec i j) <-> i=j. 
   Proof.
-    intros i j. destruct_nat_dec; simpl. firstorder. firstorder. 
+    destruct_nat_dec; simpl. firstorder. firstorder.
   Qed.
 
   Lemma and_com P Q: P /\ Q <-> Q /\P.
@@ -807,7 +805,7 @@ Section Correction.
   Lemma mem_spec i s: is_true (StateSet.mem i s) <-> StateSet.In i s.
   Transparent equal one. 
   Proof.
-    intros. simpl. setoid_replace (true = StateSet.mem i s) with (StateSet.mem i s = true) by firstorder.
+    simpl. setoid_replace (true = StateSet.mem i s) with (StateSet.mem i s = true) by firstorder.
     symmetry. apply StateSetFact.mem_iff.
   Qed.
   Opaque equal one. 

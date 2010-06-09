@@ -58,7 +58,7 @@ Module Make(O: OrderedType) <: OrderedType.
   Qed.
  
   Definition compare x y: Compare lt eq x y.
-    induction x as [|a qa]; intros [|b qb].
+    revert y; induction x as [|a qa]; intros [|b qb].
     apply EQ; constructor.
     apply LT; constructor.
     apply GT; constructor.

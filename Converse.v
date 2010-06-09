@@ -24,7 +24,7 @@ Section ISR.
 
   Lemma conv_compat' A B: forall (x y: X A B), x` == y` -> x == y.
   Proof.
-    intros A B x y H.
+    intros x y H.
     rewrite <- (conv_invol x).
     rewrite <- (conv_invol y).
     apply conv_compat; exact H.
@@ -41,7 +41,6 @@ Section ISR.
   Existing Instance dot_compat_c.
   Lemma conv_one A: one A` == 1.
   Proof.
-    intro A.
     rewrite <- (dot_neutral_left_c ((one A)`)).
     switch. apply dot_neutral_left_c.
   Qed.
@@ -49,7 +48,6 @@ Section ISR.
 
   Lemma conv_zero A B: zero B A` == 0.
   Proof.
-    intros A B.
     transitivity ((dot B A A 0 (0`))`). 
     switch.
     symmetry. apply dot_ann_left_c. 
@@ -75,13 +73,13 @@ Section ISR.
   Proper ((leq A B) ==> (leq B A)) (conv A B).
   Proof.
     unfold leq.
-    intros A B x y H.
+    intros x y H.
     rewrite <- H at 2. rewrite conv_plus. apply plus_com. 
   Qed.
 
   Lemma conv_incr' A B: forall (x y: X A B), x` <== y` -> x <== y.
   Proof.
-    intros A B x y H.
+    intros x y H.
     rewrite <- (conv_invol x).
     rewrite <- (conv_invol y).
     apply conv_incr; exact H.
@@ -127,7 +125,7 @@ Section KA.
 
   Lemma conv_star A (a: X A A): a# ` == a` #.
   Proof. 
-    intros A a; apply leq_antisym.
+    apply leq_antisym.
 
     switch. 
     rewrite <- (dot_neutral_right (a#)).

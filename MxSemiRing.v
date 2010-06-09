@@ -37,7 +37,7 @@ Section Defs.
 
   Lemma mx_dot_assoc A B C D (M: MX A B) (N: MX B C) (P: MX C D) : M*(N*P) == (M*N)*P.
   Proof.
-    intros [n A] [m B] [p C] [o D]; simpl. intros M N P i j Hi Hj.
+    destruct A as [n A], B as [m B], C as [p C], D as [o D]; simpl. intros i j Hi Hj.
     transitivity (sum 0 m (fun k => sum 0 p (fun k' => !M i k * !N k k' * !P k' j))).
      apply sum_compat; intros. 
      rewrite sum_distr_right; auto with algebra.
@@ -371,7 +371,7 @@ Section Props2.
     s < n -> !Q O s == 1 -> (forall i, i <> s -> !Q O i == 0) -> 
     Q * M == box 1 m (fun _ j => !M s j).
   Proof.
-    intros n m A B M Q s H Hs Hi.
+    intros H Hs Hi.
     repeat intro. simpl. 
    
     destruct i; [| omega_false].
@@ -387,7 +387,7 @@ Section Props2.
     s < m -> !Q s 0%nat == 1 -> (forall i, i <> s -> !Q i 0%nat == 0) -> 
     M * Q == box n 1 (fun i _ => !M i s).
   Proof.
-    intros n m A B M Q s H Hs Hi.
+    intros H Hs Hi.
     repeat intro. simpl. 
    
     destruct j; [| omega_false].

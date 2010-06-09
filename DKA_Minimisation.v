@@ -188,7 +188,7 @@ Section Correction.
 
   Lemma eq_nat_dec_eq i j: is_true (eq_nat_dec i j) <-> i=j. 
   Proof.
-    intros i j. destruct_nat_dec; simpl; firstorder.
+    destruct_nat_dec; simpl; firstorder.
   Qed.
 
   Lemma and_com P Q: P /\ Q <-> Q /\P.
@@ -216,7 +216,7 @@ Section Correction.
   Lemma minimisation_change x : x < size -> 
     eval_b (change_initial_b  Aut' x) == eval_b (change_initial_b (minimised) [x]).
   Proof.
-   intros x Hx.
+   intros Hx.
    unfold change_initial_b.   simpl b_size. symmetry. apply alg_eval with  X; simpl.  
    
    (* bloc 1 : u' == u * x *)

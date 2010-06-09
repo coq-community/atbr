@@ -266,7 +266,6 @@ Section lemmes_set_of_ones.
   
   Lemma _set_of_ones_correction1 f n : forall x, x < n -> (f x = true -> StateSet.In x (set_of_ones f n)).
   Proof.
-    intros f n. 
     induction n. intros; inversion H. 
     intros. destruct (eq_nat_dec x n). subst.  simpl. rewrite H0. stateset_dec. 
     eapply _set_of_ones_le; [| apply IHn]. auto. omega. auto.
@@ -274,8 +273,7 @@ Section lemmes_set_of_ones.
   
   Lemma _set_of_ones_correction2  f n x : StateSet.In x (set_of_ones f n ) -> (x < n /\ f x = true).
   Proof.
-    intros f n.
-    induction n.
+    revert x; induction n.
       intros; simpl in H. stateset_dec.
       intros; simpl in H.
       destruct (eq_nat_dec x n). subst.
@@ -457,7 +455,7 @@ Qed.
 Lemma partition_union f p :  compat_bool StateSet.E.eq f ->
   StateSet.Equal p (StateSet.union (fst (StateSet.partition f p)) (snd (StateSet.partition f p))).
 Proof.
-  intros f p Hf.
+  intros Hf.
   rewrite StateSet.partition_1; auto.  rewrite StateSet.partition_2; auto.
   repeat intro; intuition StateSetFact.set_iff.  
   remember (f a) as b; destruct b.
@@ -470,7 +468,7 @@ Qed.
 Lemma partition_inter f p :  compat_bool StateSet.E.eq f ->
   StateSet.Empty (StateSet.inter (fst (StateSet.partition f p)) (snd (StateSet.partition f p))).
 Proof.
-  intros f p Hf.
+  intros Hf.
   rewrite StateSet.partition_1; auto.
   rewrite StateSet.partition_2; auto. 
   repeat intro. revert H. StateSetFact.set_iff. repeat intro.

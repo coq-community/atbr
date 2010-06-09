@@ -91,10 +91,10 @@ Module Free.
   Definition is_one t := match t with one => true | _ => false end.
 
   Lemma Is_zero t : is_zero t = true -> t = zero.
-  Proof. intro t; destruct t; simpl; intuition discriminate. Qed.
+  Proof. destruct t; simpl; intuition discriminate. Qed.
 
   Lemma Is_one t : is_one t = true -> t = one.
-  Proof. intro t; destruct t; simpl; intuition discriminate. Qed.
+  Proof. destruct t; simpl; intuition discriminate. Qed.
 
   Ltac destruct_tests := 
     repeat (
@@ -964,14 +964,14 @@ Section Props.
   Global Instance dot_incr A B C: 
   Proper ((leq A B) ==> (leq B C) ==> (leq A C)) (dot A B C).
   Proof.
-    intros until C; unfold leq; intros x y E x' y' E'.
+    unfold leq; intros x y E x' y' E'.
     rewrite <- E, <- E'; semiring_reflexivity.
   Qed.
 
   Lemma sum_distr_right A B C (x: X A B) (f: nat -> X B C) i k:
     x * sum i k f == sum i k (fun u => x * f u).
   Proof.
-    intros until k; revert i; induction k; intro i; simpl_sum_r.
+    revert i; induction k; intro i; simpl_sum_r.
     apply dot_ann_right.
     rewrite dot_distr_right, IHk; reflexivity.
   Qed.
@@ -1023,8 +1023,9 @@ end.
 
 Lemma sum_distr_left `{ISR: IdemSemiRing} A B C (x: X B A) (f: nat -> X C B):
   forall i k, sum i k f * x == sum i k (fun u => f u * x).
-Proof (fun _ _ _ ISR => @sum_distr_right _ _ _ (@Dual.IdemSemiRing _ _ _ ISR)).
-
+Proof.
+apply (@sum_distr_right _ _ _ (@Dual.IdemSemiRing _ _ _ ISR) A B C x f).
+Qed.
 
 Hint Extern 2 (leq _ _ _ _) => first [ 
     apply dot_incr

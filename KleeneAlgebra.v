@@ -73,14 +73,14 @@ Section Props1.
   Global Instance star_incr A: 
   Proper ((leq A A) ==> (leq A A)) (star A).
   Proof.
-    intros A a b H.
+    intros a b H.
     star_right_induction.
     rewrite H. rewrite star_make_left. reflexivity.
   Qed.
 
   Global Instance star_compat A: Proper ((equal A A) ==> (equal A A)) (star A).
   Proof.
-    intros A a b H. apply leq_antisym; apply star_incr; apply equal_leq; auto. 
+    intros a b H. apply leq_antisym; apply star_incr; apply equal_leq; auto.
   Qed.
   
   Lemma one_leq_star_a A (a: X A A): 1 <== a#.
@@ -90,14 +90,14 @@ Section Props1.
 
   Lemma a_leq_star_a A (a: X A A): a <== a#.
   Proof.
-    intros; rewrite <- star_make_left.
+    rewrite <- star_make_left.
     rewrite <- one_leq_star_a. 
     semiring_reflexivity.
   Qed.
 
   Lemma star_mon_is_one A (a: X A A): a <== 1 -> a# == 1.
   Proof.
-    intros A a H.
+    intros H.
     apply leq_antisym. 
     star_left_induction.
     rewrite H; semiring_reflexivity.
@@ -106,23 +106,22 @@ Section Props1.
 
   Lemma star_one A: (1#: X A A) == 1.
   Proof.
-    intro; apply star_mon_is_one; reflexivity.
+    apply star_mon_is_one; reflexivity.
   Qed.
   
   Lemma star_zero A: (0#: X A A) == 1.
   Proof.
-    intro; apply star_mon_is_one; apply zero_inf.
+    apply star_mon_is_one; apply zero_inf.
   Qed.
 
   Lemma star_a_a_leq_star_a A (a: X A A): a#*a <== a#.
   Proof.
-    intros A a; rewrite <- star_make_left at 2.
+    rewrite <- star_make_left at 2.
     semiring_reflexivity.
   Qed.
 
   Lemma a_star_a_leq_star_a_a A (a: X A A): a*a# <== a#*a.
   Proof.
-    intros A a.
     star_right_induction.
     rewrite star_a_a_leq_star_a at 1.
     apply plus_destruct_leq; auto.
@@ -131,7 +130,7 @@ Section Props1.
 
   Lemma star_make_right A (a:X A A): 1+a*a# == a#.
   Proof. 
-    intros A a; apply leq_antisym.
+    apply leq_antisym.
     rewrite a_star_a_leq_star_a_a.
     apply plus_destruct_leq.
     apply one_leq_star_a.
@@ -216,7 +215,7 @@ Module Free.
   Definition is_zero t := match t with zero => true | _ => false end.
 
   Lemma Is_zero t : is_zero t = true -> t = zero.
-  Proof. intro t; destruct t; simpl; intuition discriminate. Qed.
+  Proof. destruct t; simpl; intuition discriminate. Qed.
 
   Ltac destruct_tests := 
     repeat (
@@ -663,11 +662,13 @@ Section Props2.
   Qed.
 
   Lemma a_star_a_leq_star_a A: forall (a: X A A), a*a# <== a#.
-  Proof star_a_a_leq_star_a (KA:=Dual.KleeneAlgebra).
+  Proof.
+   exact (star_a_a_leq_star_a (KA:=Dual.KleeneAlgebra) (A:=A)).
+  Qed.
 
   Lemma star_distr A: forall (a b : X A A), (a + b)# == a# * (b*a#)#.
   Proof.
-    intros A a b; apply leq_antisym.
+    intros a b; apply leq_antisym.
 
     star_left_induction.
 
@@ -696,7 +697,7 @@ Section Props2.
 
   Lemma wsemicomm_iter_right A: forall (a b : X A A), a*b <== b#*a  ->  a*b# <== b#*a.
   Proof.
-    intros A a b H.
+    intros a b H.
     rewrite <- star_idem at 2.
     apply semicomm_iter_right; assumption. 
   Qed.
@@ -707,10 +708,14 @@ Section Props3.
   Context `{KA: KleeneAlgebra}.
   
   Lemma semicomm_iter_left A B: forall (a: X A A) (b: X B B) (c: X A B), a*c <== c*b -> a#*c <== c*b#.
-  Proof semicomm_iter_right (KA:=Dual.KleeneAlgebra).
+  Proof.
+    exact (semicomm_iter_right (KA:=Dual.KleeneAlgebra) (A:=A) (B:=B)).
+  Qed.
 
   Lemma wsemicomm_iter_left A: forall (b a : X A A), a*b <== b*a#  ->  a#*b <== b*a#.
-  Proof wsemicomm_iter_right (KA:=Dual.KleeneAlgebra).
+  Proof.
+    exact (wsemicomm_iter_right (KA:=Dual.KleeneAlgebra) (A:=A)).
+  Qed.
 
   Lemma comm_iter_left A B (x : X A B) a b :  a * x == x * b -> a# * x == x * b# .
   Proof.
@@ -734,7 +739,9 @@ Section Props4.
   Context `{KA: KleeneAlgebra}.
   
   Lemma comm_iter_right B A (x : X A B) a b :  x * a == b * x -> x * a# == b# * x .
-  Proof comm_iter_left (KA:=Dual.KleeneAlgebra).
+  Proof.
+    exact (comm_iter_left (KA:=Dual.KleeneAlgebra) (a:=a) (b:=b)) .
+  Qed.
 
 End Props4.
 

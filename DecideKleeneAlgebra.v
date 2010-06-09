@@ -223,7 +223,7 @@ Section Protect.
 
   Lemma merge_DFAs_lt_second a b : DFA_wf a -> DFA_wf b -> D_size a + D_initial b < D_size (merge_DFAs a b).
   Proof.
-    intros a b Ha Hb.  unfold merge_DFAs. simpl. unfold DFA_wf in Ha, Hb. intuition omega.
+    intros Ha Hb.  unfold merge_DFAs. simpl. unfold DFA_wf in Ha, Hb. intuition omega.
   Qed.
 
   Lemma merge_DFAs_M A B u: DFA_wf A -> D_max_label A = D_max_label B ->
@@ -244,7 +244,7 @@ Section Protect.
       (change_initial_M (MPlus (DFA_to_MAut A) B) (D_initial A))
       (MPlus (DFA_to_MAut A) (empty_initial_M B)).
   Proof.
-    intros A B (HAi&HAf&HAd). constructor; trivial.
+    intros (HAi&HAf&HAd). constructor; trivial.
     Transparent equal. intros [|] j Hi Hj; try omega_false. Opaque equal.
     simpl. destruct_nat_dec; destruct_blocks; simpl; trivial; try discriminate.
     omega_false.
@@ -253,7 +253,7 @@ Section Protect.
   Lemma merge_first A B: D_max_label A = D_max_label B -> DFA_wf A -> 
     eval_D (change_initial_D (merge_DFAs A B) (D_initial A)) == eval_D A.
   Proof.
-    intros A B HB HA. unfold eval_D, eval_b.
+    intros HB HA. unfold eval_D, eval_b.
     fold (DFA_to_MAut (change_initial_D (merge_DFAs A B) (D_initial A))).
     rewrite merge_DFAs_M by trivial.
     generalize (DFA_to_MAut B); clear HB B; intro B.
@@ -275,7 +275,7 @@ Section Protect.
   Lemma merge_second A B: D_max_label A = D_max_label B -> DFA_wf A ->
     eval_D (change_initial_D (merge_DFAs A B) (D_size A + D_initial B)) == eval_D B.
   Proof.
-    intros A B HB HA. unfold eval_D, eval_b.
+    intros HB HA. unfold eval_D, eval_b.
     fold (DFA_to_MAut (change_initial_D (merge_DFAs A B) (D_size A + D_initial B))).
     rewrite merge_DFAs_M by trivial.
     change (D_size A) with (M_size (DFA_to_MAut A)).
