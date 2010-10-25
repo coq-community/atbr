@@ -1,14 +1,13 @@
 (**************************************************************************)
 (*  This is part of ATBR, it is distributed under the terms of the        *)
-(*           GNU Lesser General Public License version 3                  *)
-(*                (see file LICENSE for more details)                     *)
+(*         GNU Lesser General Public License version 3                    *)
+(*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*          Copyright 2009: Thomas Braibant, Damien Pous.                 *)
-(*                                                                        *)
+(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
-(*i $Id$ i*)
-
+(** Memoisation function for matrices: we define an identity function
+   that enforces evaluation *)
 
 Require Import List.
 Require Import Arith.
@@ -26,7 +25,7 @@ Section force.
 
   Fixpoint nth i l :=
     match l,i with
-      | nil, _ => f O           (* n'arrivera jamais en pratique *)
+      | nil, _ => f O           	(* absurd *)
       | a::_, O => a
       |_::q, S i => nth i q
     end.
@@ -92,13 +91,11 @@ Section force2.
   Qed.
 End force2.
 
-
-
 (*begintests
 
-   Let m i := mult i i.
+   Let m i := mult i i - i.
    Eval compute in print 5 m. 
-   Eval compute in print 5 (id 5 m). 
+   Time   Eval vm_compute in let _ := print 100 (id 100 m) in true. 
 
    Let n i j := mult i (j+1).
    Eval compute in print2 3 5 n. 

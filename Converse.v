@@ -1,18 +1,23 @@
 (**************************************************************************)
 (*  This is part of ATBR, it is distributed under the terms of the        *)
-(*           GNU Lesser General Public License version 3                  *)
-(*                (see file LICENSE for more details)                     *)
+(*         GNU Lesser General Public License version 3                    *)
+(*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*          Copyright 2009: Thomas Braibant, Damien Pous.                 *)
-(*                                                                        *)
+(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
-(*i $Id$ i*)
+(** Properties and tactics about algebraic structures with converse. 
+
+   In particular,
+   - [converse_down] pushes converses down to leaves
+   - [switch] add converses on both sides of an (in)equation, and pushes converses down to leaves
+   *)
 
 Require Import Common.
 Require Import Classes.
+Require Import Graph.
 Require Import SemiLattice.
-Require Import ATBR.SemiRing.
+Require Import SemiRing.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -22,21 +27,21 @@ Section ISR.
 
   Context `{CISR: ConverseIdemSemiRing}.
 
-  Lemma conv_compat' A B: forall (x y: X A B), x` == y` -> x == y.
+  Lemma conv_compat' A B (x y: X A B): x` == y` -> x == y.
   Proof.
-    intros x y H.
+    intro H.
     rewrite <- (conv_invol x).
     rewrite <- (conv_invol y).
     apply conv_compat; exact H.
   Qed.
 
-  Hint Rewrite conv_dot conv_plus conv_invol: conv_down.
+  Hint Rewrite conv_dot conv_plus conv_invol: converse_down.
 
   Ltac switch := 
     match goal with
       | |- _ ` == _ ` => apply conv_compat
       | |- _   == _   => apply conv_compat'
-    end; autorewrite with conv_down.
+    end; autorewrite with converse_down.
 
   Existing Instance dot_compat_c.
   Lemma conv_one A: one A` == 1.
@@ -44,16 +49,16 @@ Section ISR.
     rewrite <- (dot_neutral_left_c ((one A)`)).
     switch. apply dot_neutral_left_c.
   Qed.
-  Hint Rewrite conv_one: conv_down.
+  Hint Rewrite conv_one: converse_down.
 
   Lemma conv_zero A B: zero B A` == 0.
   Proof.
     transitivity ((dot B A A 0 (0`))`). 
     switch.
     symmetry. apply dot_ann_left_c. 
-    autorewrite with conv_down. apply dot_ann_left_c.
+    autorewrite with converse_down. apply dot_ann_left_c.
   Qed.
-  Hint Rewrite conv_zero: conv_down.
+  Hint Rewrite conv_zero: converse_down.
 
   Instance CISR_ISR: IdemSemiRing. 
   Proof.
@@ -77,9 +82,9 @@ Section ISR.
     rewrite <- H at 2. rewrite conv_plus. apply plus_com. 
   Qed.
 
-  Lemma conv_incr' A B: forall (x y: X A B), x` <== y` -> x <== y.
+  Lemma conv_incr' A B (x y: X A B): x` <== y` -> x <== y.
   Proof.
-    intros x y H.
+    intro H.
     rewrite <- (conv_invol x).
     rewrite <- (conv_invol y).
     apply conv_incr; exact H.
@@ -87,7 +92,8 @@ Section ISR.
 
 End ISR.
 
-Ltac conv_down :=
+(** the push converses down to leaves  *)
+Ltac converse_down :=
   repeat (
     rewrite conv_invol ||
     rewrite conv_dot ||
@@ -98,15 +104,14 @@ Ltac conv_down :=
     rewrite conv_zero
   ).
 
-(* Hint Rewrite conv_dot conv_plus conv_invol conv_one conv_zero: conv_down. *)
-
+(** add converses on both sides, and push converses down to leaves  *)
 Ltac switch := 
   match goal with
     | |- _ ` == _ ` => apply conv_compat
     | |- _   == _   => apply conv_compat'
     | |- _ ` <== _ ` => apply conv_incr
     | |- _   <== _   => apply conv_incr'
-  end; conv_down.
+  end; converse_down.
 
 
 Section KA.
@@ -115,9 +120,9 @@ Section KA.
 
   Existing Instance CISR_ISR.
   
-  Lemma star_destruct_left_old' A B: forall (a: X A A) (b c: X A B), b+a*c <== c  ->  a#*b <== c.
+  Lemma star_destruct_left_old' A B (a: X A A) (b c: X A B): b+a*c <== c  ->  a#*b <== c.
   Proof.
-    intros; transitivity (a#*c).
+    intro H; transitivity (a#*c).
      rewrite <- H; semiring_reflexivity.
      apply star_destruct_left_c.
      rewrite <- H at -1; auto with algebra. 
@@ -139,9 +144,9 @@ Section KA.
     rewrite <- star_make_left_c at 2. aci_reflexivity. 
   Qed.
 
-  Instance CKA_KA: KleeneAlgebra.
+  Global Instance CKA_KA: KleeneAlgebra.
   Proof.
-    intros. constructor. apply CISR_ISR. 
+    constructor. apply CISR_ISR. 
     apply star_make_left_c.
     apply star_destruct_left_c.
     intros. switch. rewrite conv_star. 
@@ -150,7 +155,8 @@ Section KA.
 
 End KA.
 
-Ltac conv_down ::=
+(** override, to take [conv_star] into account *)
+Ltac converse_down ::=
   repeat (
     rewrite conv_invol ||
     rewrite conv_star || 

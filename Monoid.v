@@ -1,23 +1,26 @@
 (**************************************************************************)
 (*  This is part of ATBR, it is distributed under the terms of the        *)
-(*           GNU Lesser General Public License version 3                  *)
-(*                (see file LICENSE for more details)                     *)
+(*         GNU Lesser General Public License version 3                    *)
+(*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*          Copyright 2009: Thomas Braibant, Damien Pous.                 *)
-(*                                                                        *)
+(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
-(*i $Id$ i*)
+(** Properties, definitions, hints and tactics for monoids :
+   - [monoid_reflexivity] solves the equational theory
+   - [monoid_normalize] normalizes the goal modulo associativity (and neutral elements)
+   - [monoid_rewrite] does closed rewrites modulo associativity
+   *)
 
 Require Import Common.
 Require Import Classes.
 Require Import Graph.
-Require Import SemiLattice.
-Require        Quote. 
+Require Import BoolView.
+Require        Reification.
 Set Implicit Arguments.
 Unset Strict Implicit.
 
-(* cf. Structure.txt pour la politique des hints *)
+(* see Structure.txt for the hints policy *)
 Hint Extern 0 (equal _ _ _ _) => first [ 
     apply dot_assoc
   | apply dot_neutral_left
@@ -32,15 +35,19 @@ Hint Extern 2 (equal _ _ _ _) => first [
 Hint Rewrite @dot_neutral_left @dot_neutral_right using ti_auto: simpl.  
 
 
-(* monoide libre non type, genere par nat *)
-Module Free.
+(** Syntactic model to obtain write reflexive tactics 
+    this module is "untyped", and uses an untyping theorem
+    module T below uses a typed normalisation function.
+  *)
+Module U.
+
+  (** untyped syntax and equality *)
   Inductive X :=
   | dot: X -> X -> X
   | one: X
-  | var: nat -> X
-    .
+  | var: positive -> X.
 
-  Inductive equal: X -> X -> Prop :=
+  Inductive equal: relation X :=
   | refl_one: equal one one
   | refl_var: forall i, equal (var i) (var i)
 
@@ -50,235 +57,365 @@ Module Free.
 
   | dot_compat: forall x x', equal x x' -> forall y y', equal y y' -> equal (dot x y) (dot x' y')
   | equal_trans: forall x y z, equal x y -> equal y z -> equal x z
-  | equal_sym: forall x y, equal x y -> equal y x  
-    .
+  | equal_sym: forall x y, equal x y -> equal y x.
 
-  Lemma equal_refl: forall x, equal x x.
-  Proof. induction x; constructor; assumption. Qed.
-
-  Add Relation X equal
-    reflexivity proved by equal_refl
-    symmetry proved by equal_sym
-      transitivity proved by equal_trans
-        as free_equal_setoid_relation.
-
+  (** normalisation function *)
   Fixpoint norm_aux acc x :=
     match x with
       | dot y z => norm_aux (norm_aux acc y) z
       | one => acc
       | var _ => match acc with one => x | _ => dot acc x end 
     end.
+
   Definition norm := norm_aux one.
 
-  Section Protect.
-  Instance dot_compat': Proper (equal ==> equal ==> equal) dot := dot_compat.
+  (** term comparison *)
+  Fixpoint eqb (x y: X): bool := 
+    match x,y with
+      | dot x1 x2, dot y1 y2 => if eqb x1 y1 then eqb x2 y2 else false
+      | one, one => true
+      | var i, var j => eq_pos_bool i j 
+      | _,_ => false
+    end.
 
-  Lemma insert q: forall x, equal (dot q x) (norm_aux q x).
-  Proof.
-    intros x; revert q; induction x; intro q; simpl.
-    rewrite dot_assoc, IHx1; apply IHx2.
-    apply dot_neutral_right.
-    destruct q; try reflexivity. 
-    apply dot_neutral_left.
-  Qed.
-
-  Lemma normalize: forall x, equal x (norm x).
-  Proof.
-    intro x; rewrite <- (dot_neutral_left x) at 1.  
-    apply insert.
-  Qed.
-
-  Lemma reflect: forall x y, norm x = norm y -> equal x y.
-  Proof.
-    intros x y H.
-    eapply equal_trans; [apply normalize|].
-    eapply equal_trans; [|symmetry; apply normalize].
-    rewrite H; reflexivity.
-  Qed.
-  End Protect.
+  (** decision function *)
+  Definition decide x y := eqb (norm x) (norm y).
 
 
+  (** correctness of the untyped normalisation and decision functions *)
+  Section correctness.         (* section used to protect instances *)
 
-End Free.
-
-(* module d'evaluation depuis le monoid libre, pour Quote *)
-Module FreeEval. 
-Section Params.
-
-  Context `{M: Monoid}.
-
-  Section Env.
-    Variables s t: nat -> T.
-    Variable f: forall i, X (s i) (t i).
+    Instance E: Equivalence equal.
+    Proof.
+      constructor.
+      intro x; induction x; constructor; assumption.
+      exact equal_sym.
+      exact equal_trans.
+    Qed.
+    Instance dot_compat': Proper (equal ==> equal ==> equal) dot := dot_compat.
   
-    Inductive eval: forall A B, Free.X -> X A B -> Prop :=
-    | e_one: forall A, @eval A A Free.one 1
-    | e_dot: forall A B C x y x' y', 
-                 @eval A B x x' -> @eval B C y y' -> @eval A C (Free.dot x y) (x'*y')
-    | e_var: forall i, @eval (s i) (t i) (Free.var i) (f i).
+    Lemma insert q x: equal (dot q x) (norm_aux q x).
+    Proof.
+      revert q; induction x; intro q; simpl.
+      rewrite dot_assoc, IHx1; apply IHx2.
+      apply dot_neutral_right.
+      destruct q; try reflexivity. 
+      apply dot_neutral_left.
+    Qed.
+  
+    Lemma norm_correct: forall x, equal x (norm x).
+    Proof.
+      intro x; rewrite <- (dot_neutral_left x) at 1.  
+      apply insert.
+    Qed.
+  
+    Lemma eqb_spec: forall x y, reflect (x=y) (eqb x y).
+    Proof.
+      induction x; intros [u v| |j]; simpl; try (constructor; congruence).
+      case (IHx1 u); intro; subst; try (constructor; congruence).
+      case (IHx2 v); intro; subst; constructor; congruence.
+      case eq_pos_spec; intro; subst; constructor; congruence.
+    Qed.    
+  
+    Theorem decide_correct: forall x y, decide x y = true -> equal x y.
+    Proof.
+      unfold decide. intros x y. case eqb_spec. 
+       intros H _. rewrite (norm_correct x), H. symmetry. apply norm_correct. 
+       congruence.
+    Qed.
+
+  End correctness.
+
+
+  Definition obind A B: option A -> (A -> option B) -> option B :=
+    fun a f => match a with None => None | Some a => f a end.
+
+  Definition pos_eq_dec: forall n m: positive, {n=m}+{n<>m}.
+  Proof.
+    induction n; destruct m; try (right; intro; discriminate). 
+     case (IHn m); [left|right; congruence]. rewrite e; reflexivity.
+     case (IHn m); [left|right; congruence]. rewrite e; reflexivity.
+     left. reflexivity. 
+  Defined.
+
+
+  (** Erasure function, from typed syntax to untyped syntax *)
+  Section erase.
+
+    Import Reification Monoid.
+    Context `{env: Env}.
+
+    Fixpoint erase n m (x: X n m): U.X :=
+      match x with 
+        | dot _ _ _ x y => U.dot (erase x) (erase y)
+        | one _ => U.one
+        | var i => U.var i
+      end.
+
+    Record Pack' := pack' { src': positive; tgt': positive; unpack': X src' tgt' }.    
+    Definition cast' p n m (H: n=m) (x: X p n): X p m := eq_rect n (X p) x m H.
+
+    Fixpoint rebuild' l x: option Pack' :=
+      match x with
+        | U.dot x y => 
+          obind (rebuild' l x) (fun x => 
+            obind (rebuild' (tgt' x) y) (fun y => 
+              match U.pos_eq_dec (tgt' x) (src' y) with
+                | left H => Some (pack' (dot (cast' H (unpack' x)) (unpack' y)))
+                | right _ => None
+              end
+            ))
+        | U.one => Some (pack' (one l))
+        | U.var i => Some (pack' (var i))
+      end.
+
+
+    Definition cast p n m (H: n=m) (x: Classes.X p (typ n)): Classes.X p (typ m) := 
+      eq_rect n (fun n => Classes.X p (typ n)) x m H.
+
+    Context {Mo: Monoid_Ops}.
+    Fixpoint rebuild l x: option (Pack typ) :=
+      match x with
+        | U.dot x y => 
+          obind (rebuild l x) (fun x => 
+            obind (rebuild (tgt_p x) y) (fun y => 
+              match U.pos_eq_dec (tgt_p x) (src_p y) with
+                | left H => Some (pack (cast H (unpack x) * unpack y))
+                | right _ => None
+              end
+            ))
+        | U.one => Some (pack (Classes.one (typ l)))
+        | U.var i => Some (val i)
+      end.
+
+  End erase.
+
+
+
+  (** Untyping theorem for monoids *)
+  Section faithful.
+
+    Import Reification Classes.
+    Context `{M: Monoid} {env: Env}.
+    Notation feval := Monoid.eval.
+
+    (** evaluation predicate *)
+    Inductive eval: forall n m, U.X -> X (typ n) (typ m) -> Prop :=
+    | e_dot: forall n m p u a v b, @eval n m u a -> @eval m p v b -> eval (U.dot u v) (a*b)
+    | e_one: forall n, @eval n n U.one 1
+    | e_var: forall i, eval (U.var i) (unpack (val i)).
     Implicit Arguments eval [].
-    Hint Local Constructors eval.
-    
-    Lemma eval_dot_inv: forall A C x y z, eval A C (Free.dot x y) z -> 
-      exists B, exists x', exists y', JMeq z (x'*y') /\ eval A B x x' /\ eval B C y y'.
+    Local Hint Constructors eval.
+
+    (** evaluation of erased terms *)
+    Lemma eval_erase_feval: forall n m a, eval n m (erase a) (feval a).
+    Proof. induction a; constructor; trivial. Qed.
+
+    Lemma eval_rebuild: forall n m a a', eval n m a a' -> rebuild n a = Some (pack a').
+    Proof.
+      induction 1; simpl; auto.
+       rewrite IHeval1. simpl. rewrite IHeval2. simpl. case U.pos_eq_dec; intro J.
+        unfold cast. rewrite <- (Eqdep_dec.eq_rect_eq_dec pos_eq_dec). reflexivity.
+        elim J. reflexivity.
+       case (val i). reflexivity.
+    Qed. 
+
+    (* inversion lemmas for the eval predicate *)
+    Lemma eval_dot_inv: forall n p u v c, eval n p (U.dot u v) c -> 
+      exists m, exists a, exists b, c = a*b /\ eval n m u a /\ eval m p v b.
     Proof. intros. dependent destruction H. eauto 6. Qed.
   
-    Lemma eval_one_inv: forall A B z, eval A B Free.one z -> JMeq z (one A) /\ A=B. 
-    Proof. intros. dependent destruction H. auto. Qed.
+    Lemma eval_one_inv: forall n m c, eval n m U.one c -> c [=] one (typ n) /\ n=m.
+    Proof. intros. dependent destruction H. split; reflexivity. Qed.
   
-    Lemma eval_var_inv: forall A B i z, eval A B (Free.var i) z -> JMeq z (f i) /\ A=s i /\ B=t i.
-    Proof. intros. dependent destruction H. auto. Qed.
- 
-(*     Ltac destruct_or_rewrite H :=  *)
-(*     (* c'est pas tres satisfaisant, mais un coup il faut faire destruct, un coup case,  *)
-(*        un coup rewrite, et parfois subst...  *) *)
-(*       subst; try ((rewrite H || case H); clear H). *)
+    Lemma eval_var_inv: forall n m i c, eval n m (U.var i) c -> c [=] unpack (val i) /\ n=src_p (val i) /\ m=tgt_p (val i).
+    Proof. intros. dependent destruction H. intuition reflexivity. Qed.
 
-    (* inversion récursive d'hypothèses d'évaluation *)
+    (* corresponding inversion tactic *)
     Ltac eval_inversion :=
       repeat match goal with 
-               | H : eval _ _ ?x _ |- _ => eval_inversion_aux H x 
+               | H : eval _ _ ?u _ |- _ => eval_inversion_aux H u 
              end
-      with eval_inversion_aux hyp t :=
+      with eval_inversion_aux H u :=
         let H1 := fresh in 
-          match t with 
-            | Free.one => destruct (eval_one_inv hyp) as [H1 ?H]; subst; 
-              try (apply JMeq_eq in H1; rewrite H1)
-            | Free.dot _ _ => destruct (eval_dot_inv hyp) as (?B & ?x & ?y & H1 & ?H & ?H); subst; 
-              try (apply JMeq_eq in H1; rewrite H1)
-            | Free.var _ => destruct (eval_var_inv hyp) as (H1 & ?H & ?H); subst; try 
-              (apply JMeq_eq in H1; rewrite H1)
-          end; clear hyp.
-
+          match u with 
+            | U.dot _ _ => destruct (eval_dot_inv H) as (?&?&?&H1&?&?); subst; try rewrite H1
+            | U.one => destruct (eval_one_inv H) as [H1 ?]; auto; subst; apply eqd_inj in H1; subst
+            | U.var _ => destruct (eval_var_inv H) as (H1&?&?); auto; subst; apply eqd_inj in H1; subst
+          end; clear H.
   
-    (* semi-injectivité du typage de l'evalutation (ça ne marche que grâce à l'absence de zero) *)
-    Lemma eval_type_inj_left: forall A A' B x z z', eval A B x z -> eval A' B x z' -> A=A'.
+    (* injectivity of types, on the left *)
+    Lemma eval_type_inj_left: forall n n' m u a b, eval n m u a -> eval n' m u b -> n=n'.
     Proof.
-      intros A A' B x z z' H; revert A' z'; induction H; intros A' z' H';
-        eval_inversion; trivial.
+      intros n n' m u a b H; revert n' b; induction H; intros n' c H'; eval_inversion.
       idestruct (IHeval2 _ _ H3).
       apply (IHeval1 _ _ H2).
     Qed.
-  
-    (* injectivité de l'évaluation *)
-    Lemma eval_inj: forall A B x y z, eval A B x y -> eval A B x z -> y=z.
+
+    (* injectivity of the evaluation predicate (once types are fixed) *)
+    Lemma eval_inj: forall n m u a b, eval n m u a -> eval n m u b -> a=b.
     Proof.
-      intros A B x y z H; revert z; induction H; intros; eval_inversion; trivial.
+      intros n m u a b H; revert b; induction H; intros; eval_inversion; trivial.
       idestruct (eval_type_inj_left H0 H4).
       rewrite (IHeval1 _ H3).
       rewrite (IHeval2 _ H4).
       reflexivity.
     Qed.
 
-    Lemma and_idem: forall (A: Prop), A -> A/\A.
-    Proof. auto. Qed.
-  
-    (* decomposition et utilisation automatique des hypotheses de recurrence, 
-       pour la preuve suivante *)
+    Lemma and_idem: forall (A: Prop), A -> A/\A. Proof. auto. Qed.
+
     Ltac split_IHeval :=
       repeat match goal with 
-               | H: (forall A B x', eval A B ?x x' -> _) /\ _ ,
-                 Hx: eval ?A ?B ?x ?x' |- _ => destruct (proj1 H _ _ _ Hx); clear H
-               | H: _ /\ forall A B x', eval A B ?x x' -> _  ,
-                 Hx: eval ?A ?B ?x ?x' |- _ => destruct (proj2 H _ _ _ Hx); clear H
+               | H: (forall n m x', eval n m ?x x' -> _) /\ _ ,
+                 Hx: eval ?n ?m ?x ?x' |- _ => destruct (proj1 H _ _ _ Hx); clear H
+               | H: _ /\ forall n m x', eval n m ?x x' -> _  ,
+                 Hx: eval ?n ?m ?x ?x' |- _ => destruct (proj2 H _ _ _ Hx); clear H
              end;
       repeat match goal with 
-               | H: (forall A B x', eval A B ?x x' -> _) 
-                 /\ (forall A B y', eval A B ?y y' -> _) |- _ => destruct H
+               | H: (forall n m x', eval n m ?x x' -> _) 
+                 /\ (forall n m y', eval n m ?y y' -> _) |- _ => destruct H
              end.
 
-    (* lemme préliminaire pour le théorème eval_equal *)
-    Lemma eval_equal_aux: forall x y, Free.equal x y -> forall A B x', eval A B x x' -> exists2 y', eval A B y y' & x' == y'.
+    Lemma equal_eval_aux: forall x y, U.equal x y -> 
+      forall n m x', eval n m x x' -> exists2 y', eval n m y y' & x' == y'.
     Proof.
       intros x y H.
-      cut ((forall A B x', eval A B x x' -> exists2 y', eval A B y y' & x' == y')
-              /\ (forall A B y', eval A B y y' -> exists2 x', eval A B x x' & y' == x')); [tauto| ].
-      induction H; (apply and_idem || split); intros A B xe Hx; 
+      cut ((forall n m x', eval n m x x' -> exists2 y', eval n m y y' & x' == y')
+              /\ (forall n m y', eval n m y y' -> exists2 x', eval n m x x' & y' == x')); [tauto| ].
+      induction H; (apply and_idem || split); intros n m xe Hx; 
         eval_inversion; split_IHeval;
           eauto with algebra;
-            eauto using equal_trans;
-              eauto 6 using equal_sym with algebra.
+            eauto using Graph.equal_trans;
+              eauto 6 using Graph.equal_sym with algebra.
     Qed.
-    
-    (* on conclut par injectivité de l'évaluation *)
-    Theorem eval_equal: forall A B x' y' x y, eval A B x' x -> eval A B y' y -> Free.equal x' y' -> x == y.
+
+    (* "untyping" theorem: equal untyped terms evaluate to equal morphisms *)
+    Lemma equal_eval: forall u v, U.equal u v -> 
+      forall n m a b, eval n m u a -> eval n m v b -> a == b.
     Proof.
-      intros A B x' y' x y Hx Hy H.
-      destruct (eval_equal_aux H Hx) as [y'' Hy' Hxy].
-      idestruct (eval_inj Hy Hy').
+      intros u v H n m a b Ha Hb.
+      destruct (equal_eval_aux H Ha) as [b'' Hb' Hab].
+      idestruct (eval_inj Hb Hb').
       assumption.
     Qed.
-(* Axiom Ici, on découvre qu'on a l'axiome JMeq    Print Assumptions eval_equal. *)
 
-  End Env.
+    (* other formulation, using the intermediate reification syntax *)
+    Theorem erase_faithful: forall n m (a b: Monoid.X n m), 
+      U.equal (erase a) (erase b) -> feval a == feval b.
+    Proof. intros. eapply equal_eval; eauto using eval_erase_feval. Qed.
 
-  Instance Quote: Quote.EVAL G := {
-    X' := Free.X;
-    var := Free.var;
-    eval := eval
-  }.
-  Proof.
-    intros; split; intro.
-    apply eval_var_inv; assumption. 
-    intuition; subst; rewrite H0; constructor.
-  Defined.
-End Params.
-End FreeEval.
+    (* combination with the untyped decision procedure, to get the reflexive tactic *)
+    Lemma decide_typed: forall n m (a b: Monoid.X n m), 
+      decide (erase a) (erase b) = true -> feval a == feval b.
+    Proof. intros. apply erase_faithful, decide_correct. assumption. Qed.
 
-Ltac monoid_reflexivity := abstract
-  lazymatch goal with 
-    | |- @equal ?G _ _ _ _ => 
-      Quote.quote (FreeEval.Quote (G:=G)) (FreeEval.eval_equal (G:=G));
-        apply Free.reflect; vm_compute; (reflexivity || fail "Not a Monoid theorem")
-    | |- @leq ?G _ _ _ _ _ => apply equal_leq; (* il ne faut pas dérouler leq, puisque l'on ne gère pas la somme *)
-      Quote.quote (FreeEval.Quote (G:=G)) (FreeEval.eval_equal (G:=G));
-        apply Free.reflect; vm_compute; (reflexivity || fail "Not a Monoid theorem")
-    | _ => fail "Not an (in)equality"
-  end.
+    (* for the monoid_normalize tactic *)
+    Lemma normalizer {n} {m} {R} `{T: Transitive (Classes.X (typ n) (typ m)) R} `{H: subrelation _ (equal _ _) R} :
+      forall (a b: Monoid.X n m) a' b',
+        (* utiliser le prédicat d'évaluation permet d'éviter de repasser en OCaml 
+           pour inventer le témoin typé... par contre, le terme de preuve grossit un peu. *)
+        (let na := norm (erase a) in eval n m na a') ->
+        (let nb := norm (erase b) in eval n m nb b') ->
+        R a' b' -> R (feval a) (feval b).
+    Proof.
+      intros until b'; intros Ha Hb Hab.
+      transitivity a'.
+       apply H. eapply equal_eval; eauto using eval_erase_feval, norm_correct. 
+       rewrite Hab.
+       apply H. symmetry. eapply equal_eval; eauto using eval_erase_feval, norm_correct. 
+    Qed.
+
+  End faithful.
+  Implicit Arguments normalizer [[G] [Mo] [M] [env] [n] [m] [R] [T] [H] a b].
+End U.
+
+(** the two reflexive tactics for monoids  *)
+Ltac monoid_reflexivity := 
+  (try apply equal_leq);       (* only sensible way of handling <== *)
+  monoid_reify; intros;
+    apply U.decide_typed; 
+      vm_compute; (reflexivity || fail "Not a Monoid theorem").
 
 Ltac monoid_normalize :=
-  lazymatch goal with 
-    | |- @equal ?G ?A ?B _ _ =>
-        Quote.reduce
-        (FreeEval.Quote (G:=G))
-        (equal_normalizer 
-          (E:=FreeEval.Quote (G:=G))
-          (FreeEval.eval_equal (G:=G))
-           Free.normalize)
-    | |- @leq ?G ?SLo ?A ?B _ _ => 
-        Quote.reduce
-        (FreeEval.Quote (G:=G))
-        (leq_normalizer (SLo := SLo)
-          (E:=FreeEval.Quote (G:=G))
-          (FreeEval.eval_equal (G:=G))
-           Free.normalize)
-    | _ => fail "Not an (in)equality"
-  end.
+  let t := fresh "t" in
+  let e := fresh "e" in
+  let l := fresh "l" in
+  let r := fresh "r" in
+  let x := fresh "x" in
+  let solve_eval :=
+    intro x; vm_compute in x; subst x;
+      repeat econstructor;
+        match goal with |- U.eval (U.var ?i) _ => eapply (U.e_var (env:=e) i) end
+  in
+    monoid_reify; intros t e l r;
+      eapply U.normalizer;
+        [ solve_eval | 
+          solve_eval |
+            compute [t e Reification.unpack Reification.val Reification.typ 
+              Reification.tgt Reification.src Reification.tgt_p Reification.src_p
+              Reification.sigma_get Reification.sigma_add Reification.sigma_empty
+              FMapPositive.PositiveMap.find FMapPositive.PositiveMap.add
+              FMapPositive.PositiveMap.empty ] ];
+        try clear t e l r.
 
 (*begintests
-(* tests pour les tactiques précédentes *)
-Goal forall `{Monoid} A B (a: X A B) (b: X B A) (c: X A A), c*a*(b*c*1)*a == c*(a*(1*b)*(c*a)).
+
+Import Reification Classes.
+(* Set Printing All. *)
+
+Lemma test_idx: forall `{Monoid} n m (a: Classes.X n m), a*1 == a.
+Proof.
+  intros.
+  monoid_normalize.           (* bugue avec '' *)
+  reflexivity.
+Qed.
+Print Assumptions test_idx.
+
+Lemma test0: forall `{Monoid} n, 1*1*(1*1*1)*1 == 1*(1*(1*1)*(1*one n)).
   intros.
   monoid_reflexivity.
 Qed.
 
-Goal forall `{Monoid} A B (a: X A B) (b: X B A) (c: X A A), c*a*(b*c*1)*a == c*(a*(1*b)*(c*a)).
+Lemma test1: forall `{Monoid} A B (a: X A B) (b: X B A) (c: X A A), c*a*(b*c*1)*a == c*(a*(1*b)*(c*a)).
   intros.
-  monoid_normalize.
-  reflexivity.
+  Time monoid_reflexivity.
 Qed.
+Print test1.
 
-Goal forall `{KleeneAlgebra} A B (a: X A B) (b: X B A) (c: X A A), c*a*(b*c#*1)*a <== c*(a*(1*b)*(c#*a)).
+Lemma test2: forall `{Monoid} A B (a: X A B) (b: X B A) (c: X A A), c*a*(b*c*1)*a == c*(a*(1*b)*(c*a)).
   intros.
-  (* TODO: repair *)
-  monoid_normalize.
+  Time monoid_normalize.
   reflexivity.
 Qed.
+Print test2.
+
+Lemma test3: forall `{Monoid} A B (a: X A B) (b: X B A) (c: X A A), 1*1*(1*1*1)*1 == c*(a*(1*b)*(c*a))*b.
+  intros.
+  Time monoid_normalize. 
+  admit.
+Qed.
+Print test3.
+
+Lemma test1': forall `{KleeneAlgebra} A B (a: X A B) (b: X B A) (c: X A A), c*a*(b*c#*1)*a <== c*(a*(1*b)*(c#*a)).
+  intros.
+  Time monoid_reflexivity.
+Qed.
+Print test1'.
+
+Lemma test2': forall `{KleeneAlgebra} A B (a: X A B) (b: X B A) (c: X A A), c*a*(b*c# *1)*a <== c*(a*(1*b)*(c#*a+a)).
+  intros.
+  Time monoid_normalize. 
+  admit.
+Time Qed.
+Print test2'.
+
 endtests*)
 
 
 
-(* rewrite modulo A *) 
+
+(** simple ad-hoc tactic for closed rewrites modulo associativity *) 
+
 Section monoid_rewrite_equal.
   Context `{M: Monoid}.
 
@@ -311,17 +448,21 @@ Section monoid_rewrite_equal.
   Proof. intros; rewrite <- H; monoid_reflexivity. Qed.
 End monoid_rewrite_equal.
 
+
+
 Section monoid_rewrite_leq.
   Context `{M: IdemSemiRing}.
 
-  (* Damien: je mets ce morphisme ici, bien qu'il soit dans [SemiRing] : 
-     il le faut pour prouver les continuations sur leq *)
+  (* This lemma cannot be in SemiRing only .. *)
   Instance dot_incr_temp A B C: 
   Proper ((leq A B) ==> (leq B C) ==> (leq A C)) (dot A B C).
   Proof.
     unfold leq; intros x y E x' y' E'.
     rewrite <- E, <- E'.
-    rewrite dot_distr_left, 2 dot_distr_right; aci_reflexivity.
+    rewrite dot_distr_left, 2 dot_distr_right. 
+    rewrite <- (plus_assoc (x*x')) at 1.
+    rewrite plus_assoc, plus_idem, plus_assoc. 
+    reflexivity.
   Qed.
 
   Lemma add_continuationl A B (r: X A B) (p: forall Q, X Q A -> X Q B) (P: Prop):
@@ -378,12 +519,10 @@ Section monoid_rewrite_leq.
 End monoid_rewrite_leq.
 
 
-Ltac add_continuation H H' := fail "TODO: generic add_continuation";
+Ltac add_continuation H H' := fail "todo: generic add_continuation";
   let Q := fresh "Q" in
   let q := fresh "q" in
   let r' := fresh "r" in
-  (* pour optimiser, on pourrait faire a la main les cas ou l est un produit de deux, trois ou quatre termes..., 
-     et retomber sur la tactique generique pour les autres *)
     match type of H with
       | equal ?A ?B ?l ?r =>
         (eapply (@add_continuation _ _ r); 
@@ -402,12 +541,6 @@ Ltac add_continuation H H' := fail "TODO: generic add_continuation";
       | _ => fail 1 "Not an equality"
     end.
 
-(*
-Goal forall `{M: Monoid} A B (a: X A B) (b: X B A) (c: X A A), a*b*c == c*c -> False.
-  intros.
-  add_continuation H H'.
-Abort.
-*)
 
 
 Ltac _monoid_rewrite_equal H :=
@@ -460,6 +593,7 @@ Tactic Notation "monoid_rewrite" "<-" constr(H) :=
 (*begintests
 Section monoid_rewrite_tests.
 
+  Require Import SemiLattice.
   Context `{ISR: IdemSemiRing}.
 
   Variable A: T.
@@ -474,7 +608,7 @@ Section monoid_rewrite_tests.
   Instance dot_incr_temp' A B C: 
   Proper ((leq A B) ==> (leq B C) ==> (leq A C)) (dot A B C).
   Proof.
-    intros until C; unfold leq; intros x y E x' y' E'.
+    unfold leq; intros x y E x' y' E'.
     rewrite <- E, <- E'.
     rewrite dot_distr_left, 2 dot_distr_right; aci_reflexivity.
   Qed.
@@ -504,45 +638,59 @@ Section monoid_rewrite_tests.
 End monoid_rewrite_tests.
 endtests*)
 
-(* finite iterations *)
-Fixpoint iter `{Monoid} A (a: X A A) n := 
-  match n with
-    | 0 => 1
-    | S n => a * iter a n
-  end.
-    
-Lemma iter_once `{Monoid} A (a: X A A): iter a 1 == a.
-Proof. intros; simpl; apply dot_neutral_right. Qed.
+
+(** Various properties about monoids and finite iterations *)
+Section Props1.
+  
+  Context `{M: Monoid}.
+
+  Fixpoint iter A (a: X A A) n := 
+    match n with
+      | 0 => 1
+      | S n => a * iter a n
+    end.
+
+  Variables A B C: T.
+     
+  Lemma iter_once (a: X A A): iter a 1 == a.
+  Proof. intros; simpl; apply dot_neutral_right. Qed.
+        
+  Lemma iter_split (a: X A A): forall m n, iter a (m+n) == iter a m * iter a n.
+  Proof.
+    induction m; intro n; simpl.
+    monoid_reflexivity.
+    rewrite IHm; monoid_reflexivity.
+  Qed.
       
-Lemma iter_split `{Monoid} A (a: X A A): forall m n, iter a (m+n) == iter a m * iter a n.
-Proof.
-  induction m; intro n; simpl.
-  monoid_reflexivity.
-  rewrite IHm; monoid_reflexivity.
-Qed.
-    
-Lemma iter_swap `{Monoid} A (a: X A A): forall n, a * iter a n == iter a n * a.
-Proof.
-  intros until n.
-  rewrite <- (iter_once a) at 4.
-  rewrite <- iter_split.
-  rewrite plus_comm.
-  reflexivity.
-Qed.
+  Lemma iter_swap (a: X A A): forall n, a * iter a n == iter a n * a.
+  Proof.
+    intros until n.
+    rewrite <- (iter_once a) at 4.
+    rewrite <- iter_split.
+    rewrite plus_comm.
+    reflexivity.
+  Qed.
+  
+  Lemma iter_swap2 (a: X A B) b: forall n, a * iter (b*a) n == iter (a*b) n * a.
+  Proof.
+    induction n; simpl.
+    monoid_reflexivity.
+    monoid_rewrite IHn.
+    monoid_reflexivity.
+  Qed.
+  
+  Lemma iter_compat n (a b: X A A): a==b -> iter a n == iter b n.
+  Proof.
+    intros E; induction n; simpl.
+    reflexivity.
+    rewrite IHn, E; reflexivity.
+  Qed.
+  
+  Lemma xif_dot: forall b (x y: X A B) (z: X B C), xif b x y * z == xif b (x*z) (y*z).
+  Proof. intros. destruct b; trivial. Qed.
 
-Lemma iter_swap2 `{Monoid} A B (a: X A B) b: forall n, a * iter (b*a) n == iter (a*b) n * a.
-Proof.
-  induction n; simpl.
-  monoid_reflexivity.
-  monoid_rewrite IHn.
-  monoid_reflexivity.
-Qed.
-
-Lemma iter_compat `{Monoid} n A (a b: X A A): a==b -> iter a n == iter b n.
-Proof.
-  intro E; induction n; simpl.
-  reflexivity.
-  rewrite IHn, E; reflexivity.
-Qed.
-
+  Lemma dot_xif: forall b (x y: X B A) (z: X C B), z * xif b x y == xif b (z*x) (z*y).
+  Proof. intros. destruct b; trivial. Qed.
+  
+End Props1.
 
