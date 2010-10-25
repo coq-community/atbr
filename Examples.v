@@ -1,30 +1,14 @@
 (**************************************************************************)
 (*  This is part of ATBR, it is distributed under the terms of the        *)
-(*           GNU Lesser General Public License version 3                  *)
-(*                (see file LICENSE for more details)                     *)
+(*         GNU Lesser General Public License version 3                    *)
+(*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*          Copyright 2009: Thomas Braibant, Damien Pous.                 *)
-(*                                                                        *)
+(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** * Examples about uses of the ATBR library *)
 
-(* replace "." with the path to ATBR library ; 
-   this line is not required if the path is just "ATBR" *)
-Add Rec LoadPath "." as ATBR.      
-
-
-Require Import ATBR.Common.
-Require Import ATBR.Classes.
-Require Import ATBR.Graph.
-Require Import ATBR.Monoid.
-Require Import ATBR.SemiLattice.
-Require Import ATBR.SemiRing.
-Require Import ATBR.KleeneAlgebra.
-
-(* The following file defines the [kleene_reflexivity] tactic. It is
-   quite long to load, we hope to improve this at some point *) 
-Require Import ATBR.DecideKleeneAlgebra.
+Require Import ATBR.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -205,7 +189,7 @@ End Tactics.
 
 Section Matrices.
 
-  Require Import ATBR.Matrices.
+  Require Import ATBR_Matrices.
 
   (** Assume an underlying idempotent semi-ring  *)
   Context `{ISR: IdemSemiRing}.
@@ -231,7 +215,7 @@ Section Matrices.
   Proof. 
     (** since the dimensions are known (and finite), the matricial product can be computed *)
     simpl.                     
-    (** the [mx_intros] simple tactic introduce indices to prove a
+    (** the [mx_intros] simple tactic introduces indices to prove a
     matricial equality; it is useful when considering vectors: only
     one dimension is introduced *)
     mx_intros i j Hi Hj.        
@@ -250,10 +234,11 @@ Section Matrices.
 
   (** Block matrices manipulation *)
   Lemma square_triangular_blocks A n m (M: MX(n,A)(n,A)) (N: MX(n,A)(m,A)) (P: MX(m,A)(m,A)):
-    makeMat_blocks M N 0 P * makeMat_blocks M N 0 P == makeMat_blocks (M*M) (M*N+N*P) 0 (P*P).
+    mx_blocks M N 0 P * mx_blocks M N 0 P == mx_blocks (M*M) (M*N+N*P) 0 (P*P).
   Proof.
-    rewrite Mat_blocks_dot.
-    apply makeMat_blocks_compat; semiring_reflexivity.
+    intros.
+    rewrite mx_blocks_dot.
+    apply mx_blocks_compat; semiring_reflexivity.
   Qed.
 
   (** (We will clean-up and document this library for matrices at some
@@ -267,18 +252,19 @@ End Matrices.
 
      To work with a concrete given struture, you need to show that it
      satisfies the corresponding axioms. Examples are given in files
-     RelAlg.v, BoolAlg.v, and PropAlg.v.
+     Model_*.v
 
-     For example, it is shown in RelAlg.v that (heterogeneous) binary
-     relations form a Kleene algebra with converse. This file can
-     easily be adapted to use other definitions.
+     For example, it is shown in Model_Relations.v that
+     (heterogeneous) binary relations form a Kleene algebra with
+     converse. This file can easily be adapted to use other
+     definitions.  
      *)
 
 
 Section Concrete.
 
-  Require Import ATBR.RelAlg.
-  Import ATBR.RelAlg.Load.
+  Require Import Model_Relations.
+  Import Load.
   (* the latter line is required in order to register binary relations
      to the typeclass mechanism *)
   
@@ -290,3 +276,28 @@ Section Concrete.
 
 End Concrete.
 
+
+(** Similarly, homogeneous relations (from the standard library) are
+    declared in Model_StdRelations, so that one can use our tactics to
+    reason about these.  *)
+
+Section Concrete'.
+
+  Require Import Relations.
+  Require Import Model_StdRelations.
+  Import Load.
+  
+  Variable A: Set.
+  Variables R S: relation A.
+
+  Lemma example: same_relation _
+    (clos_refl_trans _ (union _ R S))
+    (comp (clos_refl_trans _ R) (clos_refl_trans _ (comp S (clos_refl_trans _ R)))).
+  Proof.
+    intros.
+    fold_RelAlg A.
+    kleene_reflexivity.
+  Qed.
+  Print Assumptions example.
+  
+End Concrete'.

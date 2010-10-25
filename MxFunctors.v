@@ -1,17 +1,18 @@
 (**************************************************************************)
 (*  This is part of ATBR, it is distributed under the terms of the        *)
-(*           GNU Lesser General Public License version 3                  *)
-(*                (see file LICENSE for more details)                     *)
+(*         GNU Lesser General Public License version 3                    *)
+(*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*          Copyright 2009: Thomas Braibant, Damien Pous.                 *)
-(*                                                                        *)
+(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
+
+(* Extension of functors on base structures to functors on matrices *)
 
 Require Import Common.
 Require Import Classes.
 Require Import Monoid.
 Require Import SemiLattice.
-Require Import ATBR.SemiRing.
+Require Import SemiRing.
 Require Import KleeneAlgebra.
 Require Import MxGraph.
 Require Import MxSemiLattice.
@@ -41,7 +42,7 @@ Section Defs.
 
   Global Instance mxgraph_functor {HF: graph_functor F}: graph_functor mxF.
   Proof.
-    repeat intro. simpl. apply functor_compat. auto.
+    constructor. repeat intro. simpl. apply functor_compat. auto.
   Qed.
 
   Global Instance mxsemilattice_functor 
@@ -55,7 +56,7 @@ Section Defs.
   Qed.
   
   Global Instance mxsemiring_functor 
-  {SLo1: SemiLattice_Ops (G:=G1)} `{SL2: SemiLattice (G:=G2)} 
+  `{SL1: SemiLattice (G:=G1)} `{SL2: SemiLattice (G:=G2)} 
   {Mo1: Monoid_Ops (G:=G1)} {Mo2: Monoid_Ops (G:=G2)} 
   {HF: semiring_functor F}: semiring_functor mxF.
   Proof.
@@ -63,39 +64,39 @@ Section Defs.
 
      apply mxgraph_functor.
  
-     simpl. intros. destruct B as [m B]; simpl @fst in *.
+     simpl. intros. destruct B as [m B]; simpl fst in *; simpl snd in *.
      rewrite functor_sum. apply sum_compat. intros. apply functor_dot. 
 
-     simpl. intros. destruct_nat_dec.
+     simpl. intros. BoolView.nat_analyse.
      apply functor_one. apply functor_zero.
 
      apply mxsemilattice_functor.
   Qed.
 
-  Lemma functor_makeMat_blocks: 
+  Lemma functor_mx_blocks: 
     forall A B x y n m a b c d, 
-      mxF _ _ (@makeMat_blocks _ A B x y n m a b c d) == 
-      makeMat_blocks (mxF _ _ a) (mxF _ _ b) (mxF _ _ c) (mxF _ _ d).
+      mxF _ _ (@mx_blocks _ A B x y n m a b c d) == 
+      mx_blocks (mxF _ _ a) (mxF _ _ b) (mxF _ _ c) (mxF _ _ d).
   Proof. 
     simpl. intros. destruct_blocks; reflexivity. 
   Qed.
 
-  Lemma functor_subMat: 
+  Lemma functor_mx_sub: 
     forall A B n' m' x y n m M, 
-      mxF _ _ (@subMat _ A B n' m' x y n m M) =
-      subMat x y n m (mxF _ _ M).
+      mxF _ _ (@mx_sub _ A B n' m' x y n m M) =
+      mx_sub x y n m (mxF _ _ M).
   Proof. reflexivity. Qed.
 
-  Lemma functor_scal_to_Mat: 
+  Lemma functor_mx_of_scal: 
     forall A B a, 
-      mxF _ _ (@scal_to_Mat _ A B a) =
-      scal_to_Mat (F _ _ a).
+      mxF _ _ (@mx_of_scal _ A B a) =
+      mx_of_scal (F _ _ a).
   Proof. reflexivity. Qed.
 
-  Lemma functor_Mat_to_scal: 
+  Lemma functor_mx_to_scal: 
     forall A B M, 
-      F _ _ (@Mat_to_scal _ A B M) =
-      Mat_to_scal (mxF _ _ M).
+      F _ _ (@mx_to_scal _ A B M) =
+      mx_to_scal (mxF _ _ M).
   Proof. reflexivity. Qed.
 
   Global Instance mxkleene_functor 
@@ -111,21 +112,21 @@ Section Defs.
 
      unfold star, mx_Star_Op in *.
      unfold fst, snd.
-     unfold star_rec at 1; fold star_rec. unfold star_build.
+     unfold star_rec at 1. fold (star_rec (A:=A) (n:=n)). unfold star_build.
 
      change (S n) with (1+n)%nat.
-     rewrite functor_makeMat_blocks. 
-     rewrite functor_plus.
+     rewrite functor_mx_blocks.
+     rewrite functor_plus. 
      rewrite !functor_dot.
-     rewrite !functor_scal_to_Mat.
+     rewrite !functor_mx_of_scal.
      rewrite functor_star.
-     rewrite functor_Mat_to_scal. 
+     rewrite functor_mx_to_scal. 
      rewrite functor_plus. 
      rewrite functor_dot.
      do 4 rewrite functor_dot at 1.
      do 9 rewrite IHn at 1.
-     unfold sub00, sub01, sub10, sub11.
-     rewrite !functor_subMat. reflexivity.
+     unfold mx_sub00, mx_sub01, mx_sub10, mx_sub11.
+     rewrite !functor_mx_sub. reflexivity.
    Qed.
   
 End Defs.

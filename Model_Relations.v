@@ -1,13 +1,12 @@
 (**************************************************************************)
 (*  This is part of ATBR, it is distributed under the terms of the        *)
-(*           GNU Lesser General Public License version 3                  *)
-(*                (see file LICENSE for more details)                     *)
+(*         GNU Lesser General Public License version 3                    *)
+(*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*          Copyright 2009: Thomas Braibant, Damien Pous.                 *)
-(*                                                                        *)
+(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
-(*i $Id$ i*)
+(** Model of heterogeneous binary relations *)
 
 Require Import Common.
 Require Import Classes.
@@ -38,6 +37,7 @@ Section Def.
     X := rel;
     equal := rel_equal
   }.
+  
   Next Obligation.
     constructor; unfold rel_equal; repeat intro; intuition.
     apply H in H0; trivial.
@@ -89,12 +89,6 @@ Section Def.
 
   Definition Rel_IdemSemiRing: IdemSemiRing := Converse.CISR_ISR.  
 
-(*   Instance Rel_Monoid: Monoid := . *)
-(*   Proof. *)
-(*     constructor; compute; intuition (destruct_ex ; eauto). *)
-(*     subst; auto. *)
-(*     subst; auto. *)
-(*   Qed. *)
 
   Lemma rel_leq A B: forall (a b: @X (Rel_Graph) A B), a<==b <-> forall x y, a x y -> b x y.
   Proof.
@@ -129,19 +123,28 @@ Section Def.
 End Def.
 
 
+(** Import this module to work with binary relations *)
 Module Load.
 
   Existing Instance Rel_Graph.
   Existing Instance Rel_SemiLattice_Ops.
   Existing Instance Rel_Monoid_Ops.
-  Existing Instance Rel_Star_Op.
   Existing Instance Rel_Converse_Op.
   Existing Instance Rel_SemiLattice.
+  Existing Instance Rel_Star_Op.
   Existing Instance Rel_KleeneAlgebra.
   
   Canonical Structure Rel_Graph.
   
-  Transparent equal star plus dot one zero.
+  Transparent equal plus dot one zero star. 
 
+  Ltac fold_RelAlg := 
+    change rel_equal with (@equal Rel_Graph); 
+      change rel_id with (@one Rel_Graph Rel_Monoid_Ops);
+        change rel_comp with (@dot Rel_Graph Rel_Monoid_Ops);
+          change rel_union with (@plus Rel_Graph Rel_SemiLattice_Ops);
+            change rel_empty with (@zero Rel_Graph Rel_SemiLattice_Ops);
+              change rel_star with (@star Rel_Graph Rel_Star_Op).
+    
 End Load.
 

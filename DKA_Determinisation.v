@@ -1,919 +1,580 @@
 (**************************************************************************)
 (*  This is part of ATBR, it is distributed under the terms of the        *)
-(*           GNU Lesser General Public License version 3                  *)
-(*                (see file LICENSE for more details)                     *)
+(*         GNU Lesser General Public License version 3                    *)
+(*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*          Copyright 2009: Thomas Braibant, Damien Pous.                 *)
-(*                                                                        *)
+(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
-(*i $Id$ i*)
+(** Conversion from NFAs to DFAs.
+
+    The algorithm basically constructs a [Store], i.e.,
+    - a bijection from reachable set of states to a new set of states,
+    represented as a [Table] together with a bound (the next fresh state, 
+    or, equivalently, the size of the [Table])
+    - a transition relation over these new states, represented by a
+      map ([Delta])
+    *)
 
 Require Import Common.
 Require Import Classes.
-Require Import SemiLattice.
+Require Import Graph.
 Require Import Monoid.
-Require Import ATBR.SemiRing.
+Require Import SemiLattice.
+Require Import SemiRing.
 Require Import KleeneAlgebra.
 Require Import MxGraph.
+Require Import MxSemiLattice.
 Require Import MxSemiRing.
 Require Import MxKleeneAlgebra.
-Require Import BoolAlg.
-Require Import FreeKleeneAlg.
 
-Require Import DKA_Annexe.
+Require Import DKA_Definitions.
+Require Import DKA_StateSetSets.
+Require Import Numbers.
+Require Import Utils_WF.
 
 Set Implicit Arguments.
+Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 
-Lemma alg_eval `{KleeneAlgebra} B B' A C: forall (x: X B' B) (u: X A B) m v u' m' (v': X B' C),
-  u'*x == u ->
-  m'*x == x*m ->
-  v' == x*v ->
-  u'*m'#*v' == u*m#*v.
-Proof.
-  intros.
-  rewrite H2. 
-  rewrite <- H0.
-  monoid_rewrite <- (comm_iter_left H1).
-  monoid_reflexivity.
-Qed.
+Import Numbers.Positive.
+Open Scope num_scope.
 
 
-Section Protect.
 
-Opaque equal dot plus one zero star.
 
-Existing Instance bool_SemiLattice_Ops. 
-Existing Instance bool_Monoid_Ops.
-Existing Instance bool_Star_Op.
-Existing Instance bool_SemiLattice.
-Existing Instance bool_Monoid.
-Existing Instance bool_SemiRing.
-Existing Instance bool_KleeneAlgebra.
+Notation Table := (statesetmap state).
+Notation Delta := (statelabelmap state).
+Notation Store := (Table * Delta * state)%type.
 
-Existing Instance KAF_SemiLattice_Ops. 
-Existing Instance KAF_Monoid_Ops.
-Existing Instance KAF_Star_Op.
-Existing Instance KAF_SemiLattice.
-Existing Instance KAF_Monoid.
-Existing Instance KAF_SemiRing.
-Existing Instance KAF_KleeneAlgebra.
+Section S.
 
-Import Det.
-
-Section Termination.
-
-  Variable A: NFA.
-  Notation size := (N_size A).
-
-  Fixpoint power n := (match n with O => 1 | S n => 2*power n end)%nat.
-
-  Lemma below0_empty p: below p 0 -> StateSet.Empty p.
-  Proof.
-    intros H.
-    rewrite StateSetProp.elements_Empty.
-    remember (StateSet.elements p) as l. destruct l as [|i l]. trivial.
-    lpose (H i) as H'. 
-    rewrite StateSetFact.elements_iff. rewrite <- Heql. auto.  
-    inversion H'.
-  Qed.
-
-  Definition statesetset_map f t :=
-    StateSetSet.fold (fun x acc => StateSetSet.add (f x) acc) t StateSetSet.empty.
-
-  Section sssm.
-    Variable t0: StateSetSet.t.
-    Variable f: stateset -> stateset.
-
-    Lemma statesetset_map_in p:
-      StateSetSet.In p (statesetset_map f t0) -> exists2 q, StateSetSet.In q t0 & StateSet.Equal (f q) p.
-    Proof.
-      unfold statesetset_map.
-      apply StateSetSetProp.fold_rec_nodep.  statesetset_dec.
-      intros q a Hq IH.  StateSetSetFact.set_iff. intros [Hp|Hp]; eauto. 
-    Qed.
-
-    Hypothesis Hf: forall p q, StateSetSet.In p t0 -> StateSetSet.In q t0 -> 
-      (StateSet.Equal (f p) (f q) <-> StateSet.Equal p q).
-
-    Lemma statesetset_map_cardinal:
-      StateSetSet.cardinal (statesetset_map f t0) = StateSetSet.cardinal t0.
-    Proof.
-      refine (proj2 (StateSetSetProp.fold_rec_bis 
-        (P:=fun t a => (forall p, StateSetSet.In p t0 -> (StateSetSet.In (f p) a <-> StateSetSet.In p t)) /\  
-          ((forall p, StateSetSet.In p t -> StateSetSet.In p t0) -> StateSetSet.cardinal a = StateSetSet.cardinal t)) _ _ _) _); trivial. 
-      intros. setoid_rewrite <- H. trivial. 
-      split; trivial. statesetset_dec. 
-      intros p a t' Hp Hp' [IH IHc]. split.
-      intros q Hq. StateSetSetFact.set_iff. specialize (IH q Hq). rewrite Hf by auto. tauto.  
-      intros Ht'.
-      rewrite (StateSetSetProp.cardinal_2 (s:=a) (x:=f p)); auto with map. 
-      symmetry. rewrite (StateSetSetProp.cardinal_2 (s:=t') (x:=p)); auto with map. 
-      symmetry. rewrite IHc; auto. intros q Hq. apply Ht'. statesetset_dec.
-      rewrite IH; auto.
-    Qed.
-
-  End sssm.
-
-  Lemma card_pset s t: (forall p, StateSetSet.In p t -> below p s) -> StateSetSet.cardinal t <= power s.
-  Proof. 
-    induction s in t |- *; intros H; simpl.
-    (* il ne peut y avoir que l'ensemble vide dans la table *)
-     destruct (StateSetSetProp.cardinal_0 t) as (l&Hl&Hlt&->).
-     setoid_rewrite Hlt in H. clear Hlt.
-     destruct l as [|x [| y q]]; simpl; auto with arith. elimtype False.
-     inversion_clear Hl. apply H0. left. clear H0 H1.
-     lpose (@below0_empty x) as Hx. apply H. left. reflexivity.
-     lpose (@below0_empty y) as Hy. apply H. right. left. reflexivity.
-     stateset_dec.
-
-    (* il faut partitionner: ceux qui contiennent s et les autres *)
-    remember (StateSetSet.partition (fun p => StateSet.mem s p) t) as tt. 
-    pose (t0' := statesetset_map (StateSet.remove s) (fst tt)).
-    setoid_replace t with (StateSetSet.union (fst tt) (snd tt)).
-    rewrite StateSetSetProp'.union_cardinal.
-    replace (StateSetSet.cardinal (fst tt)) with (StateSetSet.cardinal t0').
-    lpose (IHs (snd tt)) as Ht0'. 2:lpose (IHs t0') as H1. 3: omega.
-
-     rewrite Heqtt. intro p. 
-     rewrite (fun f H t => StateSetSet.equal_2 (StateSetSetProp'.partition_filter_2 f H t)).
-     rewrite StateSetSetFact.mem_iff.
-     rewrite StateSetSetProp'.filter_mem.
-     case_eq (StateSetSet.mem p t). 2:(intros; discriminate). simpl. intros Hp Hp'. 
-     intros x Hx. destruct (eq_nat_dec x s). rewrite e in Hx. revert Hp'. 
-     case_eq (StateSet.mem s p). intros; try discriminate. rewrite <- StateSetFact.not_mem_iff. tauto. 
-     rewrite <- StateSetSetFact.mem_iff in Hp. pose (H' := H p Hp x Hx). simpl in H'. omega.
-     repeat intro. rewrite H0. trivial.
-     repeat intro. rewrite H0. trivial.
-
-     intros p Hp. destruct (statesetset_map_in _ _ Hp) as [q Hq Hq']. revert Hq.
-     rewrite Heqtt. 
-     rewrite (fun f H t => StateSetSet.equal_2 (StateSetSetProp'.partition_filter_1 f H t)).
-     rewrite StateSetSetFact.mem_iff.
-     rewrite StateSetSetProp'.filter_mem.
-     case_eq (StateSetSet.mem q t). 2:(intros; discriminate). simpl. intros Hq Hq''. 
-     intros x Hx. destruct (eq_nat_dec x s). rewrite e in Hx. stateset_dec. 
-     rewrite <- StateSetSetFact.mem_iff in Hq. 
-     rewrite <- StateSetFact.mem_iff in Hq''. 
-     specialize (H q Hq). lpose (H x) as H'. stateset_dec. omega.
-     repeat intro. rewrite H0. trivial.
-     repeat intro. rewrite H0. trivial.
-
-     apply statesetset_map_cardinal. 
-     rewrite Heqtt. intros p q.
-     rewrite (fun f H t => StateSetSet.equal_2 (StateSetSetProp'.partition_filter_1 f H t)).
-     setoid_rewrite StateSetSetFact.mem_iff.
-     setoid_rewrite StateSetSetProp'.filter_mem. 
-     case (StateSetSet.mem p t). 2: (intros; discriminate).
-     case (StateSetSet.mem q t). 2: (intros; discriminate). simpl.
-     setoid_rewrite <- StateSetFact.mem_iff. 
-     (* BUG de fsetdec ? devrait passer, non ? *)
-     (*      stateset_dec. *)
-     split; intro; stateset_dec. (* long... *)
-     repeat intro. rewrite H0. trivial.
-     repeat intro. rewrite H0. trivial.
-     repeat intro. rewrite H0. trivial.
-
-    intro x. rewrite Heqtt. 
-    rewrite (fun f H t => StateSetSet.equal_2 (StateSetSetProp'.partition_filter_1 f H t)).
-    rewrite (fun f H t => StateSetSet.equal_2 (StateSetSetProp'.partition_filter_2 f H t)).
-    setoid_rewrite StateSetSetProp'.filter_mem. case (StateSet.mem s x); case (StateSetSet.mem x t); trivial. 
-    repeat intro. rewrite H0. trivial.
-    repeat intro. rewrite H0. trivial.
-    repeat intro. rewrite H0. trivial.
-    repeat intro. rewrite H0. trivial.
-    
-    rewrite Heqtt.
-    rewrite (fun f H t => StateSetSet.equal_2 (StateSetSetProp'.partition_filter_1 f H t)).
-    rewrite (fun f H t => StateSetSet.equal_2 (StateSetSetProp'.partition_filter_2 f H t)).
-    rewrite StateSetSetProp'.union_filter.
-    intro u. setoid_rewrite StateSetSetFact.mem_iff.
-    rewrite StateSetSetProp'.filter_mem.
-    rewrite andb_comm. case (StateSet.mem s u); simpl; tauto.
-    repeat intro. rewrite H0. trivial.
-    repeat intro. rewrite H0. trivial.
-    repeat intro. rewrite H0. trivial.
-    repeat intro. rewrite H0. trivial.
-    repeat intro. rewrite H0. trivial.
-  Qed.
+  Open Scope num_scope.
+  Variable A : NFA.t.
   
-  Definition domain t := StateSetMap.fold (fun p (np: nat) a => StateSetSet.add p a) t StateSetSet.empty.
-  
-  Lemma cardinal_domain t: StateSetSet.cardinal (domain t) = StateSetMap.cardinal t.
-  Proof.
-    refine (proj2 (StateSetMapProp.fold_rec_bis 
-      (P:=fun t a => (forall p, StateSetSet.In p a <-> StateSetMap.In p t) /\  
-                     StateSetSet.cardinal a = StateSetMap.cardinal t) _ _ _)). 
-    intros. setoid_rewrite <- H. trivial. 
-    split; trivial. split. statesetset_dec. StateSetMapFact.map_iff. tauto. 
-    intros p np a t' Hp Hp' [IH IHc]. split.
-    intro q. StateSetSetFact.set_iff. StateSetMapFact.map_iff. specialize (IH q). tauto.
-    rewrite (StateSetMapProp.cardinal_2 Hp') by (intro; reflexivity). 
-    rewrite (StateSetSetProp.cardinal_2 (s:=a) (x:=p)). congruence. rewrite IH; trivial.
-    auto with map.
-  Qed.  
+  Notation delta := (NFA.delta A).
+  Notation initiaux := (NFA.initiaux A).
+  Notation finaux := (NFA.finaux A).
+  Notation max_label := (NFA.max_label A).
+  Notation size := (NFA.size A).
 
-  Definition valid_elts s t := 
-    StateSetMap.cardinal 
-      (@StateSetMapProp.filter_dom nat
-        (fun p => StateSet.for_all (fun i => negb (le_lt_dec s i) (* i<s *)) p)
-        t).
+  (** extension of the transition function to sets *)
+  Definition delta_set :=
+    let delta := delta in
+      fun (a: label) (q: stateset) => StateSet.fold (fun x => StateSet.union (delta a x)) q StateSet.empty.
 
-  Lemma bbool_view b1 b2: (b1=true <-> b2=true) -> b1=b2.
-  Proof. destruct b1 as [|], b2 as [|]; intuition. Qed.
+  (** we start with the store mapping the set of initial states to one *)
+  Definition initial_store: Store := 
+    (StateSetMap.add initiaux (state_of_nat 0) (StateSetMap.empty _),StateLabelMap.empty _,(state_of_nat 1)).
 
-  Lemma for_all_compat f: Proper (StateSet.Equal ==> @eq bool) (StateSet.for_all f).
-  Proof. 
-    intros x y H.
-    apply bbool_view.
-    rewrite <- 2StateSetFact.for_all_iff by (repeat intro; subst; trivial). 
-    (split; intros Ht i); [rewrite <- H| rewrite H]; auto.  
-  Qed.
+  (** the algorithm (function [build_store] below) consists in iterating the following function [step], 
+     defined by open recursion through the [loop] argument.
+     intuitively, [step loop p np a s] assumes that [p] points to [np] in the store [s] ;
+     it returns the store where all descendants of [p] along [a] have been added.
+     *)
+  Definition step loop p np := 
+    let delta_set := delta_set in
+    (fun a s => 
+      let q := delta_set a p in
+        let '(table,d,next) := s in
+          match StateSetMap.find q table with 
+            | None => loop (StateSetMap.add q next table, StateLabelMap.add (np,a) next d, S next) q next
+            | Some nq => (table, StateLabelMap.add (np,a) nq d, next)
+          end
+    ).
 
-  Lemma valid_add s: forall p np table, 
-    StateSetMap.find p table = None -> 
-    below p s ->
-    valid_elts s (StateSetMap.add p np table) = S (valid_elts s table).
-  Proof.
-    intros. unfold valid_elts. unfold StateSetMapProp.filter_dom.
-    apply StateSetMapProp.cardinal_2 with p np.
-     apply <- StateSetMapFact.not_find_in_iff.
-     match goal with |- ?x = None => case_eq x end; trivial. intros n Hn. 
-     rewrite <- StateSetMapFact.find_mapsto_iff in Hn.
-     rewrite -> StateSetMapProp.filter_iff in Hn. apply proj1 in Hn.
-     rewrite -> StateSetMapFact.find_mapsto_iff, H in Hn. discriminate.
-     repeat intro. subst. apply for_all_compat. assumption.
+  (** powerfix does (2^size) iterations, which is sufficient since the set of 
+     reachable sets of states cannot have a larger size. 
+     at each stage, one folds over the set of labels to add all the descendence of [p] 
+     *)
+  Definition build_store :=
+    let step := step in
+    let max_label := max_label in
+    powerfix size
+    (fun loop (s: Store) (p: stateset) (np: state) => 
+      fold_labels (step loop p np) max_label s
+    ) (fun s _ _ => s) initial_store initiaux 0.
 
-     intro q.
-     match goal with |- ?x = _ => case_eq x; [intros r Hr|intro Hr]; symmetry end. 
-      rewrite <- StateSetMapFact.find_mapsto_iff in Hr.
-      rewrite <- StateSetMapFact.find_mapsto_iff. 
-      rewrite StateSetMapProp.filter_iff in Hr. destruct Hr as [Hr Hr'].
-      rewrite StateSetMapFact.add_mapsto_iff in Hr. intuition. 
-      subst. auto with map.
-      apply StateSetMap.add_2; trivial.
-      rewrite StateSetMapProp.filter_iff. auto. 
-      repeat intro. subst. apply for_all_compat. assumption. 
-      repeat intro. subst. apply for_all_compat. assumption. 
-      
-      rewrite <- StateSetMapFact.not_find_in_iff in Hr.
-      rewrite <- StateSetMapFact.not_find_in_iff.
-      StateSetMapFact.map_iff. intros [Hr'|[nq Hr']]; apply Hr; clear Hr.
-       rewrite <- Hr'. clear Hr' q. exists np. rewrite StateSetMapProp.filter_iff.
-       split. apply StateSetMap.add_1; trivial. 
-       rewrite <- StateSetFact.for_all_iff by (repeat intro; subst; trivial). 
-       intros x Hx. destruct (le_lt_dec s x); trivial. simpl. pose (H':= H0 x Hx). omega_false.
-       repeat intro. subst. apply for_all_compat. assumption. 
+  (** once we obtained the store, it suffices to convert it into a DFA *)
+  Definition table_finals (table: Table) :=
+    let finaux := finaux in
+    StateSetMap.fold 
+      (fun p np acc => 
+        if StateSet.exists_ (fun s => StateSet.mem s finaux) p 
+          then StateSet.add np acc else acc
+      ) table StateSet.empty.
 
-       exists nq.
-       rewrite StateSetMapProp.filter_iff in Hr'. destruct Hr' as [Hq Hr'].
-       rewrite StateSetMapProp.filter_iff. split; auto.
-       apply StateSetMap.add_2; trivial. 
-       intro Hpq. rewrite <- Hpq in Hq. 
-       rewrite StateSetMapFact.find_mapsto_iff, H in Hq. discriminate.
-       repeat intro. subst. apply for_all_compat. assumption. 
-       repeat intro. subst. apply for_all_compat. assumption. 
-  Qed. 
+  Definition delta' (d: Delta) := 
+    fun a x => match StateLabelMap.find (x,a) d with Some y => y | None => 0 end.
+
+  Definition NFA_to_DFA :=
+    let '(t,d,n) := build_store in
+      DFA.build n 
+      (delta' d)
+      0
+      (table_finals t)
+      max_label.
 
 
-  Lemma valid_size: forall s table, valid_elts s table <= power s.
-  Proof.
-    intros. unfold valid_elts.
-    rewrite <- cardinal_domain.
-    apply card_pset. intro p. 
-    unfold domain.
-    apply StateSetMapProp.fold_rec_nodep. statesetset_dec. 
-    intros q nq a Hq IH.
-    StateSetSetFact.set_iff. intros [H|H]. 2: auto.
-    clear IH. unfold StateSetMapProp.filter_dom in Hq. rewrite StateSetMapProp.filter_iff in Hq.
-    apply proj2 in Hq. rewrite <- StateSetFact.for_all_iff in Hq.
-    intros x Hx. rewrite <- H in Hx. generalize (Hq x Hx). destruct (le_lt_dec s x); trivial. intro. discriminate. 
-    repeat intro. subst. trivial.
-    repeat intro. subst. apply for_all_compat. assumption. 
-  Qed.
-
-  Lemma delta_set_below: NFA_wf A -> forall p b,(* below p size ->*) b<N_max_label A -> below (delta_set A p b) size.
-  Proof.
-    intros.
-    unfold delta_set.
-    apply StateSetProp.fold_rec_nodep.
-    intros x Hx. stateset_dec.
-    intros x a Hx IH y Hy. apply StateSet.union_1 in Hy as [Hy|Hy].
-    eapply (proj2 (proj2 H)); eauto.
-    apply IH. assumption.
-  Qed.
-
-  (* l'énoncé ne doit pas bouger : requis par DecideKleeneAlgebra *)
-  Theorem Termination: Det.Termination A.
-  Proof.
-    intros HA.
-    eapply (lexico_incl_wf 
-      (fun nttd: NTTD => 
-        let '(_,table,todo,_) := nttd in 
-          (power size - valid_elts size table, List.length todo))); try apply lt_wf.
-    intros nttd' nttd H. inversion_clear H. clear nttd nttd'.
-    destruct ntt as [[next' table'] todo']. simpl.
-    revert next table todo H0. rename dp into dp'. generalize (StateMap.empty nat) as dp.
-    unfold explore_labels. 
-    generalize (lt_n_Sn (N_max_label A)). pattern (N_max_label A) at -2.
-    induction (N_max_label A) as [| b IHb]; intros Hb dp next table todo H.
-     inversion_clear H.
-     right. simpl. trivial with arith. 
-     
-     simpl in H.
-     case_eq (StateSetMap.find (delta_set A p b) table).
-      intros nq Hnq. rewrite Hnq in H. apply IHb in H; auto with arith. 
-      intro Ht. rewrite Ht in H. apply IHb in H; auto with arith. clear IHb.
-      left.
-      lpose (@valid_add size _ next _ Ht) as Hs. apply delta_set_below; auto with arith.
-      inversion H; subst; clear H.
-       omega.
-       pose proof (valid_size size (StateSetMap.add (delta_set A p b) next table)). omega.
-  Qed.
-
-End Termination.
-
-Section Correction.
-
-  Variable A: NFA.
-  Hypothesis HA: NFA_wf A.
-
-  Notation explore := (explore (@Termination _) HA).
-
-  Notation size := (N_size A).
-  Notation delta := (N_delta A).
-  Notation initiaux := (N_initiaux A).
-  Notation finaux := (N_finaux A).
-  Notation max_label := (N_max_label A).
-
-  (* d contient la transition np -a-> nq *)
-  Definition MapsTo2 (np: state) (a: label) (nq: state) (d: Delta) := 
-    (exists2 dp, StateMap.MapsTo np dp d & LabelMap.MapsTo a nq dp).
-
-  (* égalité sur les listes (SetoiList.InA inliné) *)
-  Inductive In_list: Todo -> list Todo -> Prop :=
-  | In_head: forall p p' np q, StateSet.Equal p p' -> In_list (p,np) ((p',np)::q)
-  | In_tail: forall pnp x q, In_list pnp q -> In_list pnp (x::q).
-
-  (* invariant de la fonction explore *)
-  Record invariant_explore next table todo d := {
-    (* la table ne pointe que vers des etats valides *)
-    ie_table_wf: forall s i, StateSetMap.MapsTo s i table -> i < next;
-    (* la table ne part que d'états valides *)
-    ie_table_wf': forall s i, StateSetMap.MapsTo s i table -> below s size;
-    (* la table est injective *)
-    ie_table_inj: forall s t i, StateSetMap.MapsTo s i table -> StateSetMap.MapsTo t i table -> StateSet.Equal s t;
-    (* la table est surjective (up to next) *)
-    ie_table_surj: forall i, i<next -> { s | StateSetMap.MapsTo s i table };
-    (* la liste todo est contenue dans la table *)
-    ie_todo_table: forall p np, In_list (p,np) todo -> StateSetMap.MapsTo p np table;
-    (* tout etat de la table, mais pas dans todo, admet ses successeurs dans delta *)
-    ie_table_delta_set: forall p a np, a < max_label -> 
-      StateSetMap.MapsTo p np table -> 
-         In_list (p,np) todo 
-      \/ exists2 nq, MapsTo2 np a nq d & StateSetMap.MapsTo (delta_set A p a) nq table;
-    (* toute transition de d correspond a une transition de delta_set
-       (et en particulier, tous les points de delta sont dans la table) *)
-    ie_delta: forall np a nq, MapsTo2 np a nq d -> 
-      exists2 p, StateSetMap.MapsTo p np table & StateSetMap.MapsTo (delta_set A p a) nq table
-  }.
-
-  Definition invariant_explore' nttd :=
-    let '(next,table,todo,d) := nttd in invariant_explore next table todo d.
-
-  (* invariant de la fonction explore_labels *)
-  Record invariant_explore_labels p np dp next table todo d b := {
-    (* l'invariant externe est satisfait *)
-    iel_ie: invariant_explore next table ((p,np)::todo) d;
-    (* p admet tous ses successeurs par des labels >= b dans dp *)
-    iel_dp_delta_set_table: forall a, b <= a -> a < max_label -> 
-      exists2 nq, LabelMap.MapsTo a nq dp & StateSetMap.MapsTo (delta_set A p a) nq table;
-    (* toute transition de dp correspond a une transition de delta_set 
-       (et en particulier, tous les points de dp sont dans la table) *)
-    iel_dp: forall a nq, LabelMap.MapsTo a nq dp -> StateSetMap.MapsTo (delta_set A p a) nq table
-  }.
-
-  Definition invariant_explore_labels' p np nttdp d :=
-    let '(next,table,todo,dp) := nttdp in invariant_explore_labels p np dp next table todo d.
-
-  Definition delta_set' a q := delta_set A q a.
-
-  Instance delta_set_compat a: Proper (StateSet.Equal ==> StateSet.Equal) (delta_set' a).
-  Proof.
-    intros s t H. unfold delta_set', delta_set.
-    rewrite StateSetOrdProp.fold_equal. reflexivity. 3: assumption. 
-    constructor; repeat intro; stateset_dec.
-    intros x x' -> y y' Hy. rewrite Hy. reflexivity. 
-  Qed.  
+  (** Now starts the correctness proof ; we need to know that the NFA [A] is bounded. *)
+  Hypothesis HA: NFA.bounded A.
 
 
-  Lemma In_list_2cons: forall p np x p' np' q,
-    In_list (p,np) (x::(p',np')::q) <-> StateSet.Equal p p' /\ np=np' \/ In_list (p,np) (x::q).
-  Proof.
-    intros p np [x nx] p' np' q; split; intro H.
-    inversion_clear H.
-     right. left. trivial.
-     inversion_clear H0; auto. 
-     right. right. trivial.
-    destruct H as [[H ->] | H].
-     right. left. trivial.
-    inversion_clear H.
-     left. trivial.
-     right. right. trivial.
-  Qed.
+  (** We start the correctness proof by characterising [build_store] with the 
+     following simpler fixpoint (which is problemetic from the computational point of 
+     view: one has to compute the worst case exponential bound, even if it is not 
+     reached) *)
 
-  Lemma delta_set_wf: forall p a, below p size -> a<max_label -> below (delta_set A p a) size.
-  Proof.
-    intros p a Hp Ha i.
-    unfold delta_set.
-    apply StateSetProp.fold_rec_nodep.
-    stateset_dec.
-    intros j q Hjq Hq.
-    StateSetFact.set_iff. intros [H | H]; auto.
-    eapply (proj2 (proj2 HA)); eauto. 
-  Qed.
-
-  Lemma explore_labels_invariant: forall p np nttdp d,
-    invariant_explore_labels' p np nttdp d max_label ->
-    invariant_explore_labels' p np (explore_labels A p np nttdp) d O.
-  Proof.
-    unfold explore_labels. fold max_label. intros p np. generalize (lt_n_Sn max_label).
-    pattern max_label at -2. induction max_label as [|b IHb]; simpl; intros Hb [[[next table] todo] dp] d IH. 
-     assumption.
-
-     (* cas inductif de explore_labels *)
-     remember (insert_table (next,table,todo) (delta_set A p b)) as it.
-     destruct it as [nq [[next' table'] todo']].
-     apply IHb. omega.
-     unfold insert_table in Heqit.
-     remember (StateSetMap.find (delta_set A p b) table) as snq. destruct snq as [nq'|].
-      (* l'etat existait *)
-      inversion Heqit. subst. clear Heqit.
-      symmetry in Heqsnq. rewrite <- StateSetMapFact.find_mapsto_iff in Heqsnq.
-      destruct IH. destruct iel_ie0. constructor. constructor; intuition.
-       intros a Ha Ha'.
-       destruct (eq_nat_dec a b). subst.
-       exists nq'; auto. apply StateMap.add_1; trivial.
-       destruct (iel_dp_delta_set_table0 a) as [nq Hnq Hnq']; trivial. omega.
-       exists nq; auto. apply StateMap.add_2; trivial. compute; intro; subst; tauto_false.
-
-       intros a nq Ha.
-       rewrite StateMapFact.add_mapsto_iff in Ha. intuition. subst. assumption.
-
-       (* on ajoute un nouvel etat *)
-      inversion Heqit. subst. clear Heqit.
-      destruct IH. destruct iel_ie0. constructor. constructor.  
-       (* table_wf *)
-       intros s i H. rewrite StateSetMapFact.add_mapsto_iff in H. intuition. 
-       apply ie_table_wf0 in H1. auto with arith. 
-
-       (* table_wf' *)
-       intros s i H. rewrite StateSetMapFact.add_mapsto_iff in H. intuition. 
-       intros x Hx. rewrite <- H in Hx. revert x Hx. apply delta_set_wf. 
-        eapply ie_table_wf'0. apply ie_todo_table0. left. reflexivity.  omega. 
-       apply ie_table_wf'0 in H1. trivial.
-
-       (* table_inj *)
-       intros s t i Hs Ht. 
-       rewrite StateSetMapFact.add_mapsto_iff in Hs. 
-       rewrite StateSetMapFact.add_mapsto_iff in Ht. 
-       intuition.
-        rewrite <- H0. trivial. 
-        subst. apply ie_table_wf0 in H3. omega_false.
-        subst. apply ie_table_wf0 in H1. omega_false.
-        apply ie_table_inj0 with i; trivial.
-
-       (* table_surj *)
-       intros i Hi.
-       destruct (eq_nat_dec i next). subst.
-       exists (delta_set A p b). auto with map.
-       destruct (ie_table_surj0 i) as [s Hs]. omega. exists s. apply StateSetMap.add_2; trivial.
-       intro H. rewrite H in Heqsnq.
-       rewrite StateSetMapFact.find_mapsto_iff, <- Heqsnq in Hs. discriminate.
-
-       (* todo_table *)
-       intros q nq Hq. destruct (eq_nat_dec nq next). subst.
-        destruct (proj1 (In_list_2cons _ _ _ _ _ _) Hq) as [[H _]|H]; clear Hq. 
-        apply StateSetMap.add_1. symmetry in H; trivial.
-        apply ie_todo_table0, ie_table_wf0 in H. omega_false.
-        destruct (proj1 (In_list_2cons _ _ _ _ _ _) Hq) as [[H Hn]|H]; clear Hq. tauto.
-        apply StateSetMap.add_2; auto. 
-        intro H'. rewrite H' in Heqsnq. clear H'.
-        apply ie_todo_table0 in H. rewrite StateSetMapFact.find_mapsto_iff, <- Heqsnq in H. discriminate.
-
-       (* table_delta_set *)
-       intros q a nq Ha Hq.
-       rewrite StateSetMapFact.add_mapsto_iff in Hq. intuition. subst.
-        left. right. left. symmetry; trivial.
-        destruct (ie_table_delta_set0 q a nq Ha H1) as [H|[nq' Hnq' Hnq'']].
-        left. apply <- In_list_2cons. auto. 
-        right. exists nq'; auto. 
-        apply StateSetMap.add_2; auto. 
-        intro H'. rewrite H' in Heqsnq. clear H'.
-        rewrite StateSetMapFact.find_mapsto_iff, <- Heqsnq in Hnq''. discriminate.
-
-       (* delta *)
-       intros nq a nq' Hq.
-       destruct (ie_delta0 _ _ _ Hq) as [q Hq' Hq''].
-       exists q. 
-        apply StateSetMap.add_2; auto. intro H'. rewrite H' in Heqsnq. clear H'.
-        rewrite StateSetMapFact.find_mapsto_iff, <- Heqsnq in Hq'. discriminate.
-        apply StateSetMap.add_2; auto. intro H'. rewrite H' in Heqsnq. clear H'.
-        rewrite StateSetMapFact.find_mapsto_iff, <- Heqsnq in Hq''. discriminate.
-
-       (* dp_delta_set_table *)
-       intros a Ha Ha'. destruct (eq_nat_dec b a). subst.
-        exists next. apply StateMap.add_1. reflexivity. apply StateSetMap.add_1. reflexivity.
-        destruct (iel_dp_delta_set_table0 a) as [nq Hq Hq']; auto with omega.
-        exists nq. apply StateMap.add_2; trivial. apply StateSetMap.add_2; trivial. 
-        intro H'. rewrite H' in Heqsnq. clear H'.
-        rewrite StateSetMapFact.find_mapsto_iff, <- Heqsnq in Hq'. discriminate.
-
-       (* dp *)
-       intros a nq Hq.
-       rewrite StateMapFact.add_mapsto_iff in Hq. intuition. subst.
-        apply StateSetMap.add_1. reflexivity.
-        apply iel_dp0 in H1.
-        apply StateSetMap.add_2; trivial. 
-        intro H'. rewrite H' in Heqsnq. clear H'.
-        rewrite StateSetMapFact.find_mapsto_iff, <- Heqsnq in H1. discriminate.
-  Qed.
-
-
-  
-
-  Lemma explore_labels_correct: forall p np dp next table todo delta' ntt',
-    explore_labels A p np (next, table, todo, StateMap.empty nat) = (ntt', dp) ->
-    invariant_explore  next table ((p,np)::todo) delta' ->
-    invariant_explore' (ntt', StateMap.add np dp delta').
-  Proof.
-    intros until 0; intros H IH.
-    pose proof (explore_labels_invariant p np (next,table,todo,StateMap.empty nat) delta') as Hl.
-    rewrite H in Hl. clear H. destruct ntt' as [[next' table'] todo']. destruct Hl.
-
-     constructor; trivial.
-     intros. omega_false.
-     intros a nq H. elim (StateMap.empty_1 H).
-
-     clear IH next table todo. destruct iel_ie0. constructor.
-      assumption.
-      assumption.
-      assumption.
-      assumption.
-      intros q nq Hq. eapply In_tail in Hq. eauto. 
-
-      (* tout etat admet ses successeurs dans d (a moins d'etre dans todo) *)
-      intros r a nr Ha Hr. destruct (eq_nat_dec nr np). subst.
-       (* le cas interessant : l'etat considere vient de passer de todo a delta  *)
-       destruct (iel_dp_delta_set_table0 a) as [nq Hnq Hnq']; trivial with arith.
-       right. exists nq. exists dp; auto with map.
-       fold (delta_set' a r). setoid_replace r with p. assumption. 
-       eapply ie_table_inj0; eauto. apply ie_todo_table0. left; reflexivity.
-       (* les deux autres cas que l'on doit transferer *)
-       destruct (ie_table_delta_set0 r a nr Ha Hr) as [H|H].
-       inversion_clear H; auto. 
-        elim n. eapply StateSetMapFact.MapsTo_fun. apply Hr. 
-        rewrite H0. apply ie_todo_table0. left; reflexivity.
-       right.
-        destruct H as [nr' [dr Hnr1 Hnr2] Hnr3]. exists nr'; trivial.
-        exists dr; trivial. apply StateMap.add_2; trivial. compute; intro; subst; tauto_false.
-
-      (* les transitions de d correspondent a des transitions de delta_set *)
-      intros nr a nq [dp' Hpq Hpq'].
-      rewrite StateMapFact.add_mapsto_iff in Hpq. intuition. subst.
-       (* transition de l'etat qu'on vient d'ajouter *)
-       exists p; intuition. apply ie_todo_table0. left; reflexivity.
-       (* transition d'un autre etat *)
-       apply ie_delta0. exists dp'; assumption.
-  Qed.
-
-  Lemma explore_invariant: forall nttd,
-    invariant_explore' nttd -> 
-    invariant_explore' (explore nttd).
-  Proof.
-    intros.
-    functional induction (explore nttd); trivial.
-    apply IHn1; clear IHn1.
-    eapply explore_labels_correct; eassumption. 
-  Qed.
-  
-  Definition get_table U (nttd: NTT*U) := let '(_,t,_,_) := nttd in t.
-
-  Lemma explore_labels_increase_table p np nttdp: forall q nq, 
-    StateSetMap.MapsTo q nq (get_table nttdp) -> StateSetMap.MapsTo q nq (get_table (explore_labels A p np nttdp)).
-  Proof.
-    revert nttdp. unfold explore_labels.
-    induction (N_max_label A) as [| b IHb]; simpl; trivial. 
-    intros [[[next table] todo] dp] q nq H; simpl.
-    apply IHb. clear IHb. 
-     case_eq (StateSetMap.find (delta_set A p b) table); simpl in *; trivial.
-     intro Hn.
-     apply StateSetMap.add_2; trivial.
-     intros D. rewrite D in Hn. clear D.
-     rewrite StateSetMapFact.find_mapsto_iff, Hn in H. discriminate.
-  Qed.
-
-  Lemma explore_increase_table nttd: forall q nq, 
-    StateSetMap.MapsTo q nq (get_table nttd) -> StateSetMap.MapsTo q nq (get_table (explore nttd)).
-  Proof.
-    functional induction (explore nttd); trivial.
-    intros q nq H. apply IHn1. clear IHn1. simpl in H.
-    destruct ntt as [[next' table'] todo']. simpl.
-    change table' with (get_table (next',table',todo',dp)).
-    unfold NTT in e1. rewrite <- e1. clear e1.
-    apply explore_labels_increase_table. assumption.    
-  Qed.
-
-  Definition nttd := explore (1%nat, 
-    StateSetMap.add initiaux O (StateSetMap.empty _), 
-    (initiaux,O)::nil, 
-    StateMap.empty _).
-  
-  Let size' := let '(next,_,_,_) := nttd in next.
-  Let table := let '(_,table,_,_) := nttd in table.
-  Let deltam := let (_,delta') := nttd in delta'.
-  Let delta' := Delta_to_fun deltam.
-  Let initial' := 0%nat.
-  Let finaux' := finals A table.
-
-
-  Global Strategy 1010 [Det.explore].
-  Lemma nttd_split: nttd = (size',table,nil,deltam).
-  Proof.
-    remember nttd. destruct n as [[[next t] todo] d].
-    replace todo with (@nil Todo). reflexivity.
-    revert Heqn. clear. 
-    unfold nttd.
-    functional induction 
-      (explore
-        (1%nat, StateSetMap.add initiaux O (StateSetMap.empty nat),
-          (initiaux, O) :: nil, StateMap.empty (StateMap.t nat))); trivial. 
-    intro H. inversion_clear H. trivial.
-  Qed.
-
-  Lemma invariant_nttd: invariant_explore size' table nil deltam.
-  Proof.
-    fold (invariant_explore' (size',table,nil,deltam)). rewrite <- nttd_split. 
-    apply explore_invariant.
-    constructor.
-     intros s i H. rewrite StateSetMapFact.add_mapsto_iff in H. intuition.
-     rewrite StateSetMapFact.empty_mapsto_iff in H1. elim H1.
-     
-     intros s i H. rewrite StateSetMapFact.add_mapsto_iff in H. intuition.
-     intro x. rewrite <- H. apply (proj1 HA). 
-     rewrite StateSetMapFact.empty_mapsto_iff in H1. elim H1.
-
-     intros s t i Hs Ht.
-     rewrite StateSetMapFact.add_mapsto_iff in Hs. intuition.
-     rewrite StateSetMapFact.add_mapsto_iff in Ht. intuition.
-      rewrite <- H0; trivial.
-      rewrite StateSetMapFact.empty_mapsto_iff in H4. elim H4.
-      rewrite StateSetMapFact.empty_mapsto_iff in H1. elim H1.
-
-     intros [|i] Hi. 2:omega_false. eauto with map.
-
-     intros p np H. inversion_clear H.
-      apply StateSetMap.add_1. symmetry; trivial.  
-      inversion H0.
-
-     intros p a np Ha H.
-      rewrite StateSetMapFact.add_mapsto_iff in H. intuition. subst.
-      left. left. symmetry; trivial. 
-      rewrite StateSetMapFact.empty_mapsto_iff in H1. elim H1.
-
-     intros np a nq [dp H H']. 
-      rewrite StateMapFact.empty_mapsto_iff in H. elim H.
-  Qed.
-
-  Let rho p i := StateSetMap.MapsTo p i table.
-
-  Definition theta i := 
-    match le_lt_dec size' i with
-      | left _ => StateSet.empty
-      | right H => let (p,_) := ie_table_surj invariant_nttd H in p
+  Fixpoint steps n s p np :=
+    match n with 
+      | O => s
+      | Datatypes.S n => fold_labels (step (steps n) p np) max_label s
     end.
 
-  Definition bX: BMX(size',size) := 
-    box (G:=bool_Graph) _ _ (fun s j => StateSet.mem j (theta s)). 
-  Notation X := (convert bX).
-
-
-  Lemma rho_theta i: i<size' -> rho (theta i) i. 
-  Proof. 
-    intros Hi. unfold theta. destruct (le_lt_dec size' i). omega_false.
-    destruct (ie_table_surj invariant_nttd l). assumption.
-  Qed.
-
-  Lemma theta_rho i: i<size' -> forall p, rho p i -> StateSet.Equal p (theta i). 
-  Proof. 
-    intros Hi p Hp.
-    eapply (ie_table_inj (invariant_nttd)). eassumption.
-    apply rho_theta. assumption.
-  Qed.
-
-  Lemma rho_wf: forall p i, rho p i -> i<size'.
+  Instance step_compat: Proper 
+    (pointwise_relation _ (pointwise_relation _ (pointwise_relation _ (@eq _)))
+      ==>
+     pointwise_relation _ (pointwise_relation _ (pointwise_relation _ (pointwise_relation _ (@eq _))))) step.
   Proof.
-    intros. destruct invariant_nttd; eauto.
+    intros f g H p np a s. unfold step. 
+    destruct s as [[table d]next].
+    StateSetMapProps.find_analyse; trivial. apply H. 
   Qed.
 
-  Lemma initiaux_initial: rho initiaux initial'.
+  (** characterisation of [build_store] with [steps], as explained above *)
+  Lemma build_store_spec: build_store = steps (power size) initial_store initiaux (state_of_nat 0).
   Proof.
-    apply explore_increase_table. 
-    simpl. auto with map.
-  Qed.
+    unfold build_store.
+    rewrite (powerfix_linearfix (R:=pointwise_relation _ (pointwise_relation _ (@eq _)))). 
+    generalize (state_of_nat 0) initiaux initial_store. generalize (power size) as n. 
+    induction n; intros s p np; simpl.
+     reflexivity.
+     apply fold_num_compat, step_compat. repeat intro. apply IHn.  
+    intros f g H s ? <- p np. apply fold_num_compat, step_compat, H.  
+  Qed.    
 
-  Lemma finaux_finaux': 
-    forall i, StateSet.In i finaux' -> exists2 p, rho p i & exists2 u, StateSet.In u p & StateSet.In u finaux.
+
+  Notation "s %t" := (fst (fst s)) (at level 1).
+  Notation "s %d" := (snd (fst s)) (at level 1).
+  Notation "s %s" := (snd s) (at level 1).
+
+  (** preliminary lemma: [delta_set] builds bounded sets *)
+  Lemma bounded_delta_set: forall a p, setbelow (delta_set a p) size.
   Proof.
-    intro i. unfold finaux', finals. destruct invariant_nttd. 
-
-    apply StateSetMapProp.fold_rec_nodep. stateset_dec.
-    intros p j a Hpj IH H.
-    case_eq (StateSet.exists_ (fun s => StateSet.mem s finaux) p); intro He; rewrite He in H. 2: auto.
-    revert H. StateSetFact.set_iff. intros [H|H]; auto. subst. clear IH. 
-    rewrite <- StateSetFact.exists_iff in He. destruct He as [k [Hk Hk']].
-    exists p; auto. exists k; auto. rewrite StateSetFact.mem_iff. trivial.
-    repeat intro. subst. trivial.
+    intros. unfold delta_set.
+    apply StateSetProps.Props.fold_rec_nodep.
+    intros x Hx. StateSetProps.setdec.
+    intros x i Hx IH y Hy. apply StateSet.union_1 in Hy as [Hy|Hy]; auto.
+    apply HA in Hy. exact Hy.
   Qed.
+
+
+  (** Invariant of the construction *)
+  Record invariant s: Prop := {
+    (** all states in the table are bounded *)
+    i_table_wf: forall p i, StateSetMap.MapsTo p i s%t -> setbelow p size /\ below i s%s;
+    (** the table is injective *)
+    i_table_inj: forall p q i, StateSetMap.MapsTo p i s%t -> StateSetMap.MapsTo q i s%t -> StateSet.Equal p q;
+    (** the table is surjective *)
+    i_table_surj: forall i, below i s%s -> exists p, StateSetMap.MapsTo p i s%t;
+    (** the table contains [s%n] elements (derivable from the two previous points, but easier to require here) *)
+    i_table_size: StateSetMap.cardinal s%t = nat_of_num s%s;
+    (** any transition in [s%d] corresponds to a [delta_set] transition in the NFA *)
+    i_delta: forall np a nq, StateLabelMap.MapsTo (np,a) nq s%d -> 
+      exists2 p, StateSetMap.MapsTo p np s%t & StateSetMap.MapsTo (delta_set a p) nq s%t
+  }.
+
+  (** Dynamics of the construction : we basically prove that [invariant s] 
+     entails [extends s (steps i s) /\ defined (steps i s)] *)
+  Record extends (s s': Store): Prop := {
+    (** the resulting store satisfies the invariant *)
+    e_invariant :> invariant s';
+    (** the table was extended *)
+    e_table: forall p i, StateSetMap.MapsTo p i s%t -> StateSetMap.MapsTo p i s'%t;
+    e_next: s%s <= s'%s
+  }.
+
+  (** Last definition: a store is `defined up to P' if there are transitions for all state [n] and label [a], 
+     except for those specified in P *)
+  Definition defined (s: Store) P := forall n a, n<s%s -> a < max_label -> StateLabelMap.In (n,a) s%d \/ P n a.
   
-  Lemma delta_delta': 
-    forall i a, i<size' -> a<max_label -> exists2 p, rho p i & rho (delta_set A p a) (delta' i a).
+  Instance transitive_extends: Transitive extends.
   Proof.
-    intros i a Hi Ha. unfold delta', Delta_to_fun.
-    destruct invariant_nttd.
-    cut (exists p, rho p i). intros [p Hp]. 
-    exists p; trivial.
-    destruct (ie_table_delta_set0 _ _ _ Ha Hp) as [H|[j [dp Hdp Hdp'] Hj']]. 
-     inversion H.
-     rewrite StateMapFact.find_mapsto_iff in Hdp. rewrite Hdp.
-     rewrite StateMapFact.find_mapsto_iff in Hdp'. rewrite Hdp'.
-     assumption.
-    edestruct ie_table_surj0; eauto. 
+    intros s s' s'' Hs Hs'. destruct Hs. destruct Hs'. constructor; simpl; auto. 
+    rewrite <- e_next1. assumption.
+  Qed.
+  Lemma reflexive_extends: forall s, invariant s -> extends s s.
+  Proof.
+    intros s Hs. constructor; auto. reflexivity.
   Qed.
 
-  Lemma initial'_wf: initial' < size'.
+  (** the following lemma corresponds to the termination of the
+     algorithm: iterating 2^n times is enough to reach all possible
+     subsets *)
+  Lemma store_size_bound: forall s, invariant s -> (nat_of_state s%s <= power size)%nat.
+  Proof.
+    intros s Hs. 
+    rewrite <- (i_table_size Hs).
+    rewrite <- cardinal_domain.
+    apply card_pset.
+    intros p Hp. 
+     rewrite domain_spec in Hp. rewrite id_num. 
+     destruct Hp. eapply Hs. eassumption.
+  Qed.
+
+  (** heart of the proof : specification of [steps] *)
+  Lemma steps_correct: forall i (s: Store) p np, 
+    (power size - s%s < i)%nat ->
+    invariant s -> 
+    StateSetMap.MapsTo p np s%t ->
+    extends s (steps i s p np) /\
+    forall P, defined s (fun n a => P n a \/ n=np) -> defined (steps i s p np) P.
   Proof. 
-    eauto using rho_wf, initiaux_initial. 
-  Qed.
+    induction i; intros s p np Hsize H Hp; simpl.
+     omega_false.
+     cut (forall a: num, extends s (fold_labels (step (steps i) p np) a s) /\
+       forall P, defined s (fun n b => P n b \/ n = np /\ b < a) ->
+         defined (fold_labels (step (steps i) p np) a s) P).
+     intro G. split. eapply G. 
+     intros P HP. eapply G. intros n b Hn Hb. specialize (HP _ _ Hn Hb). tauto.
 
-  Lemma delta'_wf: forall i a, i < size' -> a < max_label -> delta' i a < size'.
+     intro a. revert s Hsize H Hp. induction a using num_peano_rec; intros [[t d] n] Hsize H Hp.
+      rewrite fold_num_O. split.
+       apply reflexive_extends. assumption.
+       intros P HP m b Hm Hb. specialize (HP m b Hm Hb). intuition. num_omega_false.
+      rewrite fold_num_S. simpl. StateSetMapProps.find_analyse.
+       (* existing state *)
+       assert (H': invariant (t, StateLabelMap.add (np, a) x d, n)).
+         constructor; try apply H. 
+          intros nq b nq'. simpl. StateLabelMapProps.map_iff. intuition subst.
+           apply StateLabel.P.reflect in H1. injection H1; intros; subst; clear H1.
+           exists p; auto with map.
+          destruct (i_delta H H3) as [q ?]. exists q; auto with map.
+       split.
+       rewrite <- (fun s Hsize Hs Hn => proj1 (IHa s Hsize Hs Hn)); simpl; auto with map. 
+        constructor; auto with map. reflexivity.
+        intros P HP. eapply IHa; simpl; auto with map. 
+        intros m' b Hm Hb. specialize (HP _ b Hm Hb). simpl in *.
+        intuition subst; auto with map. destruct (eq_spec a b). subst. auto with map. num_omega. 
+
+       (* new state *)
+       set (s' := (StateSetMap.add (delta_set a p) n t, StateLabelMap.add (np: NumOTA.t, a) n d, S n)).
+       assert (H': invariant s').
+         constructor; simpl.
+          intros q nq. StateSetMapProps.map_iff. intuition subst.
+           intros x Hx. rewrite <- H1 in Hx. eapply bounded_delta_set, Hx.  
+           num_omega.
+           apply (i_table_wf H H3).
+           specialize (i_table_wf H H3). simpl. num_omega.
+          intros q q' nq. StateSetMapProps.map_iff. intuition subst. 
+           StateSetProps.setdec.
+           bycontradiction. specialize (i_table_wf H H5). simpl. num_omega.
+           bycontradiction. specialize (i_table_wf H H4). simpl. num_omega.
+           apply (i_table_inj H H4 H5).
+          intros m Hm. destruct (eq_num_dec m n). subst.
+           eauto with map.
+           destruct (@i_table_surj _ H m) as [q ?]. simpl. num_omega. exists q.
+            apply StateSetMap.add_2; trivial. intro F. rewrite <- F in H1. elim H0. exists m; assumption.
+          erewrite StateSetMapProps.cardinal_2; eauto. 
+           apply i_table_size in H. simpl in H. rewrite H. num_omega.
+           intro; reflexivity.
+          intros nq b nq'. StateLabelMapProps.map_iff. intuition subst.
+           apply StateLabel.P.reflect in H1. injection H1; intros; subst; clear H1.
+            exists p; auto with map.
+            apply StateSetMap.add_2; trivial. intro F. rewrite F in H0. elim H0. exists nq; assumption.
+           destruct (i_delta H H3) as [q ?]. exists q.
+            apply StateSetMap.add_2; trivial. intro F. rewrite F in H0. elim H0. exists nq; assumption.
+            apply StateSetMap.add_2; trivial. intro F. rewrite F in H0. elim H0. exists nq'; assumption.
+
+       specialize (IHi s' (delta_set a p) n). 
+       simpl in IHi. destruct IHi as [IHi1 IHi2]; auto with map.
+        clear - Hsize H Hp H0 H'. subst s'. simpl in *.
+        apply store_size_bound in H'. simpl in *. pose proof (power_positive size). num_omega.
+
+       specialize (IHa (steps i s' (delta_set a p) n)). 
+       simpl in IHa. destruct IHa as [IHa1 IHa2].
+        clear IHi2. subst s'. apply e_next in IHi1. simpl in *. num_omega.
+        apply IHi1.
+        apply IHi1. simpl.
+         apply StateSetMap.add_2; trivial. intro F. rewrite F in H0. elim H0. exists np. assumption.
+         
+       split.
+        subst s'.
+        rewrite <- IHa1. rewrite <- IHi1. 
+        constructor; simpl; auto.  
+         intros q nq Hq. 
+          apply StateSetMap.add_2; trivial. intro F. rewrite <- F in Hq. elim H0. exists nq. assumption.
+         num_omega.
+
+        intros P HP. apply IHa2. apply IHi2. unfold s' in *. clear - Hp HP. 
+        intros m b Hm Hb. simpl in *.
+        destruct (eq_num_dec m n). subst. auto.
+        destruct (HP m b) as [[y ?]|[ ?|[? ?]]]; subst; simpl in *; auto with map. num_omega. 
+         clear - H. eauto with map.
+         destruct (eq_spec a b). subst. auto with map. num_omega. 
+  Qed. 
+
+  (** the initial store satisfies the invariant *)
+  Lemma invariant_initial_store: invariant initial_store.
   Proof.
-    intros i a Hi Ha. destruct (delta_delta' Hi Ha) as [p _ Hp]. eapply rho_wf. eassumption. 
+    unfold initial_store. constructor; simpl; intros.
+     revert H. StateSetMapProps.map_iff. intuition subst; try reflexivity.
+      intros x Hx. rewrite <- H in Hx. apply (NFA.bounded_initiaux HA Hx).
+     StateSetMapProps.find_tac; StateSetProps.setdec.
+     exists initiaux. replace i with (state_of_nat O). auto with map. 
+      change 2%positive with (state_of_nat 1) in H. num_omega.
+     reflexivity.
+     revert H. StateLabelMapProps.map_iff. tauto. 
   Qed.
 
-  (* second requirement de DecideKleeneAlgebra *)
-  Lemma well_formed: DFA_wf (NFA_to_DFA Termination A HA).  
+  (** therefore, the constructed store extends the initial one, and is completely defined *)
+  Lemma build_store_correct: 
+    extends initial_store build_store 
+    /\ forall n a, n<build_store%s -> a < max_label -> StateLabelMap.In (n,a) build_store%d.
   Proof.
-    unfold NFA_to_DFA, build. fold nttd. rewrite nttd_split. fold delta' initial' finaux'.
-    repeat split.
-    apply initial'_wf.
-    intros i Hi. apply finaux_finaux' in Hi. 
-     destruct Hi as [p Hp _]. eapply rho_wf. eassumption.
-    auto using delta'_wf.
+    rewrite build_store_spec.
+    destruct (@steps_correct (power size) initial_store initiaux 0) as [H H'].
+     simpl. pose proof (power_positive size). change 2%positive with (state_of_nat 1). num_omega. 
+     apply invariant_initial_store.
+     simpl. auto with map.
+    split. apply H.
+    intros n a Hn Ha. destruct (fun H => H' (fun _ _ => False) H n a Hn Ha); try tauto.
+    intros m b Hm _. simpl in Hm. right. right. change 2%positive with (state_of_nat 1) in Hm. num_omega. 
   Qed.
 
-  Lemma theta_initiaux: StateSet.Equal initiaux (theta O).
+  (** in particular, the constructed store satisfies the invariant *)
+  Lemma invariant_build_store: invariant build_store.
+  Proof. apply build_store_correct. Qed.
+
+
+  (** we define notations for the three projections *)
+  Notation table := (build_store%t).
+  Notation size' := (build_store%s).
+  Notation d := (build_store%d).
+
+  (** rho is the predicate that associates states of the DFA to the sets of reachable states from the NFA *)
+  Notation rho p i := (StateSetMap.MapsTo p i table).
+
+  (** theta is the converse function: it associates a set of states to each state of the DFA *)
+  Definition theta i := 
+    StateSetMap.fold (fun p np acc => if eq_state_bool i np then p else acc) table StateSet.empty.
+
+  (** specification of theta, for valid states *)
+  Lemma rho_theta i: i<size' -> rho (theta i) i.
   Proof.
-    apply theta_rho; eauto using rho_wf, initiaux_initial. 
+    intro Hi. unfold theta. generalize (i_table_surj invariant_build_store Hi). clear. 
+    generalize table. intro t. 
+    refine (StateSetMapProps.fold_rec_bis 
+      (P := fun t acc => (exists p : StateSetMap.key, StateSetMap.MapsTo p i t) -> StateSetMap.MapsTo acc i t)
+    _ _ _). intros ? ? ? H. setoid_rewrite H. tauto.
+    intros [? ?]. apply StateSetMap.empty_1 in H. elim H.
+    intros p j q t' Hp Hp' IH [r Hr].
+    num_analyse. subst. auto with map.
+    StateSetMapProps.find_tac. right. apply apply in IH.
+    split; auto. intro F. elim Hp'. rewrite F. eauto with map. eauto. 
   Qed.
-  
-  Lemma eq_nat_dec_eq i j: is_true (eq_nat_dec i j) <-> i=j. 
+
+  (** rho is injective (it admits theta as an inverse function) *)
+  Lemma theta_rho: forall p i, rho p i -> StateSet.Equal (theta i) p.
   Proof.
-    destruct_nat_dec; simpl. firstorder. firstorder.
+    intros p i Hpi. assert (Hi := i_table_wf invariant_build_store Hpi).
+    apply proj2, rho_theta in Hi. eapply i_table_inj; eauto. apply invariant_build_store. 
   Qed.
 
-  Lemma and_com P Q: P /\ Q <-> Q /\P.
-  Proof. tauto. Qed.
-
-  Lemma and_assoc P Q R: P /\ (Q /\ R) <-> (P /\ Q) /\ R.
-  Proof. tauto. Qed.
-
-  Lemma and_neutral_right (P Q: Prop): P -> (Q /\ P <-> Q).
-  Proof. tauto. Qed.
-    
-  Lemma and_impl (P Q: Prop): (P -> Q) -> (P/\Q <-> P).
-  Proof. tauto. Qed.
-
-  Lemma and_impl' W (P Q: W -> Prop): (forall x, P x -> Q x) -> ((exists x, P x /\ Q x) <-> exists x, P x).
-  Proof. firstorder. Qed.
-
-  Lemma exists_eq W (v: W) (P: W -> Prop): (exists x, v=x /\ P x)  <-> P v.
-  Proof. intros. firstorder. subst. assumption. Qed.
-
-  Lemma mem_spec i s: is_true (StateSet.mem i s) <-> StateSet.In i s.
-  Transparent equal one. 
+  (** sets build via theta are bounded, and theta is empty out of the bounds *)
+  Lemma theta_below: forall u i, StateSet.In u (theta i) -> i < size' /\ u < size.
   Proof.
-    simpl. setoid_replace (true = StateSet.mem i s) with (StateSet.mem i s = true) by firstorder.
-    symmetry. apply StateSetFact.mem_iff.
-  Qed.
-  Opaque equal one. 
-
-  Lemma eq_symm: forall (i j: bool), i = j <-> j = i.
-  Proof. firstorder. Qed.
-
-  Lemma map_filter i (P: stateset -> bool) (HP: Proper (StateSet.Equal ==> @eq bool) P):
-   StateSet.In i
-     (StateSetMap.fold
-        (fun p np acc =>
-         if P p then StateSet.add np acc
-         else acc) table StateSet.empty)
-     <-> exists p, rho p i /\ P p = true.
-  Proof.
-    split. 
-     apply StateSetMapProp.fold_rec_nodep.
-     intro. stateset_dec.
-     intros p j acc Hpj IH Hi'.
-     case_eq (P p); intro He; rewrite He in Hi'.
-      revert Hi'. StateSetFact.set_iff. intros [Hi'|Hi'].
-       subst. clear IH. exists p; auto. 
-       auto.
-      auto.
-
-     intros (p&Hpi&Hp). revert Hpi.
-     apply (StateSetMapProp.fold_rec_bis 
-       (P:=fun table a => StateSetMap.MapsTo p i table -> StateSet.In i a)).
-     intros m m' a H. rewrite H. trivial.
-     rewrite StateSetMapFact.empty_mapsto_iff. tauto. 
-     intros q j a table' Hqj Hq IH H.
-     rewrite StateSetMapFact.add_mapsto_iff in H. destruct H as [[Hqp Hij]|[Hqp Hpi]]. subst.
-     rewrite <- (HP _ _ Hqp) in Hp. rewrite Hp. stateset_dec.
-     cut (StateSet.In i a); auto. case (P q); trivial; stateset_dec.
+    intros u i. unfold theta.
+    apply StateSetMapProps.fold_rec_nodep.
+     StateSetProps.setdec.
+     intros p j q Hpj IH.
+     num_analyse; auto. 
+     subst. split.
+      eapply invariant_build_store, Hpj.
+      apply invariant_build_store in Hpj. apply Hpj. assumption. 
   Qed.
 
-  Lemma in_deltaset: forall j p b, 
-    StateSet.In j (delta_set A p b) <-> 
-    exists k, StateSet.In k p /\ StateSet.In j (delta k b).
+  (** specification of the [delta_set] function *)
+  Lemma in_delta_set: forall j p b, 
+    StateSet.In j (delta_set b p) <-> 
+    exists k, StateSet.In k p /\ StateSet.In j (delta b k).
   Proof.
     unfold delta_set; split.
-     apply StateSetProp.fold_rec_nodep. stateset_dec.
+     apply StateSetProps.Props.fold_rec_nodep. StateSetProps.setdec.
      intros i a Hip IH.
-     StateSetFact.set_iff. intros [Hi|Hi]; eauto.
+     StateSetProps.set_iff. intros [Hi|Hi]; eauto.
    
      intros [i [Hip Hj]]. revert Hip.
-     apply (StateSetProp.fold_rec_bis (P:=fun p a => StateSet.In i p -> StateSet.In j a)); stateset_dec.
+     apply (StateSetProps.Props.fold_rec_bis (P:=fun p a => StateSet.In i p -> StateSet.In j a)); 
+     StateSetProps.setdec.
   Qed.
 
-
-  (* third requirement de DecideKleeneAlgebra *)
-  Theorem eval: eval_D (NFA_to_DFA Termination A HA) == eval_N A.
+  (** [theta] and [delta'] commute *)
+  Lemma theta_delta': forall a i, a < max_label -> i < size' -> 
+    StateSet.eq (theta (delta' d a i)) (delta_set a (theta i)).
   Proof.
-    unfold NFA_to_DFA, build. fold nttd. rewrite nttd_split. fold delta'.
-    apply alg_eval with X; simpl.
+    intros a i Ha Hi x. rewrite in_delta_set. 
+    unfold delta'. StateLabelMapProps.find_analyse. rename H into Hx.
+     apply invariant_build_store in Hx as [pi Hpi Hix].
+     rewrite (theta_rho Hix). 
+     rewrite in_delta_set.
+     setoid_rewrite <- (theta_rho Hpi).
+     reflexivity.
 
-    rewrite <- convert_dot. apply convert_compat. 
-    mx_intros i j Hi Hj. simpl.
-    rewrite theta_initiaux.
-    apply bool_view. rewrite mxbool_dot_spec. simpl.  
-    setoid_rewrite eq_nat_dec_eq. 
-    split.
-     intros [k [_ [-> H]]]. assumption. 
-     intro H. exists O. eauto using initial'_wf.
-
-
-    setoid_rewrite convert_zero. setoid_rewrite plus_neutral_left.
-    apply convert_sum_commute. intros b Hb. mx_intros i j Hi Hj. simpl.
-    apply bool_view. rewrite 2 mxbool_dot_spec. simpl. 
-    setoid_rewrite eq_nat_dec_eq.
-    setoid_rewrite and_com. setoid_rewrite <- and_assoc. 
-    rewrite exists_eq. rewrite and_neutral_right. 2:auto using delta'_wf.
-    setoid_rewrite mem_spec.
-    destruct (delta_delta' Hi Hb) as [p Hpi Hp].
-    setoid_rewrite <- (theta_rho Hi Hpi).
-    rewrite <- (theta_rho (delta'_wf Hi Hb) Hp). 
-    setoid_rewrite and_assoc. setoid_rewrite and_impl'.
-    apply in_deltaset.
-    intros x [H _]. eapply (ie_table_wf' invariant_nttd). apply Hpi. trivial.
-
-    
-    rewrite <- convert_dot. apply convert_compat. 
-    mx_intros i j Hi Hj. simpl. 
-    apply bool_view. rewrite mxbool_dot_spec. simpl.    
-    setoid_rewrite mem_spec. unfold finals.
-    rewrite map_filter. 
-    split.
-    
-     intros (p&Hpi&Hp).
-     setoid_rewrite <- StateSetFact.exists_iff in Hp. 2:(unfold compat_bool, Proper; intuition stateset_dec).
-     destruct Hp as (j&Hj&Hj').
-     rewrite <- StateSetFact.mem_iff in Hj'. 
-     exists j. repeat split; trivial.
-     apply (proj1 (proj2 HA)); trivial.
-     rewrite <- (theta_rho Hi Hpi). assumption.
-
-     intros (j&Hj&Hji&Hjf).
-     exists (theta i). split.
-      apply rho_theta. trivial.
-      rewrite <- StateSetFact.exists_iff. 2:(unfold compat_bool, Proper; intuition stateset_dec).
-      exists j. split; trivial.
-      rewrite <- StateSetFact.mem_iff. trivial.
-
-    intros s t H. apply bbool_view. 
-    rewrite <- 2StateSetFact.exists_iff by (unfold compat_bool, Proper; intuition stateset_dec).
-    (split; intros [x Hx]; exists x); [rewrite <- H| rewrite H]; auto.  
+     elim H. destruct (proj2 build_store_correct i a) as [di Hdi]; auto. eauto with map.
   Qed.
-  
-End Correction.
 
-End Protect.
+
+  (** we need this lemma to use the [StateSetProps.exists_iff] from the FSet library *)
+  Lemma final_compat: SetoidList.compat_bool NumSet.E.eq (fun s => StateSet.mem s finaux).
+  Proof.  intros x y H. rewrite H. reflexivity. Qed.
+  Local Hint Resolve final_compat.    
+
+      
+  (** two auxiliary lemmas about [table_finals], to obtain the characterisation [mem_table_finals] below *)
+  Lemma table_finals_correct: 
+    forall i, StateSet.In i (table_finals table) -> 
+      exists2 u, StateSet.In u (theta i) & StateSet.In u finaux.
+  Proof.
+    intros i. unfold table_finals.
+    apply StateSetMapProps.fold_rec_nodep. StateSetProps.setdec.
+    intros p j a Hpj IH H.
+    case_eq (StateSet.exists_ (fun s => StateSet.mem s finaux) p); intro He; rewrite He in H. 2: auto.
+    revert H. StateSetProps.set_iff. intros [H|H]; auto.
+     psubst. clear IH. 
+     rewrite <- StateSetProps.exists_iff in He by trivial. destruct He as [k [Hk Hk']].
+     exists k; auto. rewrite (theta_rho Hpj). trivial.
+  Qed.
+
+  Lemma table_finals_complete:
+    forall u p i, StateSet.In u finaux -> rho p i -> StateSet.In u p -> StateSet.In i (table_finals table).
+  Proof.
+    intros u p i Hu Hpi Hi. revert Hpi. 
+    refine (StateSetMapProps.fold_rec_bis (P:=fun t acc => StateSetMap.MapsTo p i t -> StateSet.In i acc) _ _ _).
+     intros ? ? ? H. setoid_rewrite H. tauto.
+
+     StateSetMapProps.map_iff. tauto.
+
+     intros q j q' t Hqj Hq IH. 
+     StateSetMapProps.map_iff. intros [[Hqp ->]|[Hqp Hpi]].
+      replace (StateSet.exists_ (fun s : StateSet.elt => StateSet.mem s finaux) q) with true. auto with set.
+      symmetry. rewrite <- StateSetProps.exists_iff by trivial. exists u.
+       rewrite Hqp. StateSetProps.mem_prop. auto. 
+      apply IH in Hpi. clear IH.
+      case StateSet.exists_; auto with set.
+  Qed.
+
+  (** specification of [table_finals] *)
+  Lemma mem_table_finals: forall i, 
+    StateSet.mem i (table_finals table) = StateSet.exists_ (fun x => StateSet.mem x finaux) (theta i).
+  Proof.
+    intros i. rewrite bool_prop_iff. 
+    rewrite <- StateSetProps.exists_iff by trivial. StateSetProps.mem_prop.
+    split; intro H. 
+     apply table_finals_correct in H as [u Hu Hu']. exists u. split; auto. StateSetProps.mem_prop. trivial.
+     destruct H as [u [H H']]. StateSetProps.mem_prop. eapply table_finals_complete.
+      eassumption.
+      apply rho_theta; trivial. eapply theta_below, H. 
+      assumption.
+  Qed.
+
+  (** the construted DFA has at least one state *)
+  Lemma positive_size: 0 < size'.
+  Proof.
+    assert (H:=build_store_correct). eapply proj1, e_next in H. simpl in H.
+    change 2%positive with (state_of_nat 1) in H. num_omega.
+  Qed.
+
+  (** its transitions are bounded *)
+  Lemma delta'_below: forall a i, delta' d a i < size'.
+  Proof.
+    intros a i. unfold delta'. StateLabelMapProps.find_analyse. 
+     apply (i_delta invariant_build_store) in H as [px _ Hx]. apply (i_table_wf invariant_build_store Hx).
+     exact positive_size.
+  Qed.
+    
+
+  (** the constructed DFA is bounded (requirement of DFA_Merge / DFA_Equiv) *)
+  Lemma bounded: DFA.bounded NFA_to_DFA.
+  Proof.
+    pose proof delta'_below.
+    pose proof positive_size.
+    assert (Ht:= table_finals_correct).
+    assert (Ht':= theta_below).
+    unfold NFA_to_DFA. destruct build_store as [[t d] n]; simpl in *.
+    constructor; simpl; auto.
+     intros i Hi. apply Ht in Hi as [? Hi _]. eapply Ht', Hi. 
+  Qed.
+
+  (** the state 1 points to the set of initial states *)
+  Lemma theta_0: StateSet.eq (theta (state_of_nat 0)) (initiaux).
+  Proof.
+    apply theta_rho. apply build_store_correct. simpl; auto with map.
+  Qed.
+
+  (** Final theorem : correctness of the algorithm, the constructed DFA evaluates as the original NFA *)
+  Theorem correct: DFA.eval NFA_to_DFA == NFA.eval A.
+  Proof. 
+    pose proof positive_size as Hpositive_size.
+    pose proof theta_below as Htheta_below.
+    pose proof delta'_below as Hdelta'_below.
+    pose proof theta_delta' as Htheta_delta'.
+    pose proof mem_table_finals as Hmem_table_finals.
+    unfold NFA_to_DFA. destruct build_store as [[t d] n]. simpl in *.  
+    apply mx_to_scal_compat. apply right_filter with
+    (mx_bool tt (nat_of_state n) size (fun s j => StateSet.mem j (theta (state_of_nat s))): KMX _ _).
+
+    (** u *)
+    Opaque dot one zero equal. simpl. Transparent dot one zero equal.
+    rewrite (mx_point_one_left (G:=RegExp.RE_Graph)) by num_omega. 
+    mx_intros i j Hi Hj. Opaque eq_nat_bool. simpl. bool_simpl. simpl. fold_regex. Transparent eq_nat_bool. 
+    rewrite theta_0. reflexivity. 
+
+    (** m *)
+    mx_intros i j Hi Hj; simpl. fold_regex. 
+    unfold labelling. 
+    setoid_rewrite sum_distr_left. rewrite sum_inversion. 
+    setoid_rewrite sum_distr_right. rewrite sum_inversion. 
+    apply sum_compat. intros a Ha.
+    setoid_rewrite dot_xif_zero. simpl; fold_regex.
+    setoid_rewrite dot_neutral_left.
+    setoid_rewrite dot_neutral_right.
+    apply leq_antisym; apply compare_sum_xif_zero; intros u Hu; bool_connectors; intros [Hu' Hu'']; simpl in *.
+     exists (nat_of_state (delta' d a i)); auto. specialize (Hdelta'_below a i). num_omega. 
+     bool_connectors. num_prop. rewrite id_num. split; trivial.
+     rewrite Htheta_delta' by num_omega.
+     StateSetProps.mem_prop. apply <- in_delta_set. exists (state_of_nat u); auto.
+
+     num_prop. rewrite Hu' in Hu''. clear u Hu Hu'. simpl in Hi. 
+     rewrite Htheta_delta', <- StateSetProps.mem_iff in Hu'' by num_omega.
+     apply -> in_delta_set in Hu''. destruct Hu'' as [k [? ?]].
+     exists (nat_of_state k). 
+      apply Htheta_below, proj2 in H. clear - H. num_omega.
+      rewrite id_num. bool_connectors. StateSetProps.mem_prop. rewrite id_num. auto. 
+
+    (** v *)
+    mx_intros i j Hi Hj; simpl in *. fold_regex.  
+    setoid_rewrite dot_xif_zero.
+    rewrite Hmem_table_finals.
+    case_eq (StateSet.exists_ (fun x => StateSet.mem x finaux) (theta (statesetelt_of_nat i))); 
+     intro H; simpl; fold_regex.
+
+     rewrite <- StateSetProps.exists_iff in H by trivial. destruct H as [u [Hu Hu']].
+     rewrite (sum_fixed_xif_zero (v:=nat_of_state u)). auto with algebra. 
+      StateSetProps.mem_prop. apply HA in Hu'. apply Htheta_below, proj2 in Hu. num_omega.
+     rewrite id_num. bool_connectors. StateSetProps.mem_prop. auto.  
+
+     apply sum_zero. intros m Hm. apply xif_false. simpl.
+     rewrite <- H. rewrite bool_prop_iff. bool_connectors. 
+     rewrite H. StateSetProps.mem_prop. intuition; try discriminate.
+     rewrite <- H. rewrite <- StateSetProps.exists_iff by trivial. eexists; StateSetProps.mem_prop; eauto. 
+  Qed.
+
+End S.
+
+(** We finally prove that the algorithm preserves the max_label field *)
+Lemma preserve_max_label: forall A, DFA.max_label (NFA_to_DFA A) = NFA.max_label A.
+Proof.
+  intros. unfold NFA_to_DFA. destruct (build_store A) as [[? ?] ?]. reflexivity.
+Qed.
