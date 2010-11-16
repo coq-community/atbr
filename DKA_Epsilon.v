@@ -168,6 +168,7 @@ Proof.
 
   StateMapProps.find_analyse. 
    (* 1 memoised case *)
+   dependent destruction Hcall.
    auto.
 
    (* 2 non memoised case *)

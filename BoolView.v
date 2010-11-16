@@ -51,13 +51,9 @@ Ltac type_view f :=
   let prf := constr:(type_view (f:=f)) in
     on_call f ltac:(fun c =>
       match c with
-          | appcontext args [ f ] =>
+          | context args [ f ] =>
             let ind_app := context args [ prf ] in
-            let H := fresh in
-            let call := fresh in
-              assert(H := ind_app);
-                set(call := c) in *; (** Abstract the call *)
-            try depelim H
+              destruct ind_app
       end).
   
 Inductive compare_spec {A} eq lt (x y : A) : comparison -> Prop :=
