@@ -325,7 +325,7 @@ Proof.
     elim n.
      rewrite <- rt_closure_spec by num_omega. 
      apply trans_rt1n. constructor 3 with (sn k); 
-      apply rt1n_trans; apply <- rt_closure_spec; eauto; instantiate; num_omega. 
+      apply rt1n_trans; apply <- rt_closure_spec; eauto; unfold below; num_omega.
      
     type_view StateSet.mem. 2: simpl; fold_regex; aci_reflexivity.
     type_view StateSet.mem. simpl; fold_regex; aci_reflexivity.
