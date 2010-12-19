@@ -168,6 +168,7 @@ Proof.
 
   StateMapProps.find_analyse. 
    (* 1 memoised case *)
+   injection Hcall; intros; subst.
    auto.
 
    (* 2 non memoised case *)

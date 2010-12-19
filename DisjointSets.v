@@ -651,6 +651,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
       rewrite Heq; apply update_equiv; auto. 
       apply boundage; auto.
       
+      injection Hxt; intros; subst.
       intuition. rewrite D_repr.  eapply rzero. eauto.
     Qed.
   
