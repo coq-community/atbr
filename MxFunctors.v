@@ -124,9 +124,7 @@ Section Defs.
      rewrite functor_plus. 
      rewrite functor_dot.
      do 4 rewrite functor_dot at 1.
-     do 9 rewrite IHn at 1.
-     unfold mx_sub00, mx_sub01, mx_sub10, mx_sub11.
-     rewrite !functor_mx_sub. reflexivity.
+     do 9 rewrite IHn at 1. reflexivity.
    Qed.
   
 End Defs.
