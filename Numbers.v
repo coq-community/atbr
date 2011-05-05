@@ -355,15 +355,15 @@ Module Positive <: NUM.
   Lemma le_spec : forall n m, reflect (le n m) (leb n m). 
   Proof.  
     intros n m; unfold leb.
-    case_eq ( (n ?=m)%positive Eq ); intro H; try constructor.
-    apply Pcompare_Eq_eq in H. subst.  unfold le ,Ple. rewrite Pcompare_refl. intro; discriminate.  
-    unfold le. unfold Ple. rewrite H. intro; discriminate.
+    case_eq (Pcompare n m Eq); intro H; try constructor.
+    apply Pcompare_Eq_eq in H. subst.  unfold le,Ple,Pos.compare. rewrite Pcompare_refl. intro; discriminate.
+    unfold le. unfold Ple,Pos.compare. rewrite H. intro; discriminate.
     apply ZC1 in H. intro H'. unfold le, Ple in H'. apply ZC2 in H.  rewrite H in H'. tauto_false.
   Qed.
   Lemma lt_spec : forall n m, reflect (lt n m) (ltb n m).
   Proof. 
     intros n m; unfold ltb.
-    case_eq ( (n ?=m)%positive Eq ); intro H; try constructor.
+    case_eq (Pcompare n m Eq); intro H; try constructor.
     intro H'. apply Pcompare_Eq_eq in H. subst. refine (Plt_irrefl _ H').
     auto.
     intro H'. apply ZC1 in H. assert (H'' := Plt_trans _ _ _ H H'). refine (Plt_irrefl _ H''). 
@@ -427,7 +427,7 @@ Module Positive <: NUM.
 
   Lemma max_spec : forall n m, nat_of_num (max n m) = Max.max (nat_of_num n) (nat_of_num m).
   Proof.
-    intros n m. unfold max, Pmax. fold (compare n m). destruct (compare_spec n m).
+    intros n m. unfold max, Pmax, Pos.compare. fold (compare n m). destruct (compare_spec n m).
      rewrite Max.max_r; trivial. apply lt_le_weak. rewrite <- lt_nat_spec. assumption.
      subst. rewrite Max.max_r; trivial. 
      rewrite Max.max_l; trivial. apply lt_le_weak. rewrite <- lt_nat_spec. assumption.
