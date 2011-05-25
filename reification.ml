@@ -189,34 +189,6 @@ module Reification = struct
 		    [|g;e;Classes.get_mo gl g;Classes.get_slo gl g;a;b;x|]);
 	  name = "semiring" }
   end
-  module Monoid = struct
-    let path = path @ ["Monoid"]
-    let eval = get_const path "eval"
-    let ops = { 
-	Semiring.ops with
-	  c_plus = None;
-	  c_zero = None;
-	  r_dot  = get_const path "dot";
-	  r_one  = get_const path "one";	
-	  r_var  = get_const path "var";	
-	  r_x    = get_const path "X";	
-	  eval = (fun gl g e a b x -> force_app eval [|g;e;Classes.get_mo gl g;a;b;x|]);
-	  name = "monoid" }
-  end 
-  module Semilattice = struct
-    let path = path @ ["Semilattice"]
-    let eval = get_const path "eval"
-    let ops = { 
-	Semiring.ops with
-	  c_dot = None;
-	  c_one = None;
-	  r_plus = get_const path "plus";
-	  r_zero = get_const path "zero";
-	  r_var  = get_const path "var";	
-	  r_x    = get_const path "X";	
-	  eval = (fun gl g e a b x -> force_app eval [|g;e;Classes.get_slo gl g;a;b;x|]);
-	  name = "semilattice" }
-  end
 end 
 
 module Tbl : sig
@@ -370,6 +342,4 @@ let reify_goal ops goal =
 
 (* tactic grammar entries *)
 TACTIC EXTEND kleene_reify [ "kleene_reify" ] -> [ reify_goal Reification.KA.ops ] END
-TACTIC EXTEND monoid_reify [ "monoid_reify" ] -> [ reify_goal Reification.Monoid.ops ] END
 TACTIC EXTEND semiring_reify [ "semiring_reify" ] -> [ reify_goal Reification.Semiring.ops ] END
-TACTIC EXTEND semilattice_reify [ "semilattice_reify" ] -> [ reify_goal Reification.Semilattice.ops ] END

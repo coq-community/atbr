@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** This small module is imported in all our files, it exports useful
@@ -26,13 +26,9 @@ Notation "f >> g" := (comp f g) (at level 50).
    an hypothesis [H] by generating the corresponding subgoals) *)
 Definition apply X x Y (f: X -> Y) := f x.
 
-
-(** Tactic to replace the goal by []False] *)
-Ltac bycontradiction := elimtype False.
-
 (** Tactics to resolve a goal by using a contradiction in the hypotheses, using either [omega] or [tauto] *)
-Ltac omega_false := bycontradiction; unfold fst in *; omega.
-Ltac tauto_false := bycontradiction; unfold fst in *; tauto.
+Ltac omega_false := exfalso; omega.
+Ltac tauto_false := exfalso; tauto.
 
 (** This destructor sometimes works better that the standard [destruct] *)
 Ltac idestruct H := 
@@ -65,9 +61,9 @@ Create HintDb algebra discriminated.
 
 Ltac rsimpl := simpl; autorewrite with simpl using ti_auto.
 
-Hint Extern 9 (@eq nat ?x ?y) => instantiate; unfold fst in *; abstract omega: omega.
-Hint Extern 9 (Peano.le ?x ?y) => instantiate; unfold fst in *; abstract omega: omega.
-Hint Extern 9 (Peano.lt ?x ?y) => instantiate; unfold fst in *; abstract omega: omega.
+Hint Extern 9 (@eq nat ?x ?y) => instantiate; abstract omega: omega.
+Hint Extern 9 (Peano.le ?x ?y) => instantiate; abstract omega: omega.
+Hint Extern 9 (Peano.lt ?x ?y) => instantiate; abstract omega: omega.
 
 (** Tactic to use when apply does not smartly unify *)
 Ltac rapply H := first 

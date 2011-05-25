@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Construction of automata ([eNFA]) from regular expressions.
@@ -47,22 +47,22 @@ Unset Printing Implicit Defensive.
 (** Algebraic, not really efficient, presentation of the construction algorithm *)
 Module Algebraic.
 
-  Record preMAUT := maut {
+  Record pre_MAUT := mk {
     size: nat;
     delta: KMX size size 
   }.
 
-  Definition add (a : regex) (i f : nat) (A : preMAUT) : preMAUT := maut (delta A + mx_point _ _ i f a).
+  Definition add (a : regex) (i f : nat) (A : pre_MAUT) : pre_MAUT := mk (delta A + mx_point _ _ i f a).
 
   Definition add_one i f A := add 1 i f A.
 
   Definition add_var i f c A := add (RegExp.var c) i f A.
     
-  Definition empty := maut (0: KMX 2 2).
+  Definition empty := mk (0: KMX 2 2).
 
-  Definition incr (A : preMAUT) : preMAUT := @maut (size A+1) (mx_blocks (delta A) 0 0 0).
+  Definition incr (A : pre_MAUT) : pre_MAUT := @mk (size A+1) (mx_blocks (delta A) 0 0 0).
     
-  Fixpoint build e i f (A : preMAUT) : preMAUT :=
+  Fixpoint build e i f (A : pre_MAUT) : pre_MAUT :=
     match e with 
       | RegExp.zero => A
       | RegExp.one => add_one i f A 
@@ -77,7 +77,7 @@ Module Algebraic.
     end.
 
   Definition to_MAUT i f A :=
-    MAUT.build (mx_point _ _ 0 i 1) (delta A) (mx_point _ _ f 0 1).
+    MAUT.mk (mx_point _ _ 0 i 1) (delta A) (mx_point _ _ f 0 1).
 
   Definition X_to_MAUT e := to_MAUT 0 1 (build e 0 1 empty).
 
@@ -86,8 +86,8 @@ Module Algebraic.
 
   Definition eval i f := to_MAUT i f >> MAUT.eval.
 
-  Inductive equal : preMAUT -> preMAUT -> Prop :=
-  | equal_refl: forall n (M N : KMX n n), M == N -> equal (maut M) (maut N).
+  Inductive equal : pre_MAUT -> pre_MAUT -> Prop :=
+  | equal_refl: forall n (M N : KMX n n), M == N -> equal (mk M) (mk N).
 
   Infix " [=0=] " := equal (at level 80).
   
@@ -169,19 +169,19 @@ Module Algebraic.
   Lemma add_comm : forall a b i f s t M, add a i f (add b s t M) [=0=] add b s t (add a i f M).
   Proof.
     intros a b i f s t [m M].
-    constructor. simpl. aci_reflexivity.
+    constructor. simpl. semiring_reflexivity.
   Qed.
 
   Lemma add_plus : forall a b i f M, add (a+b) i f M [=0=] add a i f (add b i f M).
   Proof.
     intros a b i f [m M].
-    constructor. simpl. rewrite <- mx_point_plus. aci_reflexivity.
+    constructor. simpl. rewrite <- mx_point_plus. semiring_reflexivity.
   Qed.
 
   Lemma add_zero : forall i f M, add 0 i f M [=0=] M.
   Proof.
     intros i f [m M].
-    constructor. simpl. rewrite <- mx_point_zero. aci_reflexivity.
+    constructor. simpl. rewrite <- mx_point_zero. semiring_reflexivity.
   Qed.
 
 
@@ -260,7 +260,7 @@ Module Algebraic.
     rewrite mx_point_dot by trivial with arith.  
     rewrite mx_point_dot by trivial with arith.
     apply mx_point_compat.
-    monoid_reflexivity.
+    semiring_reflexivity.
   Qed.
   
   Lemma eval_dot i f s t a b: forall A, 
@@ -271,7 +271,7 @@ Module Algebraic.
     intros [n M]. simpl. intros Hi Hf Hs Ht.
     setoid_replace (a*b: regex) with (a*0#*b)%A using relation RegExp.equal. 
     rewrite add_comm; rewrite <- eval_master_theorem;auto. apply eval_compat. rewrite add_zero. reflexivity.
-    fold_regex. rewrite star_zero. monoid_reflexivity.
+    fold_regex. rewrite star_zero. semiring_reflexivity.
   Qed.
 
   Lemma eval_star i f s t a A:
@@ -282,11 +282,11 @@ Module Algebraic.
     simpl; intros Hi Hf Hs Ht. 
     rewrite eval_master_theorem;auto.
     apply eval_compat, add_compat'; auto.
-    monoid_reflexivity.
+    semiring_reflexivity.
     reflexivity.
   Qed.
     
-  Lemma eval_build: forall a A i f s t,
+  Lemma build_correct: forall a A i f s t,
     belong i A -> belong f A -> belong s A -> belong t A -> 
     eval i f (build a s t A) == eval i f (add a s t A).
   Proof.
@@ -309,13 +309,15 @@ Module Algebraic.
      apply eval_star; trivial.
   Qed.
 
-  Theorem correct: forall (e: regex), MAUT.eval (X_to_MAUT e) == e.
+  (** Correctness of the high-level construction algorithm *)
+
+  Theorem construction_correct: forall (e: regex), MAUT.eval (X_to_MAUT e) == e.
   Proof.
     intro e. eapply equal_trans.
-    apply eval_build; auto with arith.
+    apply build_correct; auto with arith.
     Transparent dot star plus one zero Peano.minus.
     compute; fold_regex.
-    kleene_clean_zeros. monoid_reflexivity.
+    kleene_clean_zeros. semiring_reflexivity.
   Qed.
 
   End protect.
@@ -328,7 +330,7 @@ Definition statelabelmap_set_to_fun d := fun ia => optionset_to_set (StateLabelM
 
 Module Concrete.
 
-  Record preNFA := {
+  Record pre_eNFA := mk {
     size:       state;                  (** next fresh state (= size) *)
     epsilonmap: statemap stateset;      (** epsilon-transitions *)
     deltamap:   statelabelmap stateset; (** visible transitions *)
@@ -338,34 +340,22 @@ Module Concrete.
   Definition augment (i: state) f eps :=
     StateMap.add i (StateSet.add f (statemap_set_to_fun eps i)) eps. 
 
-  Definition add_one i f (A : preNFA) :=
-    Build_preNFA 
-    (size A)
-    (augment i f (epsilonmap A))
-    (deltamap A)
-    (max_label A)
-    .
+  Definition add_one i f (A: pre_eNFA) :=
+    let '(mk s e d m) := A in 
+      mk s (augment i f e) d m.
 
   Definition augment_var ia j delt :=
     StateLabelMap.add ia (StateSet.add j (statelabelmap_set_to_fun delt ia)) delt. 
 
-  Definition add_var i f a (A : preNFA) := 
-    Build_preNFA 
-    (size A)
-    (epsilonmap A)
-    (augment_var (i,a) f (deltamap A))
-    (max (S a) (max_label A))
-    .
+  Definition add_var i f a (A: pre_eNFA) :=
+    let '(mk s e d m) := A in 
+      mk s e (augment_var (i,a) f d) (max (S a) m).
       
-  Definition incr (A: preNFA): preNFA:= 
-    Build_preNFA
-    (S (size A))
-    (epsilonmap A)
-    (deltamap A)
-    (max_label A)
-    .
+  Definition incr (A: pre_eNFA): pre_eNFA:=
+    let '(mk s e d m) := A in 
+      mk (S s) e d m.
     
-  Fixpoint build e (i : state) (f: state) (A : preNFA) : preNFA :=
+  Fixpoint build e (i : state) (f: state) (A : pre_eNFA) : pre_eNFA :=
     match e with 
       | RegExp.zero => A
       | RegExp.one => add_one i f A
@@ -381,23 +371,11 @@ Module Concrete.
             add_one i p (build a p p (add_one p f A))
     end.
       
-  Definition empty := Build_preNFA 
-    2
-    (StateMap.empty _)
-    (StateLabelMap.empty _)
-    O
-    .
+  Definition empty := mk 2 (StateMap.empty _) (StateLabelMap.empty _) O.
 
   Definition X_to_eNFA e := 
-    let pre := build e 0 1 empty in
-      eNFA.build 
-      (size pre)
-      (statemap_set_to_fun (epsilonmap pre))
-      (deltamap pre)
-      0
-      1 
-      (max_label pre)
-      .
+    let '(mk s e d m) := build e 0 1 empty in
+      eNFA.mk s (statemap_set_to_fun e) d 0 1 m.
     
 End Concrete.
 
@@ -432,9 +410,9 @@ Module Correctness.
       bounded_eps : forall i j, epsilon A i j -> belong i A /\ belong j A
   }.
 
-  Definition preNFA_to_preMAUT (A: preNFA): Algebraic.preMAUT := 
+  Definition preNFA_to_preMAUT (A: pre_eNFA): Algebraic.pre_MAUT := 
     let n := nat_of_state (size A) in
-      Algebraic.maut
+      Algebraic.mk
       (mx_bool _ n n (fun i j => epsilonbrel A (state_of_nat i) (state_of_nat j))
         + box n n (fun i j => labelling (max_label A) 
                       (fun a => deltabrel A (state_of_nat i) a (state_of_nat j)))).   
@@ -447,7 +425,7 @@ Module Correctness.
   Lemma belong_incr: forall A s, belong s A -> belong s (incr A).
   Proof. intros. destruct A; simpl in *. num_omega. Qed.
   Lemma belong_incr': forall A, belong (size A) (incr A).
-  Proof. intros. simpl. num_omega. Qed.
+  Proof. intros. destruct A. simpl. num_omega. Qed.
   Lemma belong_add_one: forall i j A s, belong s A -> belong s (add_one i j A).
   Proof. intros. destruct A. assumption. Qed.
   Lemma belong_add_var: forall i j n A s, belong s A -> belong s (add_var i j n A).
@@ -461,7 +439,7 @@ Module Correctness.
   Lemma epsilonbrel_add_one: forall i j A s t, 
     epsilonbrel (add_one i j A) s t = epsilonbrel A s t || eq_state_bool i s && eq_state_bool j t.
   Proof.
-    intros. unfold epsilonbrel, epsilonfun, add_one, augment, statemap_set_to_fun. simpl.
+    intros. destruct A. unfold epsilonbrel, epsilonfun, add_one, augment, statemap_set_to_fun. simpl.
     
     repeat StateMapProps.find_analyse; simpl; StateMapProps.find_tac; bool_simpl; simpl; trivial.
      rewrite eqb_eq_nat_bool. apply orb_comm. 
@@ -504,7 +482,7 @@ Module Correctness.
     deltabrel (add_var i j n A) s m t = 
     deltabrel A s m t || eq_label_bool n m && (eq_state_bool i s && eq_state_bool j t).
   Proof.
-    intros. unfold deltabrel, deltafun, add_var, augment_var, statelabelmap_set_to_fun. simpl. 
+    intros. destruct A. unfold deltabrel, deltafun, add_var, augment_var, statelabelmap_set_to_fun. simpl. 
     repeat StateLabelMapProps.find_analyse; simpl; 
     repeat (StateLabelMapProps.find_tac;  sl_inject); bool_simpl; simpl; trivial.
      rewrite eqb_eq_nat_bool. apply orb_comm. 
@@ -526,22 +504,23 @@ Module Correctness.
 
   Lemma bounded_incr: forall A, bounded A -> bounded (incr A).
   Proof.
-    intros A [Hd He]. split.
+    intros A [Hd He]. destruct A. split.
      intros i a j H. destruct (Hd i a j H) as (?&?&?). auto.
      intros i j H. destruct (He i j H) as (?&?). auto.
   Qed.
   Lemma bounded_add_one: forall i j A, belong i A -> belong j A -> bounded A -> bounded (add_one i j A).
   Proof.
-    intros i j Hi Hj A [Hd He]. split; auto.
+    destruct A. intros Hi Hj [Hd He]. split; auto.
     intros s t Hst. apply epsilon_add_one in Hst as [Hst|[-> ->]]; auto.
   Qed.
   Lemma bounded_add_var: forall i j n A, belong i A -> belong j A -> bounded A -> bounded (add_var i j n A).
   Proof.
-    intros i j n Hi Hj A [Hd He]. split; auto.
+    intros i j n A Hi Hj [Hd He]. split; auto.
     intros s a t Hst. apply delta_add_var in Hst as [Hst|[-> [-> ->]]]; split; auto; simpl.
-     specialize (Hd _ _ _ Hst). num_simpl. eapply lt_le_trans. apply Hd. apply Max.le_max_r.
+     specialize (Hd _ _ _ Hst). destruct A. simpl. num_simpl. eapply lt_le_trans. apply Hd. apply Max.le_max_r.
      specialize (Hd _ _ _ Hst). intuition.
-     num_simpl. apply Max.le_max_l.
+     destruct A. simpl. num_simpl. apply Max.le_max_l.
+     destruct A. simpl. auto.
   Qed.
   Local Hint Resolve bounded_incr bounded_add_one bounded_add_var.
 
@@ -561,13 +540,15 @@ Module Correctness.
     Algebraic.add_one (nat_of_state i) (nat_of_state f) (preNFA_to_preMAUT A) 
     [=0=] preNFA_to_preMAUT (add_one i f A).
   Proof.
+    Opaque add_one.
     intros i f [sA epsA deltaA mlA]. constructor. mx_intros s t Hs Ht. simpl in *. fold_regex.
     rewrite plus_com, plus_assoc. apply plus_compat; trivial.
     rewrite epsilonbrel_add_one. 
     
-    case (epsilonbrel (Build_preNFA sA epsA deltaA mlA) (state_of_nat s) (state_of_nat t)); simpl; 
+    case (epsilonbrel (mk sA epsA deltaA mlA) (state_of_nat s) (state_of_nat t)); simpl; 
       nat_analyse; simpl; fold_regex; auto with algebra;
       num_analyse; simpl; fold_regex; auto with algebra; num_omega_false.
+    Transparent add_one.
   Qed.
 
   Lemma labelling_S: forall f n, 
@@ -613,14 +594,18 @@ Module Correctness.
      case (deltabrel A i (num_of_nat n) j); simpl; fold_regex; semiring_reflexivity.
   Qed.
 
+  Lemma psurj A: A = mk (size A) (epsilonmap A) (deltamap A) (max_label A).
+  Proof. destruct A. reflexivity. Qed.
+
   Opaque Max.max.
   Lemma commute_add_var: forall n i f A, 
     bounded A -> belong i A -> belong f A ->
     Algebraic.add_var (nat_of_state i) (nat_of_state f) n (preNFA_to_preMAUT A)
     [=0=] preNFA_to_preMAUT (add_var i f n A).
   Proof.
-    intros n i f A HA Hi Hf. constructor. mx_intros s t Hs Ht. simpl in *. fold_regex.
+    intros n i f A HA Hi Hf. rewrite (psurj A) at 2. simpl. constructor. mx_intros s t Hs Ht. simpl in *. fold_regex.
     rewrite <- plus_assoc. apply plus_compat; trivial.
+    fold (add_var i f n (mk (size A) (epsilonmap A) (deltamap A) (max_label A))).
     rewrite labelling_add_var.
     rewrite (@labelling_crop (Max.max (Datatypes.S (nat_of_num n)) (max_label A))); auto with arith.
     setoid_rewrite eqb_eq_nat_bool. setoid_rewrite id_nat.
@@ -641,12 +626,12 @@ Module Correctness.
     replace (nat_of_num(S s)) with (nat_of_state  s +1)%nat by (clear;num_omega).
     constructor. mx_intros i j Hi Hj. simpl. 
     destruct_blocks; trivial; fold_regex;
-      (case_eq (epsilonbrel (Build_preNFA (S s) epsilonmap0 deltamap0 max_label0) (state_of_nat i) (state_of_nat j)); 
-        intro Hij; [apply HA in Hij; simpl in *; bycontradiction; num_omega | 
+      (case_eq (epsilonbrel (mk (S s) epsilonmap0 deltamap0 max_label0) (state_of_nat i) (state_of_nat j)); 
+        intro Hij; [apply HA in Hij; simpl in *; exfalso; num_omega | 
           symmetry; rewrite labelling_empty; 
             [ auto with algebra | 
               intros a; apply not_true_eq_false; intro F; 
-                apply HA in F; simpl in *; bycontradiction; num_omega ]]).
+                apply HA in F; simpl in *; exfalso; num_omega ]]).
   Qed.
 
   Local Hint Resolve 
@@ -674,7 +659,7 @@ Module Correctness.
     constructor. mx_intros i j Hi Hj. simpl. fold_regex. 
     case_eq (epsilonbrel empty (state_of_nat i) (state_of_nat j)); intro H.
      elim (epsilon_empty H).
-     unfold labelling; simpl. fold_regex; aci_reflexivity.
+     unfold labelling; simpl. fold_regex; semiring_reflexivity.
   Qed.
 
   Lemma commute_build_empty: forall e, 
@@ -686,13 +671,15 @@ Module Correctness.
     reflexivity.
   Qed.
 
-  Theorem Construction_equals_Algebraic: forall a, 
+  (** The two construction algorithms (high-level / efficient) are equivalent  *)
+
+  Theorem constructions_equiv: forall a, 
     MAUT.equal (eNFA.to_MAUT (X_to_eNFA a)) (Algebraic.X_to_MAUT a).
   Proof.
     intros a. 
     unfold Algebraic.X_to_MAUT.
     rewrite commute_build_empty.
-    reflexivity.
+    unfold X_to_eNFA. destruct (build a 0 1 empty). reflexivity.
   Qed.
 
 
@@ -795,11 +782,12 @@ Module Correctness.
         destruct H2 as [H2|[H3 [H4 ?]]].
          apply epsilon_rt_add_one in H2 as [H2|[H3 H4]]. 
           not_epsilon.
-          auto.
+          destruct A. auto.
          apply epsilon_rt_add_one in H4 as [H4|[H5 H6]].
           not_epsilon.
-          auto.
+          destruct A. auto.
        apply epsilon_rt_add_one in H3. intuition not_epsilon.
+       destruct A. auto.
   Qed.
       
   Lemma wf_add_one: forall A i j, wf A -> ~ epsilon_rt A j i -> wf (add_one i j A).
@@ -829,9 +817,12 @@ Module Correctness.
 
       apply wf_add_one; auto. intro F. apply Ha in F. inversion F.
 
+      destruct A. auto.
+
       apply wf_add_one; auto. 
        apply IHa; auto.
         apply wf_add_one; auto. 
+         destruct A. auto. 
          intro. not_epsilon.
         intro Hnu. apply epsilon_rt_build in Hnu; auto.
         assert (Hnu': epsilon_rt (add_one (size A) v (incr A)) (size A) u). intuition. clear Hnu.
@@ -845,10 +836,12 @@ Module Correctness.
        apply Common.apply in Ha. inversion_clear Ha; auto. intuition.
        
       apply IHa1; auto. apply IHa2; auto.
+       destruct A. auto.
        intro F. not_epsilon.
        intro Hnu. apply epsilon_rt_build in Hnu; auto. intuition.
         not_epsilon.
-        apply non_strict_not_strict in H2. inversion_clear H1; tauto.
+        apply non_strict_not_strict in H2. 
+        destruct A. apply Ha in H. inversion_clear H; tauto.
   Qed.
 
 
@@ -864,13 +857,13 @@ End Correctness.
 Import Correctness  Concrete.
 
 
-(** Correction of the construction algorithm *)
+(** Correctness of the construction algorithm *)
 
 Theorem correct: forall (a: regex), eNFA.eval (X_to_eNFA a) == a.
 Proof.
   intros a. unfold eNFA.eval, comp.
-  rewrite Construction_equals_Algebraic.
-  apply Algebraic.correct.
+  rewrite constructions_equiv.
+  apply Algebraic.construction_correct.
 Qed.
 
 
@@ -879,6 +872,7 @@ Proof.
   intro.
   destruct (@bounded_build a 1 2 empty refl_equal refl_equal bounded_empty) as [Hd He].
   unfold X_to_eNFA.
+  rewrite (psurj (build a 0 1 empty)).
   split; simpl.
    intros i b j Hj. apply (Hd b i j). apply StateSet.mem_1, Hj.
    intros i j Hj. apply (He i j). apply StateSet.mem_1, Hj.
@@ -886,6 +880,7 @@ Proof.
    apply belong_build. reflexivity.
 Qed.
 
+(** The algorithm produces well-founded eNFAs when starting with expressions in strict star form *)
 
 Theorem well_founded: forall (a: regex), strict_star_form a -> eNFA.well_founded (X_to_eNFA a).
 Proof.
@@ -898,7 +893,7 @@ Proof.
     reflexivity.
     apply wf_empty.
     intro H. apply trans_rt1n in H. inversion_clear H. elim (epsilon_empty H0).
-   intros i j Hij. apply Hij.
+   intros i j Hij. unfold X_to_eNFA in Hij. destruct (build a 0 1 empty). apply Hij.
 Qed.
 
 
@@ -912,10 +907,20 @@ Qed.
    that obtaining the completness of the procedure is easier.
 *)
 
+Lemma max_label_add_one: forall i j A, max_label (add_one i j A) = max_label A.
+Proof. destruct A. reflexivity. Qed.
+
+Lemma max_label_add_var: forall i j a A, max_label (add_var i j a A) = max (S a) (max_label A).
+Proof. destruct A. reflexivity. Qed.
+
+Lemma max_label_incr: forall A, max_label (incr A) = max_label A.
+Proof. destruct A. reflexivity. Qed.
+
 Lemma build_max_label: forall a i e f A, i < max_label A -> i < max_label (build a e f A).
 Proof.
-  induction a; intros i e f A Hi; simpl; auto.
-  num_simpl. eauto using Max.le_max_r with arith.
+  induction a; intros i e f A Hi; rewrite (psurj A); simpl; auto.
+   rewrite max_label_add_one. auto.
+   num_simpl. eauto using Max.le_max_r with arith.
 Qed.
 
 Lemma collect_max_label: 
@@ -927,23 +932,26 @@ Proof.
    eapply IHa2 in Hi as [Hi|Hi]. left. apply build_max_label, Hi. auto. 
    eapply IHa1 in Hi as [Hi|Hi]. left. apply Hi. 
    eapply IHa2 in Hi as [Hi|Hi]. left. apply build_max_label, Hi. auto. 
+   rewrite max_label_add_one. auto. 
    revert Hi. NumSetProps.set_iff. intuition.
-   subst. left. num_simpl; eauto using Max.le_max_l with arith.
+   subst. left. destruct A; simpl. num_simpl. eauto using Max.le_max_l with arith.
 Qed.
 
 Lemma max_label_collect: 
   forall a i e f A, i < max_label (build a e f A) -> 
     (exists2 j, i<=j & NumSet.In (state_of_nat j) (collect a NumSet.empty)) \/ i < max_label A.
 Proof.
-  induction a; simpl; intros i e f A Hi; auto.
+  induction a; simpl; intros i e f A Hi; rewrite ?max_label_add_one, ?max_label_incr in *; auto.
    eapply IHa1 in Hi as [[j ? Hj]|Hi]. left. exists j; auto.
     eapply collect_incr_1 in Hj as [?|?]. eassumption. NumSetProps.setdec. 
-   eapply IHa2 in Hi as [[j ? ?]|Hi]. left. exists j; auto using collect_incr_2. right. assumption. 
+   eapply IHa2 in Hi as [[j ? ?]|Hi]. left. exists j; auto using collect_incr_2. 
+    right. destruct A. assumption. 
    eapply IHa1 in Hi as [[j ? Hj]|Hi]. left. exists j; auto. 
     eapply collect_incr_1 in Hj as [?|?]. eassumption. NumSetProps.setdec. 
    eapply IHa2 in Hi as [[j ? ?]|Hi]. left. exists j; auto using collect_incr_2. right. assumption. 
    eapply IHa in Hi as [Hi|Hi]; auto.
-   revert Hi. num_simpl. apply Max.max_case; auto.
+   revert Hi. rewrite max_label_add_one, max_label_incr. auto. 
+   revert Hi. rewrite max_label_add_var. num_simpl. apply Max.max_case; auto.
    intro Hi. left. exists (nat_of_num p). auto with arith. num_simpl. auto with set.
 Qed.
 
@@ -953,19 +961,21 @@ Proof. intros [|n] m H. trivial with arith. elim (H n); auto. Qed.
 Lemma le_antisym: forall n m: num, n <= m -> m <= n -> n = m.
 Proof. intros. num_omega. Qed. 
 
+Lemma max_label_X_to_eNFA a: eNFA.max_label (X_to_eNFA a) = max_label (build a 0 1 empty).
+Proof. unfold X_to_eNFA. destruct (build a 0 1 empty). reflexivity. Qed.
+
 Theorem same_labels_max_label: forall a b, same_labels a b = true -> 
   eNFA.max_label (X_to_eNFA a) = eNFA.max_label (X_to_eNFA b).
 Proof.
-  unfold X_to_eNFA. simpl.
+  intros. rewrite 2 max_label_X_to_eNFA.
   cut (forall a b, collect a NumSet.empty [=] collect b NumSet.empty -> 
     max_label (build a 0 1 empty) <= max_label (build b 0 1 empty)). 
-  intros M a b H. apply NumSet.equal_2 in H. apply le_antisym; auto. symmetry in H. auto. 
-  
-  intros a b H. apply inf_leq. intros c Hc.
+  intros H'. apply NumSet.equal_2 in H. apply le_antisym; auto. symmetry in H. auto.
+
+  clear. intros a b H. apply inf_leq. intros c Hc.
   apply max_label_collect in Hc as [[d ? Hd]|?]. 
    rewrite H in Hd. eapply collect_max_label in Hd as [Hd|?].
     eapply le_lt_trans. eassumption. unfold statesetelt_of_nat in Hd. rewrite id_nat in Hd. eassumption.
     NumSetProps.setdec.
     simpl in *. compute in H0. omega_false.
 Qed.
-

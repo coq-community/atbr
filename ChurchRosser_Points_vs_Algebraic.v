@@ -108,7 +108,7 @@ Section CR_algebra.
     star_left_induction.
     semiring_normalize.
     repeat apply plus_destruct_leq. 
-     do 2 rewrite <- one_leq_star_a. monoid_reflexivity.
+     do 2 rewrite <- one_leq_star_a. semiring_reflexivity.
      rewrite H. monoid_rewrite (star_trans R). reflexivity.
      rewrite a_star_a_leq_star_a. reflexivity.
   Qed.

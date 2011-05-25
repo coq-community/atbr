@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** * Examples about uses of the ATBR library *)
@@ -82,8 +82,8 @@ Section Tactics.
     kleene_reflexivity.
   Qed.
 
-  (** Note that kleene_reflexivity cannot use hypotheseses (Horn
-  theory of KA is undecidable) *)
+  (** Note that kleene_reflexivity cannot use hypotheses (Horn theory
+  of KA is undecidable) *)
 
   Goal a*b <== c -> a*(b*a)# <== c#*a.
     intro H. 
@@ -118,34 +118,27 @@ Section Tactics.
   Qed.
 
   Goal a*(b*1)*(c*d) == a*1*b*c*d.
-    monoid_reflexivity.
+    semiring_reflexivity.
   Qed.
 
   Goal a+(b+1)+(a+c) == 1+c+b+a+0.
-    aci_reflexivity.
+    semiring_reflexivity.
   Qed.
 
   Goal a <== 1+c+b+a+0.
-    aci_reflexivity.
+    semiring_reflexivity.
   Qed.
 
   (** On these simpler structures, we also have `normalisation' tactics: *)
 
   Goal a*1*(a+b)*d <== (a+b)*((a+(b+c))*d) + d*0.
+    (** normalize expressions by expanding them *)
     semiring_normalize.
-    Restart. semiring_clean.             (* remove zeros and ones *)
-    Restart. semiring_cleanassoc.        (* remove zeros and ones, normalize parentheses *)
+    (** just remove zeros and ones *)
+    Restart. semiring_clean.
+    (** remove zeros and ones and normalize parentheses *)
+    Restart. semiring_cleanassoc.
     semiring_reflexivity.
-  Qed.
-
-  Goal a*(b*1)*(c*d) == a*1*b*c*d.
-    monoid_normalize.
-    reflexivity.
-  Qed.
-
-  Goal a+(b+1)+(a+c) == 1+c+b+a+0.
-    aci_normalize.
-    reflexivity.
   Qed.
 
   (** *** Rewriting tactics  
@@ -157,22 +150,24 @@ Section Tactics.
 
   Goal c*d <== 0 -> a*b*c*d <== 0.
     intro H.
-    try rewrite H.  (* parentheses do not match *)
+    (** parentheses do not match *) 
+    try rewrite H.
     monoid_rewrite H.
     semiring_reflexivity.
   Qed.
 
   Goal d <== c*d -> a*b*d <== a*b*c*d.
     intro H.
-    try rewrite <- H. (* parentheses do not match *)
+    (** parentheses do not match *)
+    try rewrite <- H.
     monoid_rewrite <- H.
-    monoid_reflexivity.
+    semiring_reflexivity.
   Qed.
 
   Goal a+b+c <== c -> b+a+c+c <== c. 
     intro H.
     ac_rewrite H.
-    aci_reflexivity.
+    semiring_reflexivity.
   Qed.
 
   End ISR.
@@ -198,20 +193,23 @@ Section Matrices.
   introduce specific notations to avoid confusion betwen matrices [MX] and
   their underlying elements [X]. *)
 
-  Notation MX := (@X (@mx_Graph G)). (* type of matrices *)
-  Notation X := (@X G).              (* type of elements *)
+  Variable A: T.
+  (** type of matrices over (X A A) *)
+  Notation MX := (@X (mx_Graph A)).
+  (** type of elements *)
+  Notation X := (@X G).
 
-  (** Constant-to-a 2x2 matrix, with elements of type X A B *)
-  Definition constant A B (a: X A B): MX(2,A)(2,B) := box 2 2 (fun i j => a).
+  (** Constant-to-a 2x2 matrix, with elements of type X A A *)
+  Definition constant (a: X A A): MX 2 2 := box 2 2 (fun i j => a).
 
   (** To retrieve the elements of a matrix, we use "!" (a notation for the "get" operation) *)
-  Goal forall A B (a: X A B), !(constant a) O O == a.
+  Goal forall a, !(constant a) O O == a.
   Proof.
     intros. reflexivity.
   Qed.
 
   (** Dummy lemma, notice overloading of notations for [*] *)
-  Lemma square_constant A (a: X A A): constant a * constant a == constant (a*a).
+  Lemma square_constant a: constant a * constant a == constant (a*a).
   Proof. 
     (** since the dimensions are known (and finite), the matricial product can be computed *)
     simpl.                     
@@ -221,11 +219,11 @@ Section Matrices.
     mx_intros i j Hi Hj.        
     simpl.
     (* easy goal, on the underlying algebra *)
-    aci_reflexivity.            
+    semiring_reflexivity.            
   Qed.
 
   (** Our tactics automatically work for matrices (matrices are just another idempotent semiring) *)
-  Goal forall A B C n m p (M: MX(n,A)(m,B)) (N: MX(m,B)(p,C)) (P: MX(n,A)(p,C)),
+  Goal forall n m p (M: MX n m) (N: MX m p) (P: MX n p),
     M*1*N + P == P+M*N.
   Proof.
     intros.
@@ -233,7 +231,7 @@ Section Matrices.
   Qed.
 
   (** Block matrices manipulation *)
-  Lemma square_triangular_blocks A n m (M: MX(n,A)(n,A)) (N: MX(n,A)(m,A)) (P: MX(m,A)(m,A)):
+  Lemma square_triangular_blocks n m (M: MX n n) (N: MX n m) (P: MX m m):
     mx_blocks M N 0 P * mx_blocks M N 0 P == mx_blocks (M*M) (M*N+N*P) 0 (P*P).
   Proof.
     intros.
@@ -274,6 +272,24 @@ Section Concrete.
   Variables R S: rel A A.
   Check (star_distr R S).
 
+  (** tactics work out of the box when using our notations *)
+  Goal R*S==R -> R*(S+R#) == R#*R.
+  Proof. 
+    intro H.
+    rewrite dot_distr_right, H.
+    kleene_reflexivity.
+  Qed.
+
+  (* TOTHINK: also declare canonical structures for operations *)
+  Canonical Structure rel_Monoid_Ops.
+  Goal R*S==R -> rel_comp R (S+R#) == rel_comp (R#) R.
+  Proof. 
+    intro H.
+    rewrite dot_distr_right, H.
+    fold_relAlg.
+    kleene_reflexivity.
+  Qed.
+
 End Concrete.
 
 
@@ -295,7 +311,7 @@ Section Concrete'.
     (comp (clos_refl_trans _ R) (clos_refl_trans _ (comp S (clos_refl_trans _ R)))).
   Proof.
     intros.
-    fold_RelAlg A.
+    fold_relAlg A.
     kleene_reflexivity.
   Qed.
   Print Assumptions example.

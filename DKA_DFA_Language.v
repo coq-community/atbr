@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Proof that the evaluation of a DFA is actually the language
@@ -38,15 +38,15 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 
-Notation Language := (LX label).
+Notation language := (LX label).
 Notation LMX n m := (LMX label n m).
 Notation Word := (list label).
 
-Fixpoint interp (e: regex): Language :=
+Fixpoint regex_language (e: regex): language :=
   match e with 
-    | RegExp.plus e f => interp e + interp f
-    | RegExp.dot e f => interp e * interp f
-    | RegExp.star e => interp e #
+    | RegExp.plus e f => regex_language e + regex_language f
+    | RegExp.dot e f => regex_language e * regex_language f
+    | RegExp.star e => regex_language e #
     | RegExp.one => 1
     | RegExp.zero => 0
     | RegExp.var a => (fun w => w = a::nil)
@@ -58,29 +58,29 @@ Proof.
   intros. destruct b; reflexivity.
 Qed.
 
-Definition interpf  := 
-  @Build_functor RegExp.RE_Graph (@Lang_Graph label) (fun A => A) (fun A B e => interp e).
+Definition regex_language_f  := 
+  @Build_functor RegExp.re_Graph (@lang_Graph label) (fun A => A) (fun A B e => regex_language e).
  
 Section protect.
 
 Opaque dot plus star one zero.
 
-Instance interp_graph_functor: graph_functor interpf.
+Instance regex_language_graph_functor: graph_functor regex_language_f.
 Proof. 
   constructor. intros [] [] x y H. induction H; simpl fX; simpl fT; auto with algebra. 
   apply star_destruct_left. assumption.
   apply star_destruct_right. assumption.
-  transitivity (interp y); assumption.
+  transitivity (regex_language y); assumption.
 Qed.
 
-Instance interp_kleene_functor: kleene_functor interpf.
+Instance regex_language_kleene_functor: kleene_functor regex_language_f.
 Proof.
   constructor.
    constructor; constructor; eauto with typeclass_instances.
    intros. reflexivity.
 Qed.
 
-Ltac fold_interp := repeat match goal with |- context[interp ?e] => change (interp e) with (interpf tt tt e) end.
+Ltac fold_regex_language := repeat match goal with |- context[regex_language ?e] => change (regex_language e) with (regex_language_f tt tt e) end.
 
 Lemma dot_xifzero_left `{ISR: IdemSemiRing}: forall A B C b (x: X A B) (y: X B C), xif b x 0 * y == xif b (x*y) 0.
 Proof. intros. destruct b; auto with algebra. Qed.
@@ -94,7 +94,7 @@ Proof. intros. rewrite dot_xifzero_right, dot_neutral_right. reflexivity. Qed.
 
 Transparent dot plus star one zero. 
 
-Lemma lang_sum: forall (f: nat -> Language) w n i, sum i n f w <-> exists2 j, j<n & f (i+j)%nat w.
+Lemma lang_sum: forall (f: nat -> language) w n i, sum i n f w <-> exists2 j, j<n & f (i+j)%nat w.
 Proof.
   induction n. 
    compute. firstorder.
@@ -106,7 +106,7 @@ Proof.
     right. exists k; auto with arith. rewrite <- plus_n_Sm in H0. assumption.
 Qed.   
 
-Lemma mx_leq_pointwise `{SL: SemiLattice}: forall n m A B (M N: MX n m A B), 
+Lemma mx_leq_pointwise `{SL: SemiLattice}: forall n m A (M N: MX_ A n m), 
   M <== N <-> forall i j, i<n -> j<m -> !M i j <== !N i j.
 Proof. intros. reflexivity. Qed.
 
@@ -116,17 +116,17 @@ Section s.
   Variable M: I -> LMX n m.
 
   Definition mx_lang_Union: LMX n m := 
-    box _ _ (fun i j => lang_Union (fun k => !(M k) i j): Language).
+    box _ _ (fun i j => lang_Union (fun k => !(M k) i j): language).
 
   Lemma mx_lang_Union_spec: forall M', mx_lang_Union <== M' <-> forall i, M i <== M'.
   Proof.
     Opaque leq.
     intros. split.
     intros H u. rewrite <- H. unfold mx_lang_Union.
-     rewrite (mx_leq_pointwise (G:=@Lang_Graph label)).
+     rewrite (mx_leq_pointwise (G:=@lang_Graph label)).
      intros s t Hs Ht. simpl. rewrite <- leq_lang_Union. reflexivity. 
     intro H.
-     rewrite (mx_leq_pointwise (G:=@Lang_Graph label)).
+     rewrite (mx_leq_pointwise (G:=@lang_Graph label)).
      intros s t Hs Ht. simpl. rewrite -> lang_Union_spec. intro u. apply (H u _ _ Hs Ht). 
     Transparent leq.
   Qed.
@@ -143,7 +143,7 @@ Proof.
   apply leq_antisym.
    star_left_induction. apply plus_destruct_leq. 
     rewrite <- (leq_mx_lang_Union _ O). reflexivity. 
-    simpl. intros s t Hs Ht. fold_LangAlg label. apply sum_leq. intros k _ Hk. 
+    mx_intros s t Hs Ht. simpl. fold_langAlg label. apply sum_leq. intros k _ Hk. 
     rewrite lang_leq. intros w [u Hu [v [o Hv] ->]].
     exists (Datatypes.S o). simpl. rewrite lang_sum. exists k; auto. exists u; auto. exists v; auto.
   apply <- mx_lang_Union_spec. intro m. induction m.
@@ -167,7 +167,7 @@ Section accept.
 
   Definition bounded_word (w: Word) := forall a, List.In a w -> a < max_label A.
 
-  Definition DFA_language : Language := 
+  Definition DFA_language : language := 
     fun w => StateSet.In (read w (initial A)) (finaux A) /\ bounded_word w.
 
   Lemma read_app: forall v w i, read (w++v) i = read v (read w i).
@@ -177,41 +177,41 @@ End accept.
 
 
 
-Lemma simpl_interp : forall A,
-  mxF interpf (MAUT.size (DFA.to_MAUT A), tt) (MAUT.size (DFA.to_MAUT A), tt) (MAUT.delta (DFA.to_MAUT A))
+Lemma simpl_regex_language : forall A,
+  mxF regex_language_f tt (MAUT.size (DFA.to_MAUT A)) (MAUT.size (DFA.to_MAUT A)) (MAUT.delta (DFA.to_MAUT A))
   == box (DFA.size A) (DFA.size A)
   (fun s t => sum 0 (DFA.max_label A)
-     (fun i => xif (eqb (state_of_nat t) (DFA.delta A (num_of_nat i) s)) (interp (RegExp.var (num_of_nat i))) 0)).
+     (fun i => xif (eqb (state_of_nat t) (DFA.delta A (num_of_nat i) s)) (regex_language (RegExp.var (num_of_nat i))) 0)).
 Proof.
   intros A.
-  Opaque interpf. simpl. unfold labelling. Transparent interpf.
+  Opaque regex_language_f. simpl. unfold labelling. Transparent regex_language_f.
   apply box_compat. intros s t.
   rewrite functor_sum.
   setoid_rewrite functor_xif. reflexivity.  
 Qed.
 
 
-Theorem interp_DFA_eval: forall A, DFA.bounded A -> interp (DFA.eval A) == DFA_language A.
+Theorem language_DFA_eval: forall A, DFA.bounded A -> regex_language (DFA.eval A) == DFA_language A.
 Proof.
   Opaque leq plus. 
-  intros A HA. fold_interp.
+  intros A HA. fold_regex_language.
   unfold DFA.eval, MAUT.eval, comp.
   rewrite functor_mx_to_scal.
   rewrite 2functor_dot.
   rewrite functor_star.
-  rewrite simpl_interp.
-  Opaque eq_nat_bool interpf.
-  simpl. bool_simpl. simpl. fold_LangAlg label.
+  rewrite simpl_regex_language.
+  Opaque eq_nat_bool regex_language_f.
+  simpl. bool_simpl. simpl. fold_langAlg label.
   setoid_rewrite sum_distr_left.
   setoid_rewrite functor_xif.
-  Transparent interpf. simpl. fold_LangAlg label. 
+  Transparent regex_language_f. simpl. fold_langAlg label. 
   setoid_rewrite dot_boolxif_right. 
   setoid_rewrite dot_boolxif_left.
   setoid_rewrite xif_xif_and. 
   rewrite sum_inversion.
-  rewrite (sum_collapse (G:=@Lang_Graph label) (n:=DFA.initial A)).
+  rewrite (sum_collapse (G:=@lang_Graph label) (n:=DFA.initial A)).
    2: apply DFA.bounded_initial in HA; num_omega.
-   2: simpl; intros; fold_LangAlg label. 
+   2: simpl; intros; fold_langAlg label. 
    2: apply sum_zero; intros; apply xif_false.
    2: bool_connectors; nat_prop; intuition. 
    simpl Peano.plus. bool_simpl.
@@ -221,22 +221,22 @@ Proof.
    intros s Hs.
    match goal with |- context[box ?n ?m ?f] => set (M:=box n m f) end.
    apply leq_antisym.
-    apply sum_leq. simpl. fold_LangAlg label. intros n _ Hn.
+    apply sum_leq. simpl. fold_langAlg label. intros n _ Hn.
     rewrite (@mx_star_charac _ M s n); auto. 2: num_omega. simpl.
-    bool_simpl. StateSetProps.mem_analyse; simpl. 2: fold_LangAlg label; auto with algebra.
+    bool_simpl. StateSetProps.mem_analyse; simpl. 2: fold_langAlg label; auto with algebra.
     rewrite lang_Union_spec. intro m. revert s Hs.
     induction m; intros s Hs.
      simpl. nat_analyse.
       rewrite lang_leq. intros x ->. rewrite id_num in i. split; auto. 
       intros a Ha. inversion Ha. 
-      fold_LangAlg label; auto with algebra.
-     simpl. fold_LangAlg label.
+      fold_langAlg label; auto with algebra.
+     simpl. fold_langAlg label.
       rewrite id_num.
       setoid_rewrite sum_distr_left.
       rewrite sum_inversion.
       setoid_rewrite dot_xifzero_left.
       apply sum_leq. intros a _ Ha.
-      rewrite (sum_collapse (G:=@Lang_Graph label) (n:=DFA.delta A a s)). 
+      rewrite (sum_collapse (G:=@lang_Graph label) (n:=DFA.delta A a s)). 
       simpl. rewrite id_num. bool_simpl. simpl.
       rewrite lang_leq. intros w [u -> [v Hv ->]]. simpl.
       setoid_rewrite lang_leq in IHm. split. 
@@ -263,7 +263,7 @@ Proof.
        2: num_omega. 2: apply HA in Hj'; num_omega.
       rewrite (fun Hs Hj => @mx_star_charac _ M (DFA.delta A a s) (nat_of_state j) Hs Hj w) in Hj.
        2: specialize (DFA.bounded_delta HA a s); num_omega. 2: apply HA in Hj'; num_omega.
-      destruct Hj as [n Hn]. exists (Datatypes.S n). simpl. fold_LangAlg label.
+      destruct Hj as [n Hn]. exists (Datatypes.S n). simpl. fold_langAlg label.
       rewrite lang_sum. exists (DFA.delta A a s). specialize (DFA.bounded_delta HA a s). num_omega.
       simpl Peano.plus. exists (a::nil).
       rewrite 2id_num.

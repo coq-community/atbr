@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Hopcroft and Karp algorithm for checking the equivalence of two DFAs. *)
@@ -411,38 +411,6 @@ Section correctness.
   Qed.
 
 
-  Section Alg.
-    Context `{Ka: KleeneAlgebra}.
-
-    Lemma iteration n (y m: X n n): 1 <== y -> y * y <== y -> y * m <== m * y -> m# * y == y * (m * y)#.
-    Proof.
-      intros H1y Hyy Hym.
-      apply comm_iter_left.
-      apply leq_antisym.
-       rewrite <- H1y at 2. monoid_reflexivity.
-       monoid_normalize. rewrite Hym. monoid_rewrite Hyy. reflexivity. 
-    Qed.
-    
-    Lemma equiv_eval: forall n p q (y m: X n n) (ia ib : X p n) (v : X n q),
-      ia * y == ib * y ->
-      y * m <== m * y -> 
-      y * v == v ->
-      1 <== y ->
-      y * y <== y ->
-      ia * m # * v == ib * m # * v.
-    Proof.
-      intros n p q y m ia ib v Hiy Hym Hyv H1y Hyy.
-      rewrite <- Hyv.
-      monoid_normalize.
-      monoid_rewrite (iteration H1y Hyy Hym).
-      monoid_normalize.
-      rewrite Hiy. 
-      reflexivity.
-    Qed.
-
-  End Alg.
-
-
   Section Correction.
 
     Variables i' j' : state.
@@ -528,7 +496,7 @@ Section correctness.
         (fun np rp => xif (state_of_nat np =T= state_of_nat rp) 1 0): KMX (nat_of_num size) (nat_of_num size)).
       pose (m := MAUT.delta (to_MAUT (change_initial A j'))). 
       pose (v :=  MAUT.final (to_MAUT (change_initial A j'))).
-      apply (equiv_eval (y := y) (m := m) (v := v)).
+      apply (equiv_filter (y := y) (m := m) (v := v)).
 
       (* ia * y == ib * y *)
       simpl MAUT.initial. fold_regex.
@@ -543,7 +511,7 @@ Section correctness.
       (* y * m <== m * y *)
       mx_intros i k Hi Hk. simpl; fold_regex.
        apply sum_leq; intros j _ Hj. 
-       xif_destruct; [monoid_normalize|semiring_reflexivity].
+       xif_destruct; [semiring_normalize|semiring_reflexivity].
        unfold labelling. 
        setoid_rewrite sum_distr_left. rewrite sum_inversion. (* BUG setoid_rewrite/rewrite: très long... *)
        apply sum_incr; intros a Ha. simpl; fold_regex. fold_leq.
@@ -551,7 +519,7 @@ Section correctness.
        leq_sum (delta a i). pose proof (bounded_delta Hbounds a i). num_omega.
        bool_simpl. num_prop. num_simpl. rewrite H0. num_simpl.
        rewrite (simulation H); trivial. 
-        unfold xif. monoid_reflexivity.
+        unfold xif. semiring_reflexivity.
         num_omega. 
         num_omega. 
             
@@ -560,12 +528,12 @@ Section correctness.
       apply leq_antisym. 
        apply sum_leq.
        intros n Hn Hn'. 
-       xif_destruct; [monoid_normalize|semiring_reflexivity]. 
+       xif_destruct; [semiring_normalize|semiring_reflexivity]. 
        apply T_finaux in H. unfold statesetelt_of_nat, statemapelt_of_nat in *.
        rewrite H. reflexivity.
         
        xif_destruct; trivial with algebra.
-       leq_sum i. rewrite T_refl, H. xif_simpl. monoid_reflexivity.
+       leq_sum i. rewrite T_refl, H. xif_simpl. semiring_reflexivity.
 
       (* 1 <== y *)
       mx_intros i j Hi Hj. simpl; fold_regex.
@@ -575,8 +543,8 @@ Section correctness.
       (* y * y <== y*)
       clear. mx_intros i j Hi Hj. simpl; fold_regex.
        apply sum_leq. intros k Hk Hk'. 
-       xif_destruct; [monoid_normalize|semiring_reflexivity].
-       xif_destruct; [monoid_normalize|semiring_reflexivity].
+       xif_destruct; [semiring_normalize|semiring_reflexivity].
+       xif_destruct; [semiring_normalize|semiring_reflexivity].
        rewrite T_true in *. rewrite H0 in H. rewrite <- T_true in H. 
        rewrite H. reflexivity. 
     Qed.
@@ -652,8 +620,8 @@ Section completeness.
   Proof.
     remember (equiv A i j) as r. destruct r as [[b w]|]. 2: rewrite Heqr; firstorder. 
     intros _ H. symmetry in Heqr. apply counter_exemple_equiv in Heqr; auto. 
-    apply interp_graph_functor in H. simpl in H.
-    rewrite 2 interp_DFA_eval in H by auto using bounded_change_initial.
+    apply regex_language_graph_functor in H. simpl in H.
+    rewrite 2 language_DFA_eval in H by auto using bounded_change_initial.
     specialize (H w). destruct b; simpl in Heqr; tauto.
   Qed.
 
@@ -665,5 +633,5 @@ Proof.
   intros A i j HA Hi Hj. split.
    apply valid; assumption.
    case_eq (equiv A i j); auto.
-   intros c Hc H. bycontradiction. apply (completeness HA Hi Hj). rewrite Hc. intro. discriminate. assumption.
+   intros c Hc H. exfalso. apply (completeness HA Hi Hj). rewrite Hc. intro. discriminate. assumption.
 Qed.

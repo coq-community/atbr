@@ -9,13 +9,14 @@ formalized.
 Author: Thomas Braibant
 Email: thomas.braibant@gmail.com
 Homepage: http://sardes.inrialpes.fr/~braibant
-Institution: ENS Lyon - LIG
+Institution: INRIA, UJF - LIG: UMR 5217
 Author: Damien Pous
 Email: damien.pous@inria.fr
 Homepage: http://sardes.inrialpes.fr/~pous
-Institution: CNRS - LIG
+Institution: CNRS - LIG: UMR 5217
 Keywords: Kleene algebra, finite automata, semiring, matrices,  
 decision procedures, reflexive tactic
 Category: Computer Science/Decision Procedures and Certified Algorithms/Decision procedures
 Date: June 2009
-Require: CoLoR
+Require: 
+License: LGPL

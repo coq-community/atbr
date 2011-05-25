@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** This module aggregates all DKA_* modules, to obtain the decision
@@ -34,9 +34,9 @@ Inductive CounterExample: Set :=
 
 
 Definition X_to_DFA (a: regex) := 
-  let a' := StrictStarForm.rewrite a in
+  let a' := StrictStarForm.ssf a in
   let A  := DKA_Construction.X_to_eNFA a' in
-  let A  := DKA_Epsilon.eNFA_to_NFA A (DKA_Construction.well_founded (StrictStarForm.complete a)) in
+  let A  := DKA_Epsilon.eNFA_to_NFA A (DKA_Construction.well_founded (StrictStarForm.ssf_complete a)) in
   let A  := DKA_Determinisation.NFA_to_DFA A in
       A.
 
@@ -60,7 +60,7 @@ Proof.
   rewrite DKA_Determinisation.correct by apply DKA_Epsilon.bounded, DKA_Construction.bounded.
   rewrite DKA_Epsilon.correct by apply DKA_Construction.bounded.
   rewrite DKA_Construction.correct.
-  apply StrictStarForm.correct.
+  apply StrictStarForm.ssf_correct.
 Qed.
 
 Lemma X_to_DFA_bounded: forall a, DFA.bounded (X_to_DFA a).
@@ -85,7 +85,7 @@ Lemma translate_correct: forall ce, translate_ce ce = None <-> ce = None.
 Proof. intros [[b w]|]; simpl; intuition discriminate. Qed.
 
 
-Theorem decide_kleene_correct_complete: forall a b, decide_kleene a b = None <-> a == b.
+Theorem Kozen94: forall a b, decide_kleene a b = None <-> a == b.
 Proof.
   unfold decide_kleene. intros a b.
   case_eq (DKA_CheckLabels.same_labels (clean a) (clean b)); simpl; intros Hm. 
@@ -100,27 +100,33 @@ Proof.
 
    split; intro H.
     discriminate H.
-    bycontradiction. apply DKA_CheckLabels.complete in Hm. tauto.
+    exfalso. apply DKA_CheckLabels.complete in Hm. tauto.
 Qed.
 
-(* Print Assumptions decide_kleene_correct_complete. *)
-        
+(* Print Assumptions Kozen94. *)
 
+Import RegExp.Untype.
+Import Reification.
+
+Corollary dk_erase_correct `{KA: KleeneAlgebra} {env: Env}: 
+  forall n m (a b: KA.X n m), decide_kleene (erase a) (erase b) = None -> KA.eval a == KA.eval b.
+Proof. intros. apply erase_faithful. apply Kozen94. assumption. Qed.
+        
 
 Ltac display_counter_example e ce :=
   let eval_word w :=
     let rec build w :=
       lazymatch w with
       | nil => fail 1
-      | ?x::nil => constr:(Reification.unpack (e x))
-      | ?x::?q => let q := build q in constr:(q * Reification.unpack (e x))
+      | ?x::nil => constr:(Reification.unpack (@Reification.val _ e x))
+      | ?x::?q => let q := build q in constr:(q * Reification.unpack (@Reification.val _ e x))
       end
     in 
     let x := build w in 
     let x := eval compute [e Reification.unpack Reification.tgt Reification.src
       Reification.sigma_get Reification.sigma_add Reification.sigma_empty 
       FMapPositive.PositiveMap.find FMapPositive.PositiveMap.add 
-      FMapPositive.PositiveMap.empty ] in x
+      FMapPositive.PositiveMap.empty Reification.val] in x
     in x
   in
   match ce with
@@ -135,13 +141,13 @@ Ltac display_counter_example e ce :=
       fail 2 "Not a Kleene Algebra theorem: the empty word (1) does not belong to the right-hand side"
   end.
 
+
 (** the tactic for solving Kleene algebras equations *)
 Ltac kleene_reflexivity := 
   let e := fresh "e" in
   unfold leq; 
-  kleene_reify; intros e l r;
-  apply RegExp.Untype.erase_faithful;
-  apply -> decide_kleene_correct_complete; vm_compute; 
+  kleene_reify; intros t e l r;
+  apply dk_erase_correct; vm_compute; 
   (reflexivity || lazymatch goal with |- Some ?w = None => display_counter_example e w end).
 
 (** extension to Kleene algebras with converse *)

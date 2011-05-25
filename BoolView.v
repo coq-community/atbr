@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** This file builds some machinery to deal with reflection and
@@ -51,13 +51,9 @@ Ltac type_view f :=
   let prf := constr:(type_view (f:=f)) in
     on_call f ltac:(fun c =>
       match c with
-          | appcontext args [ f ] =>
+          | context args [ f ] =>
             let ind_app := context args [ prf ] in
-            let H := fresh in
-            let call := fresh in
-              assert(H := ind_app);
-                set(call := c) in *; (** Abstract the call *)
-            try depelim H
+              destruct ind_app
       end).
   
 Inductive compare_spec {A} eq lt (x y : A) : comparison -> Prop :=

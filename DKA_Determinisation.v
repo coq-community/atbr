@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Conversion from NFAs to DFAs.
@@ -73,8 +73,7 @@ Section S.
      intuitively, [step loop p np a s] assumes that [p] points to [np] in the store [s] ;
      it returns the store where all descendants of [p] along [a] have been added.
      *)
-  Definition step loop p np := 
-    let delta_set := delta_set in
+  Definition step (delta_set: label -> stateset -> stateset) loop p np := 
     (fun a s => 
       let q := delta_set a p in
         let '(table,d,next) := s in
@@ -89,7 +88,7 @@ Section S.
      at each stage, one folds over the set of labels to add all the descendence of [p] 
      *)
   Definition build_store :=
-    let step := step in
+    let step := step delta_set in
     let max_label := max_label in
     powerfix size
     (fun loop (s: Store) (p: stateset) (np: state) => 
@@ -110,11 +109,7 @@ Section S.
 
   Definition NFA_to_DFA :=
     let '(t,d,n) := build_store in
-      DFA.build n 
-      (delta' d)
-      0
-      (table_finals t)
-      max_label.
+      DFA.mk n (delta' d) 0 (table_finals t) max_label.
 
 
   (** Now starts the correctness proof ; we need to know that the NFA [A] is bounded. *)
@@ -122,22 +117,23 @@ Section S.
 
 
   (** We start the correctness proof by characterising [build_store] with the 
-     following simpler fixpoint (which is problemetic from the computational point of 
+     following simpler fixpoint (which is problematic from the computational point of 
      view: one has to compute the worst case exponential bound, even if it is not 
      reached) *)
+  Definition step' := step delta_set.
 
   Fixpoint steps n s p np :=
     match n with 
       | O => s
-      | Datatypes.S n => fold_labels (step (steps n) p np) max_label s
+      | Datatypes.S n => fold_labels (step' (steps n) p np) max_label s
     end.
 
   Instance step_compat: Proper 
     (pointwise_relation _ (pointwise_relation _ (pointwise_relation _ (@eq _)))
       ==>
-     pointwise_relation _ (pointwise_relation _ (pointwise_relation _ (pointwise_relation _ (@eq _))))) step.
+     pointwise_relation _ (pointwise_relation _ (pointwise_relation _ (pointwise_relation _ (@eq _))))) step'.
   Proof.
-    intros f g H p np a s. unfold step. 
+    intros f g H p np a s. unfold step', step. 
     destruct s as [[table d]next].
     StateSetMapProps.find_analyse; trivial. apply H. 
   Qed.
@@ -233,9 +229,9 @@ Section S.
   Proof. 
     induction i; intros s p np Hsize H Hp; simpl.
      omega_false.
-     cut (forall a: num, extends s (fold_labels (step (steps i) p np) a s) /\
+     cut (forall a: num, extends s (fold_labels (step' (steps i) p np) a s) /\
        forall P, defined s (fun n b => P n b \/ n = np /\ b < a) ->
-         defined (fold_labels (step (steps i) p np) a s) P).
+         defined (fold_labels (step' (steps i) p np) a s) P).
      intro G. split. eapply G. 
      intros P HP. eapply G. intros n b Hn Hb. specialize (HP _ _ Hn Hb). tauto.
 
@@ -269,8 +265,8 @@ Section S.
            specialize (i_table_wf H H3). simpl. num_omega.
           intros q q' nq. StateSetMapProps.map_iff. intuition subst. 
            StateSetProps.setdec.
-           bycontradiction. specialize (i_table_wf H H5). simpl. num_omega.
-           bycontradiction. specialize (i_table_wf H H4). simpl. num_omega.
+           exfalso. specialize (i_table_wf H H5). simpl. num_omega.
+           exfalso. specialize (i_table_wf H H4). simpl. num_omega.
            apply (i_table_inj H H4 H5).
           intros m Hm. destruct (eq_num_dec m n). subst.
            eauto with map.
@@ -527,7 +523,7 @@ Section S.
 
     (** u *)
     Opaque dot one zero equal. simpl. Transparent dot one zero equal.
-    rewrite (mx_point_one_left (G:=RegExp.RE_Graph)) by num_omega. 
+    rewrite mx_point_one_left by num_omega. 
     mx_intros i j Hi Hj. Opaque eq_nat_bool. simpl. bool_simpl. simpl. fold_regex. Transparent eq_nat_bool. 
     rewrite theta_0. reflexivity. 
 

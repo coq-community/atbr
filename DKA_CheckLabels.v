@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Reflexive algorithm to check that two regex have the same sets of variables.
@@ -93,7 +93,7 @@ Notation clean := RegExp.Clean.rewrite.
 Ltac contradict := 
   match goal with 
     | H: RegExp.equal ?x ?y , Hx: RegExp.is_zero (clean ?x) = _ , Hy: RegExp.is_zero (clean ?y) = _ |- _ => 
-      bycontradiction; apply RegExp.Clean.equal_rewrite_zero_equiv in H; rewrite H, Hy in Hx; discriminate Hx
+      exfalso; apply RegExp.Clean.equal_rewrite_zero_equiv in H; rewrite H, Hy in Hx; discriminate Hx
   end.
 
 Lemma equal_collect: forall a b, a==b -> 
@@ -116,8 +116,6 @@ Qed.
 
 
 (** Proof that rewriting a regex in strict star form preserves its set of labels *)
-
-Notation ssf := StrictStarForm.rewrite.
 
 Lemma collect_ssf_remove: forall a acc, collect (remove a) acc [=] collect a acc.
 Proof.
@@ -142,7 +140,7 @@ Qed.
 
 Lemma collect_ssf: forall a acc, collect (ssf a) acc [=] collect a acc.
 Proof.
-  induction a; simpl; unfold dot_but_one, plus_but_one, star_but_one; intro acc; auto;
+  induction a; simpl; unfold dot', plus_but_one, star'; intro acc; auto;
     RegExp.destruct_tests; simpl; auto.
    rewrite <- IHa1, IHa2. reflexivity.
    rewrite <- IHa2, IHa1. reflexivity.

@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Syntactic model of regular expressions 
@@ -109,8 +109,8 @@ Module RegExp.
 
   
   Section Def.
-  
-    Program Instance RE_Graph: Graph := {
+
+    Program Instance re_Graph: Graph := {
       T := unit;
       X A B := regex;
       equal A B := RegExp.equal
@@ -122,43 +122,43 @@ Module RegExp.
       exact RegExp.equal_trans.
     Qed.
   
-    Instance RE_SemiLattice_Ops: SemiLattice_Ops := {
+    Instance re_SemiLattice_Ops: SemiLattice_Ops re_Graph:= {
       plus A B := RegExp.plus;
       zero A B := RegExp.zero
     }.
   
-    Instance RE_Monoid_Ops: Monoid_Ops := {
+    Instance re_Monoid_Ops: Monoid_Ops re_Graph := {
       dot A B C := RegExp.dot;
       one A := RegExp.one
     }.
     
-    Instance RE_Star_Op: Star_Op := { 
+    Instance re_Star_Op: Star_Op re_Graph := { 
       star A := RegExp.star
     }.
     
-    Instance RE_SemiLattice: SemiLattice.
+    Instance re_SemiLattice: SemiLattice re_Graph.
     Proof.
       constructor; repeat intro; simpl in *;
       constructor; assumption.
     Qed.
   
-    Instance RE_Monoid: Monoid.
+    Instance re_Monoid: Monoid re_Graph.
     Proof.
       constructor; repeat intro; simpl in *;
         constructor; assumption.
     Qed.
   
-    Instance RE_SemiRing: IdemSemiRing.
+    Instance re_SemiRing: IdemSemiRing re_Graph.
     Proof.
-      apply (Build_IdemSemiRing RE_Monoid RE_SemiLattice);
+      apply (Build_IdemSemiRing re_Monoid re_SemiLattice);
       repeat intro; simpl in *;
         constructor; assumption.
     Qed.
   
-    Instance RE_KleeneAlgebra: KleeneAlgebra.
+    Instance re_KleeneAlgebra: KleeneAlgebra re_Graph.
     Proof.
       constructor; 
-      try exact RE_SemiRing;
+      try exact re_SemiRing;
       repeat intro; simpl in *;
         constructor; assumption.
     Qed.
@@ -167,34 +167,34 @@ Module RegExp.
   
   Module Load.
   
-    Existing Instance RE_Graph.
-    Existing Instance RE_SemiLattice_Ops.
-    Existing Instance RE_Monoid_Ops.
-    Existing Instance RE_SemiLattice.
-    Existing Instance RE_Star_Op.
-    Existing Instance RE_SemiRing.
-    Existing Instance RE_Monoid.
-    Existing Instance RE_KleeneAlgebra.
+    Existing Instance re_Graph.
+    Existing Instance re_SemiLattice_Ops.
+    Existing Instance re_Monoid_Ops.
+    Existing Instance re_SemiLattice.
+    Existing Instance re_Star_Op.
+    Existing Instance re_SemiRing.
+    Existing Instance re_Monoid.
+    Existing Instance re_KleeneAlgebra.
     
-    Canonical Structure RE_Graph.
+    Canonical Structure re_Graph.
     
     Import Classes.
 
-    Notation tt := (tt: @T RE_Graph).
-    Notation regex := (@X RE_Graph tt tt).
-    Notation KMX n m := (@X (@mx_Graph RE_Graph) (n,tt)%nat (m,tt)%nat).
+    Notation tt := (tt: @T re_Graph).
+    Notation regex := (@X re_Graph tt tt).
+    Notation KMX n m := (@X (@mx_Graph re_Graph tt) (n%nat) (m%nat)).
     Notation var i := (var i: regex).  
 
     Transparent equal plus dot one zero star. 
     Global Opaque T.
   
     Ltac fold_regex :=
-      change RegExp.equal with (@equal RE_Graph tt tt) ; 
-      change RegExp.one with (@one RE_Graph RE_Monoid_Ops tt) ;
-        change RegExp.dot with (@dot RE_Graph RE_Monoid_Ops tt tt tt) ;
-          change RegExp.zero with (@zero RE_Graph RE_SemiLattice_Ops tt tt) ;
-            change RegExp.plus with (@plus RE_Graph RE_SemiLattice_Ops tt tt) ;
-              change RegExp.star with (@star RE_Graph RE_Star_Op tt).
+      change RegExp.equal with (@equal re_Graph tt tt) ; 
+      change RegExp.one with (@one re_Graph re_Monoid_Ops tt) ;
+        change RegExp.dot with (@dot re_Graph re_Monoid_Ops tt tt tt) ;
+          change RegExp.zero with (@zero re_Graph re_SemiLattice_Ops tt tt) ;
+            change RegExp.plus with (@plus re_Graph re_SemiLattice_Ops tt tt) ;
+              change RegExp.star with (@star re_Graph re_Star_Op tt).
       
   End Load.
 

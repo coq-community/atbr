@@ -22,6 +22,7 @@ Model_Relations.v
 Model_StdRelations.v
 Model_Languages.v
 Model_RegExp.v
+Model_MinPlus.v
 StrictStarForm.v
 MxGraph.v
 MxSemiLattice.v
@@ -44,4 +45,3 @@ ATBR_Matrices.v
 Examples.v
 ChurchRosser.v
 ChurchRosser_Points_vs_Algebraic.v
-reification.ml

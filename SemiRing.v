@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Properties, definitions, hints and tactics for semirings :
@@ -45,8 +45,7 @@ Module U.
   | zero: X
   | dot: X -> X -> X
   | plus: X -> X -> X
-  | var: positive -> X
-    .
+  | var: positive -> X.
 
   Inductive equal: X -> X -> Prop :=
   | refl_one: equal one one
@@ -70,8 +69,7 @@ Module U.
   | dot_compat: forall x x', equal x x' -> forall y y', equal y y' -> equal (dot x y) (dot x' y')
   | plus_compat: forall x x', equal x x' -> forall y y', equal y y' -> equal (plus x y) (plus x' y')
   | equal_trans: forall x y z, equal x y -> equal y z -> equal x z
-  | equal_sym: forall x y, equal x y -> equal y x  
-    .
+  | equal_sym: forall x y, equal x y -> equal y x.
 
   Import Positive PositiveUtils.
   Notation S := Datatypes.S.
@@ -816,7 +814,7 @@ Section tests.
     semiring_normalize.
     monoid_rewrite H.
     semiring_cleanassoc.
-    aci_reflexivity.
+    aac_reflexivity.
     Show Proof.
   Qed.
 End tests.
@@ -840,7 +838,7 @@ Section Props.
   Proof.
     revert i; induction k; intro i; simpl_sum_r.
     apply dot_ann_right.
-    rewrite dot_distr_right, IHk; aci_reflexivity.
+    rewrite dot_distr_right, IHk. reflexivity.
   Qed.
 
   Lemma semi_invert_left A B C  (x : X B A) (x' : X A B) (a b: X A C) : 

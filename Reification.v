@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 
@@ -53,41 +53,6 @@ Section S.
 
 End S.
 Infix " [=] " := eqd (at level 70). 
-  
-
-Module Monoid.
-  Section S.
-    Context `{env: Env}.
-    Inductive X: positive -> positive -> Type :=
-    | dot: forall A B C, X A B -> X B C -> X A C
-    | one: forall A, X A A
-    | var: forall i, X (src_p (val i)) (tgt_p (val i)).
-    Context {Mo: Monoid_Ops}.
-    Fixpoint eval n m (x: X n m): Classes.X (typ n) (typ m) :=
-      match x with
-        | dot _ _ _ x y => eval x * eval y
-        | one _ => 1
-        | var i => unpack (val i)
-      end.
-  End S.
-End Monoid.    
-
-Module Semilattice.
-  Section S.
-    Context `{env: Env}.
-    Inductive X: positive -> positive -> Type :=
-    | plus: forall A B, X A B -> X A B -> X A B
-    | zero: forall A B, X A B
-    | var: forall i, X (src_p (val i)) (tgt_p (val i)).
-    Context {SLo: SemiLattice_Ops}.
-    Fixpoint eval n m (x: X n m): Classes.X (typ n) (typ m) :=
-      match x with
-        | plus _ _ x y => eval x + eval y
-        | zero _ _ => 0
-        | var i => unpack (val i)
-      end.
-  End S.
-End Semilattice.    
 
 Module Semiring.
   Section S.
@@ -98,7 +63,7 @@ Module Semiring.
     | plus: forall A B, X A B -> X A B -> X A B
     | zero: forall A B, X A B
     | var: forall i, X (src_p (val i)) (tgt_p (val i)).
-    Context {Mo: Monoid_Ops} {SLo: SemiLattice_Ops}.
+    Context {Mo: Monoid_Ops G} {SLo: SemiLattice_Ops G}.
     Fixpoint eval n m (x: X n m): Classes.X (typ n) (typ m) :=
       match x with
         | dot _ _ _ x y => eval x * eval y
@@ -120,7 +85,7 @@ Module KA.
     | zero: forall A B, X A B
     | star: forall A, X A A -> X A A
     | var: forall i, X (src_p (val i)) (tgt_p (val i)).
-    Context {Mo: Monoid_Ops} {SLo: SemiLattice_Ops} {Ko: Star_Op}.
+    Context {Mo: Monoid_Ops G} {SLo: SemiLattice_Ops G} {Ko: Star_Op G}.
     Fixpoint eval n m (x: X n m): Classes.X (typ n) (typ m) :=
       match x with
         | dot _ _ _ x y => eval x * eval y
@@ -132,6 +97,5 @@ Module KA.
       end.
   End S.
 End KA.    
-
 
 Declare ML Module "reification". 

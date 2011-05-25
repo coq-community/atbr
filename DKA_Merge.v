@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Parallel composition of two DFAs.
@@ -46,7 +46,7 @@ Definition merge_DFAs A B :=
     StateSet.fold (fun x acc => StateSet.add (pi0 x) acc) (finaux A)
       (StateSet.fold (fun x acc => StateSet.add (pi1 x) acc) (finaux B) StateSet.empty)
   in
-    DFA.build s delta 0 finaux k.
+    DFA.mk s delta 0 finaux k.
 
 Definition compare_DFAs T (equiv: DFA.t -> state -> state -> option T) A B :=
   equiv (merge_DFAs A B) (pi0 (initial A)) (pi1 (initial B)).

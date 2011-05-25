@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Model of heterogeneous binary relations *)
@@ -32,12 +32,11 @@ Section Def.
     end.
   Definition rel_star A (R: rel A A): rel A A := fun x y => exists n, rel_iter R n x y.
 
-  Program Instance Rel_Graph: Graph := {
+  Program Instance rel_Graph: Graph := {
     T := Type;
     X := rel;
     equal := rel_equal
   }.
-  
   Next Obligation.
     constructor; unfold rel_equal; repeat intro; intuition.
     apply H in H0; trivial.
@@ -46,27 +45,27 @@ Section Def.
     apply H0, H in H1; trivial.
   Qed.
 
-  Instance Rel_SemiLattice_Ops: SemiLattice_Ops := {
+  Instance rel_SemiLattice_Ops: SemiLattice_Ops rel_Graph := {
     plus := rel_union;
     zero := rel_empty
   }.
 
-  Instance Rel_Monoid_Ops: Monoid_Ops := {
+  Instance rel_Monoid_Ops: Monoid_Ops rel_Graph := {
     dot := rel_comp;
     one := rel_id
   }.
   
-  Instance Rel_Star_Op: Star_Op := { 
+  Instance rel_Star_Op: Star_Op rel_Graph := { 
     star := rel_star
   }.
 
-  Instance Rel_Converse_Op: Converse_Op := { 
+  Instance rel_Converse_Op: Converse_Op rel_Graph := { 
     conv := rel_conv
   }.
   
   Transparent equal.
 
-  Instance Rel_SemiLattice: SemiLattice.
+  Instance rel_SemiLattice: SemiLattice rel_Graph.
   Proof.
     constructor; compute; firstorder.
   Qed.
@@ -79,27 +78,27 @@ Section Def.
                         | H : ?A , H' : (forall (x : ?A), _ ) |- _ => specialize (H' H); intuition
                              end.
   
-  Instance Rel_ConverseSemiRing: ConverseIdemSemiRing.
+  Instance rel_ConverseSemiRing: ConverseIdemSemiRing rel_Graph.
   Proof.
-    constructor; (exact Rel_SemiLattice || intros; compute; firstorder).
+    constructor; (exact rel_SemiLattice || intros; compute; firstorder).
     destruct_ex; eauto.
     destruct_ex; eauto.
     subst; auto.
   Qed.
 
-  Definition Rel_IdemSemiRing: IdemSemiRing := Converse.CISR_ISR.  
+  Definition rel_IdemSemiRing: IdemSemiRing rel_Graph := Converse.CISR_ISR.  
 
 
-  Lemma rel_leq A B: forall (a b: @X (Rel_Graph) A B), a<==b <-> forall x y, a x y -> b x y.
+  Lemma rel_leq A B: forall (a b: @X (rel_Graph) A B), a<==b <-> forall x y, a x y -> b x y.
   Proof.
     compute. firstorder. 
   Qed.
 
-  Instance Rel_ConverseKleeneAlgebra: ConverseKleeneAlgebra.
+  Instance rel_ConverseKleeneAlgebra: ConverseKleeneAlgebra rel_Graph.
   Proof.
     constructor; 
       first [ 
-        exact Rel_ConverseSemiRing |
+        exact rel_ConverseSemiRing |
         intros
       ].
     intros p q; split; intro H.
@@ -118,7 +117,7 @@ Section Def.
      apply -> rel_leq; eauto.  exists z; trivial. 
   Qed.
 
-  Definition Rel_KleeneAlgebra: KleeneAlgebra := Converse.CKA_KA.  
+  Definition rel_KleeneAlgebra: KleeneAlgebra rel_Graph := Converse.CKA_KA.  
 
 End Def.
 
@@ -126,25 +125,25 @@ End Def.
 (** Import this module to work with binary relations *)
 Module Load.
 
-  Existing Instance Rel_Graph.
-  Existing Instance Rel_SemiLattice_Ops.
-  Existing Instance Rel_Monoid_Ops.
-  Existing Instance Rel_Converse_Op.
-  Existing Instance Rel_SemiLattice.
-  Existing Instance Rel_Star_Op.
-  Existing Instance Rel_KleeneAlgebra.
+  Existing Instance rel_Graph.
+  Existing Instance rel_SemiLattice_Ops.
+  Existing Instance rel_Monoid_Ops.
+  Existing Instance rel_Converse_Op.
+  Existing Instance rel_SemiLattice.
+  Existing Instance rel_Star_Op.
+  Existing Instance rel_KleeneAlgebra.
   
-  Canonical Structure Rel_Graph.
+  Canonical Structure rel_Graph.
   
   Transparent equal plus dot one zero star. 
 
-  Ltac fold_RelAlg := 
-    change rel_equal with (@equal Rel_Graph); 
-      change rel_id with (@one Rel_Graph Rel_Monoid_Ops);
-        change rel_comp with (@dot Rel_Graph Rel_Monoid_Ops);
-          change rel_union with (@plus Rel_Graph Rel_SemiLattice_Ops);
-            change rel_empty with (@zero Rel_Graph Rel_SemiLattice_Ops);
-              change rel_star with (@star Rel_Graph Rel_Star_Op).
+  Ltac fold_relAlg := 
+    change rel_equal with (@equal rel_Graph); 
+      change rel_id with (@one rel_Graph rel_Monoid_Ops);
+        change rel_comp with (@dot rel_Graph rel_Monoid_Ops);
+          change rel_union with (@plus rel_Graph rel_SemiLattice_Ops);
+            change rel_empty with (@zero rel_Graph rel_SemiLattice_Ops);
+              change rel_star with (@star rel_Graph rel_Star_Op).
     
 End Load.
 
