@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Simple properties about Kleene algebras *)
@@ -126,7 +126,7 @@ Section Props1.
     star_right_induction.
     rewrite star_a_a_leq_star_a at 1.
     apply plus_destruct_leq; auto.
-    rewrite <- one_leq_star_a. monoid_reflexivity.
+    rewrite <- one_leq_star_a. semiring_reflexivity.
   Qed.
 
   Lemma star_make_right (a:X A A): 1+a*a# == a#.
@@ -144,22 +144,6 @@ Section Props1.
 
 End Props1.
 
-(** setoid_rewrite based simplification tactic  *)
-Ltac r_kleenealgebra_clean :=
-  repeat   
-    lazymatch goal with 
-|  |- context [0 #] => setoid_rewrite star_zero
-|  |- context [1 #] => setoid_rewrite star_one
-(* |  |- context [?x # #] => setoid_rewrite star_idem *)
-(* |  |- context [?x + ?x] => setoid_rewrite plus_idem *)
-|  |- context [?x * 0] => setoid_rewrite dot_ann_right
-|  |- context [?x * 1] => setoid_rewrite dot_neutral_right
-|  |- context [1 * ?x] => setoid_rewrite dot_neutral_left
-|  |- context [0 + ?x] => setoid_rewrite plus_neutral_left
-|  |- context [?x + 0] => setoid_rewrite plus_neutral_right
-  
-end.
-
 (** hints *)
 Hint Extern 1 (equal _ _ _ _) => apply star_compat; instantiate: compat algebra.
 Hint Extern 0 (equal _ _ _ _) => apply star_make_left: algebra.
@@ -175,12 +159,13 @@ Hint Rewrite @star_mon_is_one using ti_auto : simpl.
 
 (** dual Kleene algebra *)
 Module Dual. Section Protect.
-
-  Instance KleeneAlgebra `{KA: KleeneAlgebra}: 
-    @KleeneAlgebra Dual.Graph Dual.Monoid_Ops Dual.SemiLattice_Ops Dual.Star_Op.
+  Existing Instance Classes.Dual.Monoid_Ops.
+  Existing Instance Classes.Dual.SemiLattice_Ops.
+  Existing Instance Classes.Dual.Star_Op.
+  Instance KleeneAlgebra `{KA: KleeneAlgebra}: KleeneAlgebra (Dual.Graph G).
   Proof.
     constructor.
-    exact Dual.IdemSemiRing.
+    apply (@Dual.IdemSemiRing G). eauto with typeclass_instances.
     exact (@star_make_right _ _ _ _ KA).
     exact (@star_destruct_right _ _ _ _ KA).
     exact (@star_destruct_left _ _ _ _ KA).
@@ -198,8 +183,8 @@ Section Props2.
   Proof.
     apply leq_antisym.
     star_right_induction.
-    rewrite star_a_a_leq_star_a; aci_reflexivity.
-    rewrite <- one_leq_star_a at 3; monoid_reflexivity.
+    rewrite star_a_a_leq_star_a. reflexivity.
+    rewrite <- one_leq_star_a at 3. semiring_reflexivity.
   Qed.
 
   Lemma star_idem (a: X A A): a## == a#.
@@ -207,7 +192,7 @@ Section Props2.
     apply leq_antisym.
     star_right_induction.
     rewrite star_trans.
-    rewrite (one_leq_star_a a); aci_reflexivity.
+    rewrite (one_leq_star_a a). auto with algebra. 
     apply a_leq_star_a.
   Qed.
 
@@ -227,7 +212,7 @@ Section Props2.
 
     rewrite <- (star_trans (a+b)).
     apply dot_incr.
-     apply star_incr; aci_reflexivity.
+     apply star_incr. auto with algebra.
      rewrite <- (star_idem (a+b)). apply star_incr.
     rewrite <- (a_star_a_leq_star_a (a+b)).
     apply dot_incr. auto with algebra. 

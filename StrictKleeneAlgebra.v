@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Class of "Strict Kleene Algebras" : those without a zero;
@@ -19,7 +19,7 @@ Unset Printing Implicit Defensive.
 Bind Scope SA_scope with X.
 
 (** Strict Kleene Algebras operations *)
-Class SKA_Ops {G: Graph} := {
+Class SKA_Ops (G: Graph) := {
   dot:  forall A B C, X A B -> X B C -> X A C;
   one:  forall A,     X A A;
   plus: forall A B, X A B -> X A B -> X A B;
@@ -40,7 +40,7 @@ Open Scope SA_scope.
 Delimit Scope SA_scope with SA.
 
 (** Strict Kleene Algebras axioms *)
-Class StrictKleeneAlgebra {G: Graph} {Ops: SKA_Ops} := {
+Class StrictKleeneAlgebra {G: Graph} {Ops: SKA_Ops G} := {
   dot_compat:> 
     forall A B C, Proper (equal A B ==> equal B C ==> equal A C) (dot A B C);
   plus_compat:> 
@@ -57,7 +57,7 @@ Class StrictKleeneAlgebra {G: Graph} {Ops: SKA_Ops} := {
   star_destruct_left: forall A B (a: X A A) (c: X A B), a*c <== c  ->  a#*c <== c;
   star_destruct_right: forall A B (a: X A A) (c: X B A), c*a <== c  ->  c*a# <== c
 }.
-
+Implicit Arguments StrictKleeneAlgebra [[Ops]].
 
 (** Lifting an equivalence relation to option types  *)
 
@@ -101,7 +101,7 @@ Section F.
     intros A B x y Hxy. inversion_clear Hxy. assumption.
   Qed.
 
-  Global Instance oMonoid_Ops: @Monoid_Ops oGraph := {
+  Global Instance oMonoid_Ops: Monoid_Ops oGraph := {
     dot A B C x y := 
       match x,y with 
         | Some x, Some y => Some (x*y)
@@ -110,7 +110,7 @@ Section F.
     one A := Some 1
   }.
 
-  Global Instance oSemiLattice_Ops: @SemiLattice_Ops oGraph := {
+  Global Instance oSemiLattice_Ops: SemiLattice_Ops oGraph := {
     plus A B x y := 
       match x,y with 
         | None,y => y 
@@ -120,7 +120,7 @@ Section F.
     zero A B := None
   }.
 
-  Global Instance oStar_Op: @Star_Op oGraph := {
+  Global Instance oStar_Op: Star_Op oGraph := {
     star A x := 
       match x with 
         | None => Some 1
@@ -128,7 +128,7 @@ Section F.
       end
   }.
 
-  Instance oMonoid: @Monoid oGraph _.
+  Instance oMonoid: Monoid oGraph.
   Proof.
     constructor; intros.
      intros _ _ [x x' Hx|] _ _ [y y' Hy|]; simpl; constructor. 
@@ -141,7 +141,7 @@ Section F.
      destruct x; simpl; constructor. apply dot_neutral_right.
   Qed.
 
-  Instance oSemiLattice: @SemiLattice oGraph _.
+  Instance oSemiLattice: SemiLattice oGraph.
   Proof.
     constructor; intros.
      intros _ _ [x x' Hx|] _ _ [y y' Hy|]; simpl; constructor; trivial.
@@ -154,7 +154,7 @@ Section F.
       apply plus_com.
   Qed.
 
-  Instance oIdemSemiRing: @IdemSemiRing oGraph _ _.
+  Instance oIdemSemiRing: IdemSemiRing oGraph.
   Proof.
     constructor; eauto with typeclass_instances; intros.
      destruct x; reflexivity.
@@ -164,7 +164,7 @@ Section F.
       apply dot_distr_right.
   Qed.
 
-  Global Instance oKleeneAlgebra: @KleeneAlgebra oGraph _ _ _.
+  Global Instance oKleeneAlgebra: KleeneAlgebra oGraph.
   Proof.
     constructor; eauto with typeclass_instances.
      intros A [a|]; simpl; constructor; try reflexivity.

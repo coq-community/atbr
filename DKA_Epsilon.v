@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (* Removal of epsilon transitions: from eNFAs to NFAs *)
@@ -111,8 +111,7 @@ Definition statelabelmap_set_to_fun d := fun a i => optionset_to_set (StateLabel
 Definition eNFA_to_NFA A (Hwf: eNFA.well_founded A) := 
   let (size,_,delta,initial,final,max_label) := A in
   let eps := rt_closure (guard 100 Hwf) size in
-    NFA.build 
-    size
+    NFA.mk size
     (statelabelmap_set_to_fun (StateLabelMap.map (set_closure eps) delta))
     (eps initial)
     (StateSet.singleton final)
@@ -284,7 +283,7 @@ Section algebraic_lemmas.
   Proof.
     intros.
     rewrite H0, H1, H2, H.
-    rewrite star_distr. monoid_reflexivity.
+    rewrite star_distr. semiring_reflexivity.
   Qed.
   
   Lemma algebraic_rt_closure: forall A (j' j : X A A), 1 <== j' -> j' * j' <== j' -> j<==j' -> j# <== j'.
@@ -313,7 +312,7 @@ Lemma rt_closure_star: forall f Hwf size, (forall i, below i size -> setbelow (f
 Proof.
   intros f Hwf size Hbounded.
   apply leq_antisym. 
-   apply algebraic_rt_closure; simpl; fold_regex; intros i j Hi Hj; fold_leq. 
+   apply algebraic_rt_closure; mx_intros i j Hi Hj; simpl; fold_regex; fold_leq. 
     nat_analyse; fold_regex; auto with algebra.
     subst. type_view StateSet.mem; auto with algebra. 
     elim n. rewrite <- rt_closure_spec by num_omega. constructor 1.
@@ -327,8 +326,8 @@ Proof.
      apply trans_rt1n. constructor 3 with (sn k); 
       apply rt1n_trans; apply <- rt_closure_spec; eauto; unfold below; num_omega.
      
-    type_view StateSet.mem. 2: simpl; fold_regex; aci_reflexivity.
-    type_view StateSet.mem. simpl; fold_regex; aci_reflexivity.
+    type_view StateSet.mem. 2: simpl; fold_regex; semiring_reflexivity.
+    type_view StateSet.mem. simpl; fold_regex; semiring_reflexivity.
     elim n.
      rewrite <- rt_closure_spec by num_omega.
      constructor 2 with (sn j). apply StateSet.mem_1 in i0. assumption. constructor 1.
@@ -350,7 +349,7 @@ Proof.
      rewrite <- lt_nat_spec in Hi. apply Hbounded in Hi. 
      rewrite <- lt_nat_spec. apply Hi. apply StateSet.mem_2, H. 
     apply leq_sum. exists (ns y); repeat split; auto with arith.
-    rewrite 2id_num. rewrite H. rewrite <- IHij by assumption. unfold xif. monoid_reflexivity.
+    rewrite 2id_num. rewrite H. rewrite <- IHij by assumption. unfold xif. semiring_reflexivity.
     apply equal_leq. refine (star_make_right m _ _ Hi Hj).
 Qed.
 
@@ -413,7 +412,7 @@ Proof.
   Local Transparent dot plus zero one equal. 
 
   (* m' = n*j' *)
-  simpl; fold_regex. intros i j Hi Hj. unfold labelling.
+  mx_intros i j Hi Hj. simpl. unfold labelling. fold_regex.
   setoid_rewrite sum_distr_left.
   rewrite sum_inversion.
   apply sum_compat. intros a Ha. simpl; fold_regex.
@@ -443,7 +442,7 @@ Proof.
   (* u' = u*j' *)
   mx_intros i j Hi Hj. simpl; fold_regex.
   rewrite (sum_collapse (n:=ns initial)). simpl. bool_simpl. simpl. fold_regex. unfold statesetelt_of_nat. 
-  monoid_reflexivity. 
+  auto with algebra. 
   apply -> lt_nat_spec. apply Hb.
   simpl. intros k Hk. nat_analyse. simpl. fold_regex. auto with algebra.
 

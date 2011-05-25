@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Basic definitions for matrices: definition of their [Graph] *)
@@ -21,19 +21,25 @@ Unset Printing Implicit Defensive.
 Section Defs.
 
   Context {G: Graph}.
+  Variable A: T.
+  Notation X := (X A A).
 
   (** [n] and [m] are phantom types, a matrix is a function from two [nat] to X *)
-  Inductive X' A B (n m: nat) := 
-    box: (nat -> nat -> X A B) -> X' A B n m.
+  Inductive MX (n m: nat) := 
+    box: (nat -> nat -> X) -> MX n m.
 
-  Definition get A B n m (M: X' A B n m) := let (f) := M in f.
-      
+  Definition get n m (M: MX n m) := let (f) := M in f.
+
+  (** matrix equality is bounded pointwise equality  *)
+
+  Definition mx_equal n m: relation (MX n m) := 
+    fun M N => forall i j, i<n -> j<m -> get M i j == get N i j.
+
   (** matrix Graph, equality is bounded pointwise equality  *)
   Program Instance mx_Graph: Graph := {
-    T := prod nat T;
-    X nA mB := X' (snd nA) (snd mB) (fst nA) (fst mB);
-    equal nA mB M N := forall i j, i<fst nA -> j<fst mB -> get M i j == get N i j
-  }.
+    T := nat;
+    X := MX;
+    equal := mx_equal }.
   Next Obligation.
     split; repeat intro; simpl in *.
     reflexivity.
@@ -41,48 +47,49 @@ Section Defs.
     transitivity (get y i j); auto.
   Qed.
 
-  Lemma mx_equal': forall nA mB (M N: @X mx_Graph nA mB) 
-    (H: forall i j, i<fst nA -> j<fst mB -> get M i j == get N i j), M == N.
+  Lemma mx_equal': forall n m (M N: @Classes.X mx_Graph n m) 
+    (H: forall i j, i<n -> j<m -> get M i j == get N i j), M == N.
   Proof (fun _ _ _ _ H => H).
   
-  Definition mx_equal_at A B p q n m n' m' (M : X' A B n m) (N : X' A B n' m') := 
+  Definition mx_equal_at p q n m n' m' (M : MX n m) (N : MX n' m') := 
     forall i j, i < p -> j < q -> get M i j == get N i j.
 
-  Lemma mx_equal_at_equal n m A B (M N: @X mx_Graph (n,A) (m,B)) : mx_equal_at n m M N <->  M == N.
-  Proof.
-    intros. unfold mx_equal_at. intuition.
-  Qed.
+  Lemma mx_equal_at_equal n m (M N: @Classes.X mx_Graph n m) : mx_equal_at n m M N <-> M == N.
+  Proof. intros. unfold mx_equal_at. intuition. Qed.
 End Defs.
 
-Notation mx_equal n m A B := (@equal mx_Graph ((n)%nat,A) ((m)%nat,B)).
-Notation MX n m A B := (@X mx_Graph ((n)%nat,A) ((m)%nat,B)).
-Notation MT := (@T mx_Graph).
+Notation MX_ A n m := (@X (mx_Graph A) (n%nat:nat) (m%nat:nat)) (only parsing).
+Notation mx_equal_ A n m := (@equal (mx_Graph A) (n%nat:nat) (m%nat:nat)) (only parsing).
 
 Notation "! M" := (get M) (at level 0) : A_scope.
-Notation "M == [ n , m ]  N" := (mx_equal n m _ _ M N) (at level 80) : A_scope.
+Notation "M == [ n , m ]  N" := (@equal (mx_Graph _) n m M N) (at level 80) : A_scope.
 
 Lemma plus_minus : forall m n, S (m+n)-n = S m.
 Proof. intros. omega. Qed.
 Global Opaque minus. 
 
+Lemma lt_n_1 n: ~ (S n<1)%nat.
+Proof. omega. Qed.
+
 (** case analysis on block matrix acesses *)
 Ltac destruct_blocks :=
+  unfold mx_equal; intros; simpl;
   rewrite ? plus_minus; 
   repeat match goal with 
            | |- context[S ?i - ?n] => case_eq (S i - n); intros 
          end. 
-  
+
 (** tactic to pointwise check matrix equality *)
 Ltac mx_intros i j Hi Hj :=
-  apply mx_equal'; unfold fst; intros i j Hi Hj;
+  apply mx_equal'; intros i j Hi Hj;
   match type of Hi with
-    | i < 0%nat => inversion Hi
-    | i < 1%nat => destruct i; [clear Hi|omega_false]
+    | i < 0%nat => elim (lt_n_O _ Hi)
+    | i < 1%nat => destruct i; [clear Hi | elim (lt_n_1 Hi)]
     | _ => idtac
   end;
   match type of Hj with
-    | j < 0%nat => inversion Hj
-    | j < 1%nat => destruct j; [clear Hj|omega_false]
+    | j < 0%nat => elim (lt_n_O _ Hj)
+    | j < 1%nat => destruct j; [clear Hj | elim (lt_n_1 Hj)]
     | _ => idtac
   end.
 
@@ -91,14 +98,13 @@ Transparent equal.
 Section Props.
 
   Context {G: Graph}.
-
-  Variables A B: T.
-  Notation MX n m := (MX n m A B).
-  Notation mx_equal n m := (mx_equal n m A B) (only parsing).
+  Variable A: T.
+  Notation MX n m := (MX_ A n m).
+  Notation mx_equal n m := (mx_equal_ A n m) (only parsing).
 
   Lemma mx_equal_compat n m: forall M N: MX n m, 
     M == N -> 
-    forall i j i' j', i<n -> j<m -> i=i' -> j=j' -> equal A B (!M i j) (!N i' j').
+    forall i j i' j', i<n -> j<m -> i=i' -> j=j' -> !M i j == !N i' j'.
   Proof. intros; subst; auto. Qed.
     
   Definition mx_force n m (M: MX n m): MX n m := box n m (Force.id2 n m !M).
@@ -112,7 +118,7 @@ Section Props.
   Proof. intros M N H. rewrite 2 mx_force_id. assumption. Qed.
 
   Global Instance box_compat n m: 
-  Proper (pointwise_relation nat (pointwise_relation nat (equal A B)) ==> mx_equal n m) (@box _ A B n m).
+  Proper (pointwise_relation nat (pointwise_relation nat (equal A A)) ==> mx_equal n m) (box n m).
   Proof. intros. intros f g H. mx_intros i j Hi Hj. apply H. Qed.
 
 
@@ -170,7 +176,7 @@ Section Props.
       mx_equal (x+n) (y+m))
     mx_blocks.
     Proof. 
-      repeat intro. simpl. destruct_blocks; auto with omega.
+      repeat intro. destruct_blocks; auto with omega.
     Qed.
 
     Lemma mx_decompose_blocks :
@@ -182,7 +188,7 @@ Section Props.
           (mx_sub10 M)
           (mx_sub11 M).
     Proof.
-      simpl. intros. destruct_blocks; auto with omega. 
+      simpl; intros. destruct_blocks; auto with omega. 
     Qed.
   
     Section Proj.
@@ -245,27 +251,27 @@ Section Props.
 
 
   (** conversions from and to scalars  *)
-  Definition mx_of_scal (x: X A B): MX 1 1 := box 1 1 (fun _ _ => x).
-  Definition mx_to_scal (M: MX 1 1): X A B := !M O O.
+  Definition mx_of_scal (x: X A A): MX 1 1 := box 1 1 (fun _ _ => x).
+  Definition mx_to_scal (M: MX 1 1): X A A := !M O O.
   
   Global Instance mx_of_scal_compat: 
-  Proper (equal A B ==> mx_equal 1 1) mx_of_scal.
+  Proper (equal A A ==> mx_equal 1 1) mx_of_scal.
   Proof. repeat intro. simpl. trivial. Qed.
   
   Global Instance mx_to_scal_compat: 
-  Proper (mx_equal 1 1 ==> equal A B) mx_to_scal.
+  Proper (mx_equal 1 1 ==> equal A A) mx_to_scal.
   Proof. repeat intro. simpl. apply H; auto. Qed.
 
   Lemma mx_to_scal_from_scal (M: MX 1 1):
     M == mx_of_scal (mx_to_scal M).
-  Proof. simpl. unfold mx_to_scal. auto with omega. Qed.
+  Proof. mx_intros i j Hi Hj. reflexivity. Qed.
 
-  Lemma Meq_to_eq: forall (a b: X A B), mx_of_scal a == mx_of_scal b -> a == b.
+  Lemma Meq_to_eq: forall a b, mx_of_scal a == mx_of_scal b -> a == b.
   Proof.
     intros a b H. apply (H O O); auto.
   Qed.
 
-  Lemma eq_to_Meq: forall (a b: MX 1 1), mx_to_scal a == mx_to_scal b -> a == b.
+  Lemma eq_to_Meq: forall a b, mx_to_scal a == mx_to_scal b -> a == b.
   Proof.
     intros a b H. mx_intros i j Hi Hj. apply H.
   Qed.
@@ -288,14 +294,14 @@ Section Props.
 
 End Props.
 
-Hint Extern 1 (mx_equal _ _ _ _ _ _) => apply mx_sub00_compat: compat algebra.
-Hint Extern 1 (mx_equal _ _ _ _ _ _) => apply mx_sub01_compat: compat algebra.
-Hint Extern 1 (mx_equal _ _ _ _ _ _) => apply mx_sub10_compat: compat algebra.
-Hint Extern 1 (mx_equal _ _ _ _ _ _) => apply mx_sub11_compat: compat algebra.
-Hint Extern 1 (mx_equal _ _ _ _ _ _) => apply mx_transpose_compat: compat algebra.
-Hint Extern 1 (mx_equal _ _ _ _ _ _) => apply mx_force_compat: compat algebra.
-Hint Extern 4 (mx_equal _ _ _ _ _ _) => apply mx_blocks_compat: compat algebra.
-Hint Extern 1 (mx_equal _ _ _ _ _ _) => apply mx_of_scal_compat: compat algebra.
+Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub00_compat: compat algebra.
+Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub01_compat: compat algebra.
+Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub10_compat: compat algebra.
+Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub11_compat: compat algebra.
+Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_transpose_compat: compat algebra.
+Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_force_compat: compat algebra.
+Hint Extern 4 (mx_equal_ _ _ _ _ _) => apply mx_blocks_compat: compat algebra.
+Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_of_scal_compat: compat algebra.
 Hint Extern 1 (equal _ _ _ _) => apply mx_to_scal_compat: compat algebra.
 Hint Extern 5 (equal _ _ _ _) => apply mx_equal_compat : compat algebra.
 
@@ -305,5 +311,3 @@ Hint Extern 5 (equal _ _ _ _) => apply mx_equal_compat : compat algebra.
 (*   @mx_sub_compat @mx_blocks_compat  *)
 (*   @scal_to_Mat_compat @Mat_to_scal_compat *)
 (*   : compat algebra. *)
-
-

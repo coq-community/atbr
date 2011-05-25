@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Properties and tactics about algebraic structures with converse. 
@@ -60,7 +60,7 @@ Section ISR.
   Qed.
   Hint Rewrite conv_zero: converse_down.
 
-  Instance CISR_ISR: IdemSemiRing. 
+  Instance CISR_ISR: IdemSemiRing G. 
   Proof.
     intros. constructor. constructor.
     apply dot_compat_c.
@@ -136,15 +136,15 @@ Section KA.
     rewrite <- (dot_neutral_right (a#)).
     apply star_destruct_left_old'.
     switch.
-    rewrite <- star_make_left_c at 2. aci_reflexivity.
+    rewrite <- star_make_left_c at 2. semiring_reflexivity.
 
     rewrite <- (dot_neutral_right (a`#)).
     apply star_destruct_left_old'.
     switch.
-    rewrite <- star_make_left_c at 2. aci_reflexivity. 
+    rewrite <- star_make_left_c at 2. semiring_reflexivity. 
   Qed.
 
-  Global Instance CKA_KA: KleeneAlgebra.
+  Global Instance CKA_KA: KleeneAlgebra G.
   Proof.
     constructor. apply CISR_ISR. 
     apply star_make_left_c.

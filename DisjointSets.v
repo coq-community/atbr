@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Disjoint Sets data-structure. 
@@ -245,7 +245,6 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
     []
     (S O).
   
-          
   Fixpoint find_aux n x t :=
     match n with
       | (S n) => match t [x] with
@@ -913,7 +912,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
 
 
     apply MapsTo_sameclass in H. 
-    bycontradiction.
+    exfalso.
     symmetry in H.  rewrite <- sameclass_equiv in H. congruence.
     
     apply equiv_reflexive_false in H0; auto;  tauto_false.
@@ -942,7 +941,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
     clear H0.
     replace (fst (equiv t x x)) with true. simpl.
     case_eq (fst (equiv t x z)). intros. NumSetProps.set_iff. right. left. num_prop.  reflexivity.
-    intros. bycontradiction.  apply MapsTo_sameclass in H.
+    intros. exfalso.  apply MapsTo_sameclass in H.
     rewrite <- sameclass_equiv in H. congruence. 
     symmetry. rewrite sameclass_equiv. reflexivity.
 

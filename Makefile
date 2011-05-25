@@ -48,6 +48,8 @@ COQSRCLIBS:=-I $(COQLIB)/kernel -I $(COQLIB)/lib \
   -I $(COQLIB)/plugins/firstorder \
   -I $(COQLIB)/plugins/fourier \
   -I $(COQLIB)/plugins/funind \
+  -I $(COQLIB)/plugins/groebner \
+  -I $(COQLIB)/plugins/interface \
   -I $(COQLIB)/plugins/micromega \
   -I $(COQLIB)/plugins/nsatz \
   -I $(COQLIB)/plugins/omega \
@@ -118,6 +120,7 @@ VFILES:=Common.v\
   Model_StdRelations.v\
   Model_Languages.v\
   Model_RegExp.v\
+  Model_MinPlus.v\
   StrictStarForm.v\
   MxGraph.v\
   MxSemiLattice.v\
@@ -146,8 +149,7 @@ VIFILES:=$(VFILES:.v=.vi)
 GFILES:=$(VFILES:.v=.g)
 HTMLFILES:=$(VFILES:.v=.html)
 GHTMLFILES:=$(VFILES:.v=.g.html)
-MLFILES:=reification.ml\
-  reification.ml
+MLFILES:=reification.ml
 CMOFILES:=$(MLFILES:.ml=.cmo)
 CMIFILES:=$(MLFILES:.ml=.cmi)
 CMXFILES:=$(MLFILES:.ml=.cmx)

@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Handler for FMap properties, provides the [find_tac] tactic. *)
@@ -64,11 +64,11 @@ Module MyMapProps (X : FMapInterface.S).
              destruct H as [?x [?H ?H]]
          | H : ~(@In _ ?x (@map _ _ ?f ?m)) |- _ => rewrite map_in_iff in H
          | H : @In _ ?x (map ?f ?m) |- _ => rewrite map_in_iff in H
-         | H :  ~ (@In _ ?k (@add _ ?k ?y ?s)) |- _ => bycontradiction; apply H; clear H; map_iff; firstorder
+         | H :  ~ (@In _ ?k (@add _ ?k ?y ?s)) |- _ => exfalso; apply H; clear H; map_iff; firstorder
          | H :  ~ (@In _ ?k (@add _ ?k' ?y ?s)), H' : @MapsTo _ ?k ?x ?s |- _ => 
-           bycontradiction; apply H; clear H; map_iff; firstorder
+           exfalso; apply H; clear H; map_iff; firstorder
          | H :  ~ (@In _ ?k ?s), H' : @MapsTo _ ?k ?x ?s |- _ => 
-           bycontradiction; apply H; clear H; map_iff; firstorder
+           exfalso; apply H; clear H; map_iff; firstorder
          | H :  ~ (@In _ ?k (@add  _ ?k' ?y ?s)) |- _ => revert H; rewrite add_in_iff; intro H
          | H : ?s = ?s |- _ => clear H
          | H : ?s <> ?s |- _ => elim H; reflexivity

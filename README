@@ -16,9 +16,12 @@ Public License version 3. See files LICENSE and COPYING.
 INSTALLATION.
 =============
 
-	run 'make' to compile the library (please note that it takes
-	quite a long time -- about 8 minutes with a recent computer)
-	Coq v8.3 is required
+	Run 'make' to compile the library (please note that it takes
+	quite a long time -- about six minutes with a recent computer).
+
+	The bugfix version of Coq v8.3 might be required (it is known
+	to compile with Coq v8.3 revisions pl2, 13766, 13769, and 14149).
+
 
 DOCUMENTATION. 
 ==============
@@ -45,8 +48,9 @@ StrictKleeneAlgebra	Class of Strict Kleene algebras (without 0), and extension o
 2- Models
 Model_Relations		Kleene Algebra of (heterogeneous) binary relations
 Model_StdRelations	Kleene Algebra of standard (homogeneous) binary relations
-Model_Languages		Kleene Algebra of languages (initial model)
+Model_Languages		Kleene Algebra of languages
 Model_RegExp		Kleene Algebra of regular expressions (syntactic free model), typed reification
+Model_MinMax		(min,+) Kleene Algebra (matrices on this algebra give weighted graphs)
 
 
 3- Matrices
@@ -70,6 +74,12 @@ DKA_DFA_Equiv 		Equivalence check for DFAs, proof of correctness
 DecideKleeneAlgebra     Kozen's initiality proof, kleene_reflexivity tactic
 
 
+5- Other tools
+StrictStarForm	        Conversion of regular expressions into strict star form, kleene_ssf tactic
+Equivalence	        Tactic for solving equivalences by transitivity
+
+
+
 5- Examples
 Examples 	  	Small tutorial file, that goes through our set of tactics
 ChurchRosser 	  	Simple usages of kleene_reflexivity to prove commutation properties
@@ -78,12 +88,11 @@ ChurchRosser_Points  	Comparison between a standard CR proof and algebraic ones
 
 6- Misc.
 Common			Shared simple tactics and definitions
-BoolView		View mechanism for boolean computations 
+BoolView		View mechanism for Boolean computations 
 Numbers			NUM interface, to abstract over the representation of numbers, sets, and maps 
 Utils_WF		Utilities about well-founded relations; partial fixpoint operators (powerfix) 
-StrictStarForm	        Conversion of regular expressions into strict star form, kleene_ssf tactic
 DisjointSets		Efficient implementation of a disjoint sets data structure 
-Force			Functional memoization (in case one needs efficient matrix computations)
+Force			Functional memoisation (in case one needs efficient matrix computations)
 Reification		Reified syntax for the various algebraic structures
 
 
@@ -93,7 +102,7 @@ MyFSetProperties	Handler for FSet properties
 MyFMapProperties	Handler for FMap properties
 
 
-8- OCaml modules
+9- OCaml modules
 reification.ml		reification for the reflexive tactics
 
 
@@ -102,13 +111,6 @@ TACTICS.
 ========
 
 1- Reflexive tactics:
-
-[aci_reflexivity]	solve an (in)equation modulo associativity, commutativity and idempotence of (+,0)
-
-[aci_normalize]		simplify an (in)equation modulo associativity, commutativity and idempotence of (+,0)
-
-[monoid_reflexivity]	solve an (in)equation modulo associativity  of (*,1)
-[monoid_normalize]	simplify an (in)equation modulo associativity  of (*,1)
 
 [semiring_reflexivity]	solve an (in)equation on the idempotent semiring (*,+,1,0)
 [semiring_normalize]	simplify an (in)equation on the idempotent semiring (*,+,1,0)

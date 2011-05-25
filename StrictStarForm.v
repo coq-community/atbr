@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Definition of the "strict star form" property for regular expressions, 
@@ -28,15 +28,13 @@ Require        Reification.
 Require Import Bool. Open Scope lazy_bool_scope.
 
 
-
 (* A regexp is [strict] if it does not accept the empty word *)
 Inductive strict: regex -> Prop := 
 | strict_zero: strict 0
 | strict_var: forall i, strict (RegExp.var i)
 | strict_plus: forall a b, strict a -> strict b -> strict (a+b)
 | strict_dot_l: forall a b, strict a -> strict (a*b)
-| strict_dot_r: forall a b, strict b -> strict (a*b)
-.
+| strict_dot_r: forall a b, strict b -> strict (a*b).
 
 
 (* Conversely, a regexp is [non_strict] if it does accept the empty word *)
@@ -45,8 +43,7 @@ Inductive non_strict: regex -> Prop :=
 | non_strict_star: forall a, non_strict (a#)
 | non_strict_dot: forall a b, non_strict a -> non_strict b -> non_strict (a*b)
 | non_strict_plus_l: forall a b, non_strict a -> non_strict (a+b)
-| non_strict_plus_r: forall a b, non_strict b -> non_strict (a+b)
-  .
+| non_strict_plus_r: forall a b, non_strict b -> non_strict (a+b).
 
 Lemma non_strict_not_strict: forall a, non_strict a -> ~ strict a.
 Proof. induction 1; intro Ha; inversion_clear Ha; auto. Qed.
@@ -59,23 +56,9 @@ Inductive strict_star_form: regex -> Prop :=
 | ssf_var: forall i, strict_star_form (RegExp.var i)
 | ssf_star: forall a, strict_star_form a -> strict a -> strict_star_form (a#)
 | ssf_plus: forall a b, strict_star_form a -> strict_star_form b -> strict_star_form (a+b)
-| ssf_dot: forall a b, strict_star_form a -> strict_star_form b -> strict_star_form (a*b)
-.
+| ssf_dot: forall a b, strict_star_form a -> strict_star_form b -> strict_star_form (a*b).
 
 (* The function [rewrite] below converts a regexp into an equivalent one, in star normal form *)
-
-Definition plus_but_one a b := 
-  if RegExp.is_one a then b 
-    else if RegExp.is_one b then a
-      else RegExp.plus a b.
-
-Definition dot_but_one a b := 
-  if RegExp.is_one a then b 
-    else if RegExp.is_one b then a
-      else RegExp.dot a b.
-
-Definition star_but_one a :=
-  if RegExp.is_one a then RegExp.one else RegExp.star a.
 
 Fixpoint contains_one e : bool :=
   match e with 
@@ -85,6 +68,11 @@ Fixpoint contains_one e : bool :=
     | RegExp.dot a b => contains_one a &&& contains_one b
     | e => false
   end.
+
+Definition plus_but_one a b := 
+  if RegExp.is_one a then b 
+    else if RegExp.is_one b then a
+      else RegExp.plus a b.
 
 Fixpoint remove e :=
   if contains_one e then 
@@ -96,32 +84,40 @@ Fixpoint remove e :=
     end
     else e.
 
-Fixpoint rewrite e := 
+Definition dot' a b := 
+  if RegExp.is_one a then b 
+    else if RegExp.is_one b then a
+      else RegExp.dot a b.
+
+Definition star' a :=
+  if RegExp.is_one a then RegExp.one else RegExp.star a.
+
+Fixpoint ssf e := 
   match e with 
-    | RegExp.plus a b => RegExp.plus (rewrite a) (rewrite b)
-    | RegExp.dot a b => dot_but_one (rewrite a) (rewrite b)
-    | RegExp.star e => star_but_one (remove (rewrite e))
+    | RegExp.plus a b => RegExp.plus (ssf a) (ssf b)
+    | RegExp.dot a b => dot' (ssf a) (ssf b)
+    | RegExp.star e => star' (remove (ssf e))
     | e => e
   end.
 
-Lemma star_plus_one : forall (a : regex), (1+a)# == a#.
+Lemma star_plus_one: forall a: regex, (1+a)# == a#.
 Proof.
   intros.
   rewrite star_distr, star_one, dot_neutral_right, dot_neutral_left. reflexivity.
 Qed.
 
-Lemma star_plus_star_1 : forall (a b : regex), (a+b)# == (a#+b)#.
+Lemma star_plus_star_1: forall a b: regex, (a+b)# == (a#+b)#.
   intros.
   setoid_rewrite star_distr. setoid_rewrite star_idem. reflexivity.
 Qed.
 
-Lemma star_plus_star: forall (a b: regex), (a+b)# == (a#+b#)#.
+Lemma star_plus_star: forall a b: regex, (a+b)# == (a#+b#)#.
 Proof.
   intros.
   rewrite star_plus_star_1. rewrite plus_com. rewrite star_plus_star_1. rewrite plus_com. reflexivity.
 Qed.
 
-Lemma star_plus_but_one : forall (a b: regex), (plus_but_one a b: regex) # == (a + b)#.
+Lemma star_plus_but_one: forall a b: regex, (plus_but_one a b) # == (a + b)#.
 Proof. 
   intros.
   unfold plus_but_one; RegExp.destruct_tests; fold_regex.
@@ -130,19 +126,18 @@ Proof.
   reflexivity.
 Qed.
 
-Lemma star_but_one_star (a : regex) : (star_but_one a: regex) == a# .
+Lemma star'_star: forall a: regex, star' a == a# .
 Proof.
-  intros; unfold star_but_one; RegExp.destruct_tests; fold_regex; auto with algebra.
+  intros; unfold star'; RegExp.destruct_tests; fold_regex; auto with algebra.
 Qed.
 
-Lemma dot_but_one_dot : forall (a b: regex), (dot_but_one a b: regex) == a * b.
+Lemma dot'_dot: forall a b: regex, dot' a b == a * b.
 Proof.
-  intros. unfold dot_but_one. 
-  RegExp.destruct_tests; fold_regex; auto with algebra. 
+  intros; unfold dot'; RegExp.destruct_tests; fold_regex; auto with algebra. 
 Qed.  
   
 
-Lemma contains_one_correct : forall a: regex, contains_one a = true -> a == a + 1.
+Lemma contains_one_correct: forall a: regex, contains_one a = true -> a == a + 1.
 Proof.
   intros.
   induction a; simpl in H; fold_regex. 
@@ -156,32 +151,33 @@ Proof.
    semiring_reflexivity.
   
    destruct (contains_one a1). 
-    rewrite IHa1 by trivial. aci_reflexivity.
-    rewrite IHa2 by trivial. aci_reflexivity.
+    rewrite IHa1 by trivial. semiring_reflexivity.
+    rewrite IHa2 by trivial. semiring_reflexivity.
 
-   rewrite <- star_make_left. aci_reflexivity.
+   rewrite <- star_make_left. semiring_reflexivity.
          
    discriminate.
 Qed.
 
-Lemma star_dot_leq_star_plus : forall (a b : regex) , (a*b)# <== (a+b)#.
+Lemma star_dot_leq_star_plus: forall a b: regex, (a*b)# <== (a+b)#.
   intros a b. 
+  (* TODO: debug very slow typeclass resolution... *)
   rewrite plus_com, star_distr. 
-  transitivity (1*(a*b#)#); [rewrite dot_neutral_left; apply star_incr|apply dot_incr]; auto with algebra.
+  transitivity (1*(a*b#)#); [rewrite dot_neutral_left|]; auto with algebra.
 Qed.
   
-Lemma star_plus_star_dot : forall (a b: regex), 
-  contains_one a = true -> contains_one b = true -> (a + b) # == (a * b)#.
+Lemma star_plus_star_dot: forall a b: regex, 
+  contains_one a = true -> contains_one b = true -> (a+b)# == (a*b)#.
 Proof.
   intros.
   rewrite (contains_one_correct a), (contains_one_correct b); trivial.
   apply leq_antisym.
    apply star_incr. semiring_reflexivity.
-   rewrite star_dot_leq_star_plus. apply star_incr. aci_reflexivity.
+   apply star_dot_leq_star_plus.
 Qed.
   
 
-Lemma star_remove: forall (a: regex), (remove a: regex) # == a #.
+Lemma star_remove: forall a: regex, remove a # == a #.
 Proof.
   induction a; simpl; fold_regex; auto with algebra.
   case_eq (contains_one a1); intro Ha1; trivial.
@@ -198,20 +194,20 @@ Qed.
   
 
 (** correctness of the rewriting procedure *)
-Theorem correct : forall (a: regex), (rewrite a: regex) == a.
+Theorem ssf_correct: forall a: regex, ssf a == a.
 Proof.
   induction a; trivial; simpl; fold_regex; auto with compat.
-  rewrite dot_but_one_dot. auto with compat. 
-  rewrite star_but_one_star. rewrite star_remove. auto with compat.
+  rewrite dot'_dot. auto with compat. 
+  rewrite star'_star. rewrite star_remove. auto with compat.
 Qed.  
 
 
 (** tactic to put Kleene algebra expressions into strict star form *)
-Theorem ssf_correct': forall e, RegExp.equal e (rewrite e). 
-Proof. intros. apply RegExp.equal_sym, correct. Qed.
+Theorem ssf_correct': forall e, RegExp.equal e (ssf e). 
+Proof. intros. apply RegExp.equal_sym, ssf_correct. Qed.
 Ltac kleene_ssf := kleene_normalize_ ssf_correct'.
 
-(* 
+(*
   Section test.
     Context `{KA: KleeneAlgebra}.
     Goal forall A (a b: X A A), (a*1)#*b == b+(a+1)#+b*1#.
@@ -270,11 +266,11 @@ Proof.
 Qed.
 
 (** completeness of the rewriting procedure *)
-Theorem complete : forall (a: regex), strict_star_form (rewrite a).
+Theorem ssf_complete: forall a, strict_star_form (ssf a).
 Proof.
   induction a; simpl; auto.
-   unfold dot_but_one. RegExp.destruct_tests; auto. 
-   unfold star_but_one. RegExp.destruct_tests; auto.
+   unfold dot'. RegExp.destruct_tests; auto. 
+   unfold star'. RegExp.destruct_tests; auto.
    constructor.
     apply remove_nf; trivial.
     apply remove_strict; trivial.

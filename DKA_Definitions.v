@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** In this file we define several types of automatas:
@@ -97,7 +97,7 @@ Definition labelling max (mem: label -> bool): regex :=
 
 (** High-level automata, represented with matrices *)
 Module MAUT.
-  Record t := build {
+  Record t := mk {
     size:    nat; 
     initial: KMX 1    size;
     delta:   KMX size size;
@@ -109,7 +109,7 @@ Module MAUT.
 
   Inductive equal : relation t :=
   | equal_refl: forall n U U' (M M': KMX n n) V V', 
-    U == U' -> M == M' -> V == V' -> equal (build U M V) (build U' M' V').
+    U == U' -> M == M' -> V == V' -> equal (mk U M V) (mk U' M' V').
   
   Infix " [==] " := equal (at level 80).
 
@@ -144,7 +144,7 @@ End MAUT.
 
 (** Non deterministic automata, with epsilon transitions *)
 Module eNFA.
-  Record t := build {
+  Record t := mk {
     size:      state;                  (* next fresh state (= size) *)
     epsilon:   state -> stateset;      (* epsilon-transitions *)
     deltamap:  statelabelmap stateset; (* visible transitions (we keep a map for efficiency reasons) *)
@@ -170,7 +170,7 @@ Module eNFA.
   (** translation to matricial automata *)
   Definition to_MAUT A := 
     let n := nat_of_state (size A) in
-      MAUT.build
+      MAUT.mk
       (mx_point 1 n 0 (initial A) 1)
       (mx_bool _ n n (fun i j => StateSet.mem j (epsilon A i)) 
          + box n n (fun i j => labelling (max_label A) 
@@ -186,7 +186,7 @@ End eNFA.
 
 (** Non deterministic, epsilon-free automata *)
 Module NFA.
-  Record t := build {
+  Record t := mk {
     size:      state;          
     delta:     label -> state -> stateset; 
     initiaux:  stateset;
@@ -206,7 +206,7 @@ Module NFA.
   (** translation to matricial automata *)
   Definition to_MAUT A := 
     let n := nat_of_state (size A) in
-      MAUT.build 
+      MAUT.mk 
     (mx_bool _ 1 n (fun _ j => StateSet.mem j (initiaux A)))
     (box n n (fun i j => labelling (max_label A) 
                  (fun a => StateSet.mem j (delta A a i))))
@@ -215,7 +215,7 @@ Module NFA.
   Definition eval := to_MAUT >> MAUT.eval.
 
   Definition change_initial A i := 
-    build (size A) (delta A) i (finaux A) (max_label A).
+    mk (size A) (delta A) i (finaux A) (max_label A).
 
 End NFA.
 
@@ -224,7 +224,7 @@ End NFA.
 
 (** Deterministic automata *)
 Module DFA.
-  Record t := build {
+  Record t := mk {
     size:      state;          
     delta:     label -> state -> state;
     initial:   state;
@@ -246,7 +246,7 @@ Module DFA.
   (** translation to matricial automata *)
   Definition to_MAUT A := 
     let n := nat_of_state (size A) in
-      MAUT.build 
+      MAUT.mk 
       (mx_point 1 n 0 (initial A) 1)
       (box n n (fun i j => labelling (max_label A) 
                    (fun a => eq_state_bool (state_of_nat j) (delta A a i))))
@@ -255,36 +255,66 @@ Module DFA.
   Definition eval := to_MAUT >> MAUT.eval.
 
   Definition change_initial A i := 
-    build (size A) (delta A) i (finaux A) (max_label A).
+    mk (size A) (delta A) i (finaux A) (max_label A).
 
 End DFA.
 
 
-(** algebraic lemmas, to prove correctness of determinisation and equivalence check  *)
-Section filters.
+(** algebraic lemmas, to prove correctness of various steps of the decision procedure  *)
+
+Section Alg.
 
   Context `{KA: KleeneAlgebra}.
-  
-  Lemma left_filter: forall i k k' j (s: X k k') m m' u (u': X i k') v (v': X k' j),
+
+  (** this one is used when merging two DFAs  *)
+  Lemma left_filter i k k' j (s: X k k') m m' u (u': X i k') v (v': X k' j):
     u*s ==   u' ->
     m*s == s*m' ->
     v   == s*v' ->
     u'*m'#*v' == u*m#*v.
   Proof.
-    intros until v'. intros Hu Hm Hv.
-    rewrite Hv, <- Hu. monoid_normalize. 
-    monoid_rewrite (comm_iter_left Hm). monoid_reflexivity.
+    intros Hu Hm Hv.
+    rewrite Hv, <- Hu, dot_assoc. 
+    monoid_rewrite (comm_iter_left Hm). 
+    semiring_reflexivity.
   Qed.
-
-  Lemma right_filter: forall i k k' j (s: X k' k) m m' u (u': X i k') v (v': X k' j),
+  
+  (** this one is used for determinisation *)
+  Lemma right_filter i k k' j (s: X k' k) m m' u (u': X i k') v (v': X k' j):
       u == u'*s ->
     s*m == m'*s ->
     s*v == v'   ->
     u'*m'#*v' == u*m#*v.
   Proof.
-    intros until v'. intros Hu Hm Hv.
-    rewrite Hu, <- Hv. monoid_normalize. 
-    monoid_rewrite (comm_iter_right Hm). monoid_reflexivity.
+    intros Hu Hm Hv. 
+    rewrite Hu, <- Hv, dot_assoc. 
+    monoid_rewrite (comm_iter_right Hm). 
+    semiring_reflexivity.
   Qed.
 
-End filters.
+  (** and [equiv_filter] below is used for the DFA equivalence check *)
+  Lemma iter_equivalence n (y m: X n n): 1 <== y -> y * y <== y -> y * m <== m * y -> m# * y == y * (m * y)#.
+  Proof.
+    intros H1y Hyy Hym.
+    apply comm_iter_left.
+    apply leq_antisym.
+     rewrite <- H1y at 2. semiring_reflexivity.
+     rewrite dot_assoc, Hym. monoid_rewrite Hyy. reflexivity. 
+  Qed.
+    
+  Lemma equiv_filter n p q (y m: X n n) (ia ib : X p n) (v : X n q):
+    ia * y == ib * y ->
+    y * m <== m * y -> 
+    y * v == v ->
+    1 <== y ->
+    y * y <== y ->
+    ia * m # * v == ib * m # * v.
+  Proof.
+    intros Hiy Hym Hyv H1y Hyy.
+    rewrite <- Hyv, 2dot_assoc. 
+    monoid_rewrite (iter_equivalence H1y Hyy Hym).
+    rewrite dot_assoc, Hiy. 
+    semiring_reflexivity.
+  Qed.
+
+End Alg.

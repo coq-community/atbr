@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Properties about sets of sets, and maps over sets *)
@@ -76,7 +76,7 @@ Proof.
   apply StateSetProps.Props.empty_is_empty_1.
   rewrite StateSetProps.Props.elements_Empty.
   remember (StateSet.elements p) as l. destruct l as [|i l]. trivial.
-  specialize (H i). apply apply in H. bycontradiction. clear - H. num_omega.
+  specialize (H i). apply apply in H. exfalso. clear - H. num_omega.
   rewrite StateSetProps.Facts.elements_iff. rewrite <- Heql. auto. 
 Qed.
 
@@ -100,7 +100,7 @@ Proof.
    destruct (StateSetSetProps.Props.cardinal_0 t) as (l&Hl&Hlt&->).
    setoid_rewrite Hlt in H. clear Hlt.
    destruct l as [|x [| y q]]; simpl; auto with arith. 
-   bycontradiction. inversion_clear Hl. apply H0. left. clear H0 H1.
+   exfalso. inversion_clear Hl. apply H0. left. clear H0 H1.
    rewrite (@below0_empty x), (@below0_empty y). reflexivity.
     apply H. right. left. reflexivity.
     apply H. left. reflexivity.
@@ -123,7 +123,7 @@ Proof.
    case_eq (StateSetSet.mem q t). 2:(intros; discriminate). simpl. intros Hq Hq''. 
    intros x Hx. 
    destruct (eq_num_dec x s). rewrite e, <- Hq' in Hx. 
-    bycontradiction. revert Hx. clear. StateSetProps.setdec. 
+    exfalso. revert Hx. clear. StateSetProps.setdec. 
    rewrite <- StateSetSetProps.mem_iff in Hq. 
    rewrite <- StateSetProps.mem_iff in Hq''. 
    specialize (H q Hq x). apply apply in H. clear - H n. num_omega. StateSetProps.setdec.

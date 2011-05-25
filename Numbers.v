@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** This file describes an interface [NUM] for abstract numbers and a
@@ -60,6 +60,8 @@ Module Type NUM.
   Declare Module NumOTA: OrderedTypeAlt with Definition t := num.
   Declare Module NumSet: FSetInterface.S with Definition E.t := num. 
   Declare Module NumMap: FMapInterface.S with Definition E.t := num. 
+
+  Parameter code: NumSet.t -> num.
   
   Notation "0" := (num_of_nat O).
   Notation "n < m" := (lt n m) (at level 70).
@@ -262,7 +264,7 @@ Module NumUtils (N : NUM).
 
   Ltac num_simpl := autorewrite with num_omega in *.
   Ltac num_omega := num_simpl; intuition (subst; omega).
-  Ltac num_omega_false := bycontradiction; num_omega.
+  Ltac num_omega_false := exfalso; num_omega.
 
   Lemma eqb_eq_nat_bool: forall i j, 
     eqb i j = eq_nat_bool (nat_of_num i) (nat_of_num j). 
@@ -473,6 +475,21 @@ Module Positive <: NUM.
 (*   Module NumSet' := FSetList.Make Pos_as_OT. Module NumSet := FSetHide NumSet'.  *)
   Module NumSet' := FSetPositive.PositiveSet. Module NumSet := FSetHide NumSet'.
   Module NumMap' := FMapPositive.PositiveMap. Module NumMap := FMapHide NumMap'.
+
+  Local Open Scope positive_scope.
+  Definition triangle k i := (*  k*(k-1)/2 + i  *)
+    match k with
+      | 1 => i
+      | k'~0 => k'*Pdouble_minus_one k'+i
+      | k'~1 => k'*k+i
+    end.
+  Definition enc i j := triangle (Ppred (i+j)) i.
+  Fixpoint code (x: NumSet.t): num :=
+    match x with
+      | NumSet'.Leaf => 1
+      | NumSet'.Node l true  r => enc (code l) (code r)~0
+      | NumSet'.Node l false r => enc (code l) (code r)~1
+    end.
 
   (* we need this tactic to substitute some positive equalities *)
   Ltac psubst :=

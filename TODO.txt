@@ -1,0 +1,25 @@
+Here is a list of things we intend to do at some point; 
+suggestions are welcome.
+
+- Non idempotent semirings:
+    we considered only idempotent (non-commutative) semirings in this
+    development. This is because we wanted to work with binary relations.
+    It should be easy, however, to isolate the idempotence hypothesis, 
+    so as to provide tools for non necessarily idempotents semirings. 
+    This would fill the gap with existing Coq tactics (ring), that handle 
+    the commutative case.
+
+- Matrix library: 
+    we need to clean up this part of the code, and to add some
+    documentation, in order to release it as a library for working
+    with matrices in a non-commutative setting. Some lemmas and
+    functions will be renamed.
+
+- Compilation time / Loading time:
+    our library is really slow to compile (about 6 minutes), and slow
+    to load (about 8 seconds), for at least two reasons:
+    1/ our intensive use of FSets modules and functors, that are really 
+    slow to instantiate and load in the current version of Coq;
+    2/ our intensive use of typeclasses.
+    Depending on the evolutions of Coq, we might be able to improve this	
+    situation.

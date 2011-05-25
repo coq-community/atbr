@@ -3,7 +3,7 @@
 (*         GNU Lesser General Public License version 3                    *)
 (*              (see file LICENSE for more details)                       *)
 (*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
 (** Properties of matrices over a Kleene algebra (in particular, they form a typed Kleene algebra)  *)
@@ -29,9 +29,12 @@ Section PreDefs.
 
   Context `{KA: KleeneAlgebra}.
   Variable A: T.
+  Notation mx_equal n m := (mx_equal_ A n m) (only parsing).
+  Notation mx_leq n m := (mx_leq_ A n m) (only parsing).
 
-  Notation SMX n := (MX n n A A).
-  Notation X := (@X G).
+  Notation MX n m := (@X (mx_Graph A) (n%nat) (m%nat)).
+  Notation X := (@X G A A).
+  Notation SMX n := (MX n n).
 
   (** block construction of the star operation over matrices  *)
   Definition star_build x n (sx: SMX x -> SMX x) (sn: SMX n -> SMX n) (M:  SMX (x+n)): SMX (x+n) :=
@@ -59,21 +62,8 @@ Section PreDefs.
 
   Definition prop_star_make_left n f := forall M: SMX n, 1 + f M * M == f M.
 
-  (* old hack which we used to help some reflexive tactics, which can
-     be used here to solve some problems with rewrite (see below) *)
-  Ltac patch := 
-    repeat 
-      match goal with 
-        |- context[(?n:nat,?A:@T _)] => 
-          let x := fresh "nA" in
-            set (x:=(n,A):@T (@mx_Graph _)) in *
-      end;
-      repeat
-        match goal with 
-          x := (_,_):@T (@mx_Graph _) |- _ => unfold x in *; clear x
-        end. 
-
   (** below, we prove that the operation we constructed is actually the star operation over matrices  *)
+
   Lemma build_star_make_left x n sx sn:
     prop_star_make_left sx ->
     prop_star_make_left sn ->
@@ -93,7 +83,7 @@ Section PreDefs.
     set (fbe := f*be).
     set (ecf := ec*f).
     setoid_rewrite (mx_decompose_blocks M).
-    unfold fst, snd in *. fold a; fold b; fold c; fold d.
+    fold a; fold b; fold c; fold d.
     clearbody a b c d. clear M.
     rewrite mx_blocks_one, mx_blocks_dot, mx_blocks_plus.
     apply mx_blocks_compat.
@@ -101,7 +91,8 @@ Section PreDefs.
     unfold fbe, f. rewrite <- dot_assoc, <- dot_distr_right. apply Hx. 
 
     unfold fbe, be. transitivity ((f*b)*(1+e*d)). clear - KA. semiring_reflexivity.
-    unfold e. clearbody f. rewrite (Hn d). monoid_reflexivity. (* BUG: le rewrite ne passe pas sans le clearbody, [patch] marche aussi *)
+    unfold e. clearbody f. rewrite (Hn d). semiring_reflexivity. 
+    (* BUG: le rewrite ne passe pas sans le clearbody *)
 
     unfold ecf, ec, be. transitivity ((e*c)*(1+f*(a+b*e*c))). clear - KA. semiring_reflexivity.
     unfold f. clearbody f. rewrite <- (Hx g) at 2. (* BUG: idem *)
@@ -113,7 +104,7 @@ Section PreDefs.
   Qed.
 
 
-  Lemma decomp_dot_leq_left B x n m (a: SMX x) b c (d: SMX n) (Y: MX (x+n) m A B):
+  Lemma decomp_dot_leq_left x n m (a: SMX x) b c (d: SMX n) (Y: MX (x+n) m):
     mx_blocks a b c d * Y <== Y <-> 
       let z := mx_sub01 (y:=0) Y in
       let y := mx_sub11 (y:=0) Y in
@@ -138,9 +129,8 @@ Section PreDefs.
         repeat intro; omega_false.
   Qed. 
 
-
   Definition prop_star_destruct_left n f := 
-    forall m B (M: SMX n) (Y: MX n m A B), 
+    forall m (M: SMX n) (Y: MX n m), 
       M * Y <== Y  ->  f M * Y <== Y.
 
   Lemma build_star_destruct_left x n sx sn:
@@ -148,7 +138,7 @@ Section PreDefs.
     prop_star_destruct_left sn ->
     prop_star_destruct_left (@star_build x n sx sn).
   Proof.
-    intros Hx Hn m B M Y H.
+    intros Hx Hn m M Y H.
     
     unfold star_build.
     set (a := mx_sub00 M).
@@ -164,15 +154,13 @@ Section PreDefs.
     set (ecf := ec*f).
 
     rewrite (mx_decompose_blocks M) in H.
-    unfold fst, snd in *.
     fold a in H; fold b in H; fold c in H; fold d in H.
     clearbody a b c d. clear M.
 
     rewrite -> decomp_dot_leq_left in H. destruct H as (H30&H31&H32&H33).
-    unfold fst, snd in *.
     set (z := mx_sub01 (y:=0) Y) in *.
     set (y := mx_sub11 (y:=0) Y) in *.
-    rewrite -> decomp_dot_leq_left. unfold fst, snd; fold z; fold y. 
+    rewrite -> decomp_dot_leq_left. fold z; fold y. 
     clearbody y z. clear Y.
 
     assert (H34: e*y <== y). 
@@ -205,7 +193,7 @@ Section PreDefs.
 
     repeat split.
       exact H40.
-      rewrite <- H42. unfold fbe, be. monoid_reflexivity.
+      rewrite <- H42. unfold fbe, be. semiring_reflexivity.
       exact H45. 
       clear H40 H42 H45.
       unfold ecf, ec, be.
@@ -214,7 +202,7 @@ Section PreDefs.
   Qed.
 
 
-  Lemma decomp_dot_leq_right B x n m (a: SMX x) b c (d: SMX n) (Y: MX m (x+n) B A):
+  Lemma decomp_dot_leq_right x n m (a: SMX x) b c (d: SMX n) (Y: MX m (x+n)):
     Y * mx_blocks a b c d <== Y <-> 
       let y := mx_sub10 (x:= 0) Y in
       let z := mx_sub11 (x:= 0) (y:=x) Y in
@@ -242,18 +230,16 @@ Section PreDefs.
         repeat intro; omega_false.
   Qed. 
 
-
   Definition prop_star_destruct_right n f := 
-    forall m B (M: SMX n) (Y: MX m n B A), 
+    forall m (M: SMX n) (Y: MX m n), 
       Y * M <== Y  ->  Y * f M <== Y.
-
   
   Lemma build_star_destruct_right x n sx sn:
     prop_star_destruct_right sx ->
     prop_star_destruct_right sn ->
     prop_star_destruct_right (@star_build x n sx sn).
   Proof.
-    intros Hx Hn m B M Y H.
+    intros Hx Hn m M Y H.
     
     unfold star_build.
     set (a := mx_sub00 M).
@@ -269,15 +255,13 @@ Section PreDefs.
     set (ecf := ec*f).
 
     rewrite (mx_decompose_blocks M) in H.
-    unfold fst, snd in *.
     fold a in H; fold b in H; fold c in H; fold d in H.
     clearbody a b c d. clear M.
 
     rewrite -> decomp_dot_leq_right in H. destruct H as (H30&H31&H32&H33).
-    unfold fst, snd in *.
     set (y := mx_sub10 (x:=0) Y)in*.
     set (z := mx_sub11 (x:=0) Y)in*.
-    rewrite -> decomp_dot_leq_right. unfold fst, snd; fold z; fold y. 
+    rewrite -> decomp_dot_leq_right. fold z; fold y. 
     clearbody y z. clear Y.
 
     assert (H34: z*e <== z). unfold e. apply Hn, H33. clear H33.
@@ -285,7 +269,7 @@ Section PreDefs.
     assert (H36: z*e*c<== y). rewrite <- H31. trivial. 
     assert (H39: y*(a+b*e*c) <== y).
       rewrite dot_distr_right; apply plus_destruct_leq; trivial. (* 30 *)
-      monoid_normalize. rewrite H32. exact H36.         
+      rewrite 2dot_assoc, H32. exact H36.         
 
     assert (H40: y*f <== y).  unfold f. apply Hx, H39.
     assert (H42: z*e*c*f <== y). rewrite H36. exact H40.
@@ -296,10 +280,10 @@ Section PreDefs.
     clear - KA H40 H42 H45 H34 H47.
     repeat split.
       exact H40. 
-      rewrite  <- H42. unfold ecf, ec. monoid_reflexivity.
-      unfold fbe, be. monoid_normalize. exact H45.
+      rewrite  <- H42. unfold ecf, ec. semiring_reflexivity.
+      unfold fbe, be. semiring_normalize. exact H45.
       semiring_normalize; apply plus_destruct_leq.
-       unfold ecf, ec, be. monoid_normalize. exact H47. 
+       unfold ecf, ec, be. semiring_normalize. exact H47. 
        exact H34. 
   Qed.
 
@@ -309,15 +293,21 @@ End PreDefs.
 Section Defs.
 
   Context `{KA: KleeneAlgebra}.
+  Variable A: T.
+  Notation mx_equal n m := (mx_equal_ A n m) (only parsing).
+  Notation mx_leq n m := (mx_leq_ A n m) (only parsing).
 
-  Global Instance mx_Star_Op: @Star_Op (@mx_Graph G) := { star nA := @star_rec _ _ _ _ _ _ }.
+  Notation X := (@X G A A).
+  Notation MX n m := (MX_ A n m).
+  Notation SMX n := (MX_ A n n).
+
+  Global Instance mx_Star_Op: Star_Op (mx_Graph A) := { star n := @star_rec _ _ _ _ _ _ }.
 
 
-  Lemma mx_star_compat: forall (nA: MT) (M N: X nA nA), M==N -> M# == N# .
+  Lemma mx_star_compat n (M N: MX n n): M==N -> M# == N# .
   Proof.
-    intros [n A] M N. unfold star, mx_Star_Op. induction n; intro. 
+    unfold star, mx_Star_Op. induction n; intro. 
     assumption.
-    unfold fst, snd in *.
     simpl. 
     change (S n) with (1+n)%nat. 
     auto 13 with compat.
@@ -339,26 +329,22 @@ Section Defs.
     *)
   Qed.
 
-  Lemma mx_star_make_left: forall (nA: MT) (M: X nA nA), 1 + M# * M == M#. 
+  Lemma mx_star_make_left n: forall M: MX n n, 1 + M# * M == M#. 
   Proof.
-    intros [n A]; unfold star, mx_Star_Op, fst, snd.
-    induction n.
-
-    intro M; mx_intros i j Hi Hj. 
+    unfold star, mx_Star_Op.
+    induction n; intro M.
+     mx_intros i j Hi Hj. 
  
-    Opaque one dot plus X.
-    simpl. 
-    Transparent one dot plus X.
-
-    change (S n) with (1+n)%nat. apply build_star_make_left. 
-     intro M; mx_intros i j Hi Hj. 
-     unfold mx_to_scal. simpl.
-     rewrite <- star_make_left at 2. aci_reflexivity.
-
-     exact IHn.
+     Opaque one dot plus. simpl. Transparent one dot plus.
+     change (S n) with (1+n)%nat. 
+     apply build_star_make_left. 
+      intro N; mx_intros i j Hi Hj. 
+      unfold mx_to_scal. simpl.
+      rewrite <- star_make_left at 2. semiring_reflexivity.
+      exact IHn.
   Qed.
 
-  Lemma mx_star_block_make_left A x n: forall (M: MX (x+n) (x+n) A A),
+  Lemma mx_star_block_make_left x n: forall M: MX (x+n) (x+n),
     1 + mx_star_block M * M == mx_star_block M. 
   Proof.
     apply build_star_make_left; intro; rapply mx_star_make_left.
@@ -366,59 +352,51 @@ Section Defs.
 
  
 
-  Lemma mx_star_destruct_left: forall (nA mB: MT) (M: X nA nA) (Y: X nA mB), M*Y <== Y  ->  M#*Y <== Y.
+  Lemma mx_star_destruct_left: forall n m (M: MX n n) (Y: MX n m), M*Y <== Y  ->  M#*Y <== Y.
   Proof.
-    intros [n A] [m B]; revert m B; induction n. 
+    induction n; intros.
+     mx_intros i j Hi Hj.
 
-    intros; mx_intros i j Hi Hj.
-
-    unfold star, mx_Star_Op, fst, snd.
-    Opaque one dot plus leq X.
-    simpl. 
-    Transparent one dot plus leq X.
-    change (S n) with (1+n)%nat.
-    apply build_star_destruct_left; trivial.
-
-    intros m B M Y H; mx_intros i j Hi Hj.
-    unfold mx_of_scal. simpl.
-    rewrite plus_neutral_right. apply star_destruct_left.
-    specialize (H O j (le_n _) Hj). simpl in H. rewrite plus_neutral_right in H. assumption.
+     unfold star, mx_Star_Op.
+     Opaque one dot plus leq. simpl. Transparent one dot plus leq.
+     change (S n) with (1+n)%nat.
+     apply build_star_destruct_left; trivial.
+     clear - KA.
+     intros m M Y H; mx_intros i j Hi Hj.
+     unfold mx_of_scal. simpl.
+     rewrite plus_neutral_right. apply star_destruct_left.
+     specialize (H O j (le_n _) Hj). simpl in H. rewrite plus_neutral_right in H. assumption.
   Qed.
 
-  Lemma mx_star_block_destruct_left: forall A B x n m (M: MX (x+n) (x+n) A A) (Y: MX (x+n) m A B), 
+  Lemma mx_star_block_destruct_left: forall x n m (M: MX (x+n) (x+n)) (Y: MX (x+n) m), 
     M * Y <== Y  ->  mx_star_block M * Y <== Y.
   Proof.
-    intros A B x n m.
-    apply build_star_destruct_left; intros ? ? ? ?; apply mx_star_destruct_left.
+    intros x n m. apply build_star_destruct_left; intros ? ? ?; apply mx_star_destruct_left.
   Qed.
 
 
-  Lemma mx_star_destruct_right: forall (nA mB: MT) (M: X nA nA) (Y: X mB nA), Y*M <== Y  ->  Y*M# <== Y.
+  Lemma mx_star_destruct_right: forall n m (M: MX n n) (Y: MX m n), Y*M <== Y  ->  Y*M# <== Y.
   Proof.
-    intros [n A] [m B]; revert m B; induction n. 
+    induction n; intros. 
+     mx_intros i j Hi Hj.
 
-    intros m B M Y H; mx_intros i j Hi Hj.
-
-    unfold star, mx_Star_Op, fst, snd. 
-    Opaque one dot plus leq X.
-    simpl. 
-    Transparent one dot plus leq X.
-    change (S n) with (1+n)%nat.
-    apply build_star_destruct_right; trivial.
-
-    intros m B M Y H; mx_intros i j Hi Hj.
-    unfold mx_of_scal. simpl.
-    rewrite plus_neutral_right. apply star_destruct_right.
-    specialize (H i O Hi (le_n _)). simpl in H. rewrite plus_neutral_right in H. assumption.
+     unfold star, mx_Star_Op.
+     Opaque one dot plus leq. simpl. Transparent one dot plus leq.
+     change (S n) with (1+n)%nat.
+     apply build_star_destruct_right; trivial.
+     clear - KA.
+     intros m M Y H; mx_intros i j Hi Hj.
+     unfold mx_of_scal. simpl.
+     rewrite plus_neutral_right. apply star_destruct_right.
+     specialize (H i O Hi (le_n _)). simpl in H. rewrite plus_neutral_right in H. assumption.
   Qed.
 
 
 
-  Global Instance mx_KleeneAlgebra: 
-    @KleeneAlgebra mx_Graph mx_Monoid_Ops mx_SemiLattice_Ops mx_Star_Op.
+  Global Instance mx_KleeneAlgebra: KleeneAlgebra (mx_Graph A).
   Proof.
     constructor; intros.
-    exact mx_SemiRing.
+    apply mx_SemiRing.
     apply mx_star_make_left.
     apply mx_star_destruct_left; assumption.
     apply mx_star_destruct_right; assumption.
@@ -426,10 +404,6 @@ Section Defs.
 
 
   (** additional properties of block matrices  *)
-
-  Variable A: T.
-  Notation MX n m := (MX n m A A).
-
 
   Lemma mx_blocks_star': forall x n (M: MX (x+n) (x+n)), M# == mx_star_block M.
   Proof.
@@ -476,15 +450,14 @@ Section Defs.
     semiring_reflexivity.
   Qed.
   
-  Lemma mx_to_scal_star: forall (a : MX 1 1), mx_to_scal (a #) ==  (mx_to_scal a) #.
+  Lemma mx_to_scal_star (a: MX 1 1): mx_to_scal (a #) ==  (mx_to_scal a) #.
   Proof.
-    intros. simpl.
-    destruct_blocks. 
+    simpl. destruct_blocks. 
      rewrite plus_neutral_right. reflexivity.
      discriminate.
   Qed.
 
-  Lemma mx_of_scal_star (a : X A A) : mx_of_scal (a #) ==  (mx_of_scal a) #.
+  Lemma mx_of_scal_star (a: X): mx_of_scal (a #) ==  (mx_of_scal a) #.
   Proof.
     mx_intros i j Hi Hj. 
     simpl. destruct_blocks. 
