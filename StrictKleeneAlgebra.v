@@ -135,7 +135,7 @@ Section F.
       apply dot_compat; assumption.
      destruct x; try constructor.
       destruct y; try constructor.
-       destruct z. ; constructor. apply dot_assoc.
+       destruct z; constructor. apply dot_assoc.
      destruct x; simpl; constructor. apply dot_neutral_left.
      destruct x; simpl; constructor. apply dot_neutral_right.
   Qed.
