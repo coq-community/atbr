@@ -84,7 +84,7 @@ Unset Strict Implicit.
    to Kleene Algebras *)
 
 Section F.
-  Context `{StrictKleeneAlgebra}.
+  Context G Ops `{@StrictKleeneAlgebra G Ops}.
 
   Instance oGraph: Graph := {
     T := T; 
@@ -95,7 +95,7 @@ Section F.
     intros. apply oequal_equivalence, G. 
   Defined.
 
-  Definition inj A B (x: X A B): @X oGraph A B := Some x. 
+  Definition inj A B (x: @X G A B): @X oGraph A B := Some x.
   Lemma faithful: forall A B (x y: X A B), inj x == inj y -> x == y.
   Proof. 
     intros A B x y Hxy. inversion_clear Hxy. assumption.
