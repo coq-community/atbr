@@ -20,7 +20,7 @@ open Proof_type
 let hashtbl_pick t = Hashtbl.fold (fun i x -> function None -> Some (i,x) | acc -> acc) t None
 
 (* raise an error in Coq *)
-let error s = Printf.kprintf Util.error ("[ATBR reification] "^^s)
+let error s = Printf.kprintf Errors.error ("[ATBR reification] "^^s)
 
 (* resolving a typeclass [cls] in a goal [gl] *)
 let tc_find gl cls = Typeclasses.resolve_one_typeclass (Tacmach.pf_env gl) (Tacmach.project gl) cls
