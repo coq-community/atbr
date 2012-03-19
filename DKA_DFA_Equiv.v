@@ -83,7 +83,8 @@ Section comb.
   |cnl_nil : combine_no_length nil nil
   |cnl_cons : forall lx ly x y, combine_no_length lx ly -> combine_no_length (x::lx) (y::ly).
   
-  Program Definition build_combine X Y lx ly (H : List.length lx = List.length ly) : @combine_no_length X Y lx ly.
+  Program Definition build_combine X Y : forall lx ly (H : List.length lx = List.length ly),
+                                           @combine_no_length X Y lx ly.
   Proof. 
     induction lx. 
     intros [|y ly] Hl; (constructor || discriminate).
