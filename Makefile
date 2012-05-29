@@ -17,16 +17,21 @@
 # coq_makefile -f Make -o Makefile 
 #
 
-NOARG: all
+.DEFAULT_GOAL := all
 
 # 
-# This Makefile may take COQBIN as argument passed as environment variables:
-#  to specify the directory where Coq binaries resides;
-Makefile-localvars.gen:
-	$(COQBIN)coqtop -config > $@
+# This Makefile may take arguments passed as environment variables:
+# COQBIN to specify the directory where Coq binaries resides;
+# ZDEBUG/COQDEBUG to specify debug flags for ocamlc&ocamlopt/coqc;
+# DSTROOT to specify a prefix to install path.
 
--include Makefile-localvars.gen
-.SECONDARY: Makefile-localvars.gen
+# Here is a hack to make $(eval $(shell works:
+define donewline
+
+
+endef
+includecmdwithout@ = $(eval $(subst @,$(donewline),$(shell { $(1) | tr '\n' '@'; })))
+$(call includecmdwithout@,$(COQBIN)coqtop -config)
 
 ##########################
 #                        #
@@ -35,14 +40,35 @@ Makefile-localvars.gen:
 ##########################
 
 OCAMLLIBS?=
+COQLIBS?= -R . ATBR
+COQDOCLIBS?=-R . ATBR
+
+##########################
+#                        #
+# Variables definitions. #
+#                        #
+##########################
+
+
+OPT?=
+COQDEP?=$(COQBIN)coqdep -c
+COQFLAGS?=-q $(OPT) $(COQLIBS) $(OTHERFLAGS) $(COQ_XML)
+COQCHKFLAGS?=-silent -o
+COQDOCFLAGS?=-interpolate -utf8
+COQC?=$(COQBIN)coqc
+GALLINA?=$(COQBIN)gallina
+COQDOC?=$(COQBIN)coqdoc
+COQCHK?=$(COQBIN)coqchk
+
 COQSRCLIBS?=-I $(COQLIB)kernel -I $(COQLIB)lib \
   -I $(COQLIB)library -I $(COQLIB)parsing \
   -I $(COQLIB)pretyping -I $(COQLIB)interp \
+  -I $(COQLIB)printing -I $(COQLIB)intf \
   -I $(COQLIB)proofs -I $(COQLIB)tactics \
-  -I $(COQLIB)toplevel \
+  -I $(COQLIB)toplevel -I $(COQLIB)grammar \
+  -I $(COQLIB)plugins/btauto \
   -I $(COQLIB)plugins/cc \
   -I $(COQLIB)plugins/decl_mode \
-  -I $(COQLIB)plugins/dp \
   -I $(COQLIB)plugins/extraction \
   -I $(COQLIB)plugins/field \
   -I $(COQLIB)plugins/firstorder \
@@ -56,87 +82,89 @@ COQSRCLIBS?=-I $(COQLIB)kernel -I $(COQLIB)lib \
   -I $(COQLIB)plugins/romega \
   -I $(COQLIB)plugins/rtauto \
   -I $(COQLIB)plugins/setoid_ring \
-  -I $(COQLIB)plugins/subtac \
-  -I $(COQLIB)plugins/subtac/test \
   -I $(COQLIB)plugins/syntax \
   -I $(COQLIB)plugins/xml
-COQLIBS?= -R . ATBR
-COQDOCLIBS?=-R . ATBR
-
-##########################
-#                        #
-# Variables definitions. #
-#                        #
-##########################
-
-
 ZFLAGS=$(OCAMLLIBS) $(COQSRCLIBS) -I $(CAMLP4LIB)
-OPT?=
-COQFLAGS?=-q $(OPT) $(COQLIBS) $(OTHERFLAGS) $(COQ_XML)
-COQC?=$(COQBIN)coqc
-COQDEP?=$(COQBIN)coqdep -c
-GALLINA?=$(COQBIN)gallina
-COQDOC?=$(COQBIN)coqdoc
+
 CAMLC?=$(OCAMLC) -c -rectypes
 CAMLOPTC?=$(OCAMLOPT) -c -rectypes
 CAMLLINK?=$(OCAMLC) -rectypes
 CAMLOPTLINK?=$(OCAMLOPT) -rectypes
 GRAMMARS?=grammar.cma
 CAMLP4EXTEND?=pa_extend.cmo pa_macro.cmo q_MLast.cmo
-CAMLP4OPTIONS?=
+CAMLP4OPTIONS?=-loc loc
 PP?=-pp "$(CAMLP4BIN)$(CAMLP4)o -I $(CAMLLIB) -I . $(COQSRCLIBS) $(CAMLP4EXTEND) $(GRAMMARS) $(CAMLP4OPTIONS) -impl"
 
-###################################
-#                                 #
-# Definition of the "all" target. #
-#                                 #
-###################################
+##################
+#                #
+# Install Paths. #
+#                #
+##################
 
-VFILES:=Common.v\
-  BoolView.v\
-  MyFSets.v\
-  MyFSetProperties.v\
-  MyFMapProperties.v\
-  Numbers.v\
-  Utils_WF.v\
-  Force.v\
-  DisjointSets.v\
-  Classes.v\
-  Reification.v\
-  Functors.v\
-  Graph.v\
-  SemiLattice.v\
-  Monoid.v\
-  SemiRing.v\
-  KleeneAlgebra.v\
-  Converse.v\
-  Model_Relations.v\
-  Model_StdRelations.v\
-  Model_Languages.v\
-  Model_RegExp.v\
-  Model_MinPlus.v\
-  StrictStarForm.v\
-  MxGraph.v\
-  MxSemiLattice.v\
-  MxSemiRing.v\
-  MxKleeneAlgebra.v\
-  MxFunctors.v\
-  DKA_Definitions.v\
-  DKA_StateSetSets.v\
-  DKA_CheckLabels.v\
-  DKA_Construction.v\
-  DKA_Epsilon.v\
-  DKA_Determinisation.v\
-  DKA_Merge.v\
-  DKA_DFA_Language.v\
-  DKA_DFA_Equiv.v\
-  DecideKleeneAlgebra.v\
-  StrictKleeneAlgebra.v\
-  ATBR.v\
-  ATBR_Matrices.v\
-  Examples.v\
+ifdef USERINSTALL
+XDG_DATA_HOME?=$(HOME)/.local/share
+COQLIBINSTALL=$(XDG_DATA_HOME)/coq
+COQDOCINSTALL=$(XDG_DATA_HOME)/doc/coq
+else
+COQLIBINSTALL=${COQLIB}user-contrib
+COQDOCINSTALL=${DOCDIR}user-contrib
+endif
+
+######################
+#                    #
+# Files dispatching. #
+#                    #
+######################
+
+VFILES:=ChurchRosser_Points_vs_Algebraic.v\
   ChurchRosser.v\
-  ChurchRosser_Points_vs_Algebraic.v
+  Examples.v\
+  ATBR_Matrices.v\
+  ATBR.v\
+  StrictKleeneAlgebra.v\
+  DecideKleeneAlgebra.v\
+  DKA_DFA_Equiv.v\
+  DKA_DFA_Language.v\
+  DKA_Merge.v\
+  DKA_Determinisation.v\
+  DKA_Epsilon.v\
+  DKA_Construction.v\
+  DKA_CheckLabels.v\
+  DKA_StateSetSets.v\
+  DKA_Definitions.v\
+  MxFunctors.v\
+  MxKleeneAlgebra.v\
+  MxSemiRing.v\
+  MxSemiLattice.v\
+  MxGraph.v\
+  StrictStarForm.v\
+  Model_MinPlus.v\
+  Model_RegExp.v\
+  Model_Languages.v\
+  Model_StdRelations.v\
+  Model_Relations.v\
+  Converse.v\
+  KleeneAlgebra.v\
+  SemiRing.v\
+  Monoid.v\
+  SemiLattice.v\
+  Graph.v\
+  Functors.v\
+  Reification.v\
+  Classes.v\
+  DisjointSets.v\
+  Force.v\
+  Utils_WF.v\
+  Numbers.v\
+  MyFMapProperties.v\
+  MyFSetProperties.v\
+  MyFSets.v\
+  BoolView.v\
+  Common.v
+
+-include $(addsuffix .d,$(VFILES))
+.SECONDARY: $(addsuffix .d,$(VFILES))
+
 VOFILES:=$(VFILES:.v=.vo)
 GLOBFILES:=$(VFILES:.v=.glob)
 VIFILES:=$(VFILES:.v=.vi)
@@ -144,11 +172,22 @@ GFILES:=$(VFILES:.v=.g)
 HTMLFILES:=$(VFILES:.v=.html)
 GHTMLFILES:=$(VFILES:.v=.g.html)
 ML4FILES:=reification.ml4
-CMOFILES:=$(ML4FILES:.ml4=.cmo)
-CMIFILES:=$(sort $(CMOFILES:.cmo=.cmi) $(MLIFILES:.mli=.cmi))
-CMXFILES:=$(CMOFILES:.cmo=.cmx)
-CMXSFILES:=$(CMXFILES:.cmx=.cmxs)
-OFILES:=$(CMXFILES:.cmx=.o)
+
+-include $(addsuffix .d,$(ML4FILES))
+.SECONDARY: $(addsuffix .d,$(ML4FILES))
+
+ALLCMOFILES:=$(ML4FILES:.ml4=.cmo)
+CMOFILES=$(filter-out $(addsuffix .cmo,$(foreach lib,$(MLLIBFILES:.mllib=_MLLIB_DEPENDENCIES) $(MLPACKFILES:.mlpack=_MLPACK_DEPENDENCIES),$($(lib)))),$(ALLCMOFILES))
+CMXFILES=$(CMOFILES:.cmo=.cmx)
+OFILES=$(CMXFILES:.cmx=.o)
+CMIFILES=$(ALLCMOFILES:.cmo=.cmi)
+CMXSFILES=$(CMXFILES:.cmx=.cmxs)
+
+#######################################
+#                                     #
+# Definition of the toplevel targets. #
+#                                     #
+#######################################
 
 all: $(VOFILES) $(CMOFILES) $(if ifeq '$(HASNATDYNLINK)' 'true',$(CMXSFILES)) 
 
@@ -158,24 +197,33 @@ gallina: $(GFILES)
 
 html: $(GLOBFILES) $(VFILES)
 	- mkdir -p html
-	$(COQDOC) -toc -html $(COQDOCLIBS) -d html $(VFILES)
+	$(COQDOC) -toc $(COQDOCFLAGS) -html $(COQDOCLIBS) -d html $(VFILES)
 
 gallinahtml: $(GLOBFILES) $(VFILES)
 	- mkdir -p html
-	$(COQDOC) -toc -html -g $(COQDOCLIBS) -d html $(VFILES)
+	$(COQDOC) -toc $(COQDOCFLAGS) -html -g $(COQDOCLIBS) -d html $(VFILES)
 
 all.ps: $(VFILES)
-	$(COQDOC) -toc -ps $(COQDOCLIBS) -o $@ `$(COQDEP) -sort -suffix .v $(VFILES)`
+	$(COQDOC) -toc $(COQDOCFLAGS) -ps $(COQDOCLIBS) -o $@ `$(COQDEP) -sort -suffix .v $^`
 
 all-gal.ps: $(VFILES)
-	$(COQDOC) -toc -ps -g $(COQDOCLIBS) -o $@ `$(COQDEP) -sort -suffix .v $(VFILES)`
+	$(COQDOC) -toc $(COQDOCFLAGS) -ps -g $(COQDOCLIBS) -o $@ `$(COQDEP) -sort -suffix .v $^`
 
 all.pdf: $(VFILES)
-	$(COQDOC) -toc -pdf $(COQDOCLIBS) -o $@ `$(COQDEP) -sort -suffix .v $(VFILES)`
+	$(COQDOC) -toc $(COQDOCFLAGS) -pdf $(COQDOCLIBS) -o $@ `$(COQDEP) -sort -suffix .v $^`
 
 all-gal.pdf: $(VFILES)
-	$(COQDOC) -toc -pdf -g $(COQDOCLIBS) -o $@ `$(COQDEP) -sort -suffix .v $(VFILES)`
+	$(COQDOC) -toc $(COQDOCFLAGS) -pdf -g $(COQDOCLIBS) -o $@ `$(COQDEP) -sort -suffix .v $^`
 
+validate: $(VOFILES)
+	$(COQCHK) $(COQCHKFLAGS) $(COQLIBS) $(notdir $(^:.vo=))
+
+beautify: $(VFILES:=.beautified)
+	for file in $^; do mv $${file%.beautified} $${file%beautified}old && mv $${file} $${file%.beautified}; done
+	@echo 'Do not do "make clean" until you are sure that everything went well!'
+	@echo 'If there were a problem, execute "for file in $$(find . -name \*.v.old -print); do mv $${file} $${file%.old}; done" in your shell/'
+
+.PHONY: all opt byte archclean clean install userinstall depend html validate
 
 ####################
 #                  #
@@ -183,7 +231,71 @@ all-gal.pdf: $(VFILES)
 #                  #
 ####################
 
-.PHONY: NOARG all opt byte archclean clean install depend html
+byte:
+	$(MAKE) all "OPT:=-byte"
+
+opt:
+	$(MAKE) all "OPT:=-opt"
+
+userinstall:
+	+$(MAKE) USERINSTALL=true install
+
+install-natdynlink:
+	for i in $(CMXSFILES); do \
+	 install -d `dirname $(DSTROOT)$(COQLIBINSTALL)/ATBR/$$i`; \
+	 install -m 0644 $$i $(DSTROOT)$(COQLIBINSTALL)/ATBR/$$i; \
+	done
+
+install:$(if ifeq '$(HASNATDYNLINK)' 'true',install-natdynlink)
+	for i in $(VOFILES); do \
+	 install -d `dirname $(DSTROOT)$(COQLIBINSTALL)/ATBR/$$i`; \
+	 install -m 0644 $$i $(DSTROOT)$(COQLIBINSTALL)/ATBR/$$i; \
+	done
+	for i in $(CMOFILES); do \
+	 install -d `dirname $(DSTROOT)$(COQLIBINSTALL)/ATBR/$$i`; \
+	 install -m 0644 $$i $(DSTROOT)$(COQLIBINSTALL)/ATBR/$$i; \
+	done
+	for i in $(CMIFILES); do \
+	 install -d `dirname $(DSTROOT)$(COQLIBINSTALL)/ATBR/$$i`; \
+	 install -m 0644 $$i $(DSTROOT)$(COQLIBINSTALL)/ATBR/$$i; \
+	done
+
+install-doc:
+	install -d $(DSTROOT)$(COQDOCINSTALL)/ATBR/html
+	for i in html/*; do \
+	 install -m 0644 $$i $(DSTROOT)$(COQDOCINSTALL)/ATBR/$$i;\
+	done
+
+clean:
+	rm -f $(ALLCMOFILES) $(CMIFILES) $(CMAFILES)
+	rm -f $(ALLCMOFILES:.cmo=.cmx) $(CMXAFILES) $(CMXSFILES) $(ALLCMOFILES:.cmo=.o) $(CMXAFILES:.cmxa=.a)
+	rm -f $(addsuffix .d,$(MLFILES) $(MLIFILES) $(ML4FILES) $(MLLIBFILES) $(MLPACKFILES))
+	rm -f $(VOFILES) $(VIFILES) $(GFILES) $(VFILES:.v=.v.d) $(VFILES:=.beautified) $(VFILES:=.old)
+	rm -f all.ps all-gal.ps all.pdf all-gal.pdf all.glob $(VFILES:.v=.glob) $(VFILES:.v=.tex) $(VFILES:.v=.g.tex) all-mli.tex
+	- rm -rf html mlihtml
+
+archclean:
+	rm -f *.cmx *.o
+
+printenv:
+	@$(COQBIN)coqtop -config
+	@echo CAMLC =	$(CAMLC)
+	@echo CAMLOPTC =	$(CAMLOPTC)
+	@echo PP =	$(PP)
+	@echo COQFLAGS =	$(COQFLAGS)
+	@echo COQLIBINSTALL =	$(COQLIBINSTALL)
+	@echo COQDOCINSTALL =	$(COQDOCINSTALL)
+
+Makefile: Make
+	mv -f $@ $@.bak
+	$(COQBIN)coq_makefile -f $< -o $@
+
+
+###################
+#                 #
+# Implicit rules. #
+#                 #
+###################
 
 %.cmo: %.ml4
 	$(CAMLC) $(ZDEBUG) $(ZFLAGS) $(PP) -impl $<
@@ -191,11 +303,11 @@ all-gal.pdf: $(VFILES)
 %.cmx: %.ml4
 	$(CAMLOPTC) $(ZDEBUG) $(ZFLAGS) $(PP) -impl $<
 
-%.cmxs: %.ml4
-	$(CAMLOPTLINK) $(ZDEBUG) $(ZFLAGS) -shared -o $@ $(PP) -impl $<
-
 %.ml4.d: %.ml4
 	$(OCAMLDEP) -slash $(OCAMLLIBS) $(PP) -impl "$<" > "$@" || ( RV=$$?; rm -f "$@"; exit $${RV} )
+
+%.cmxs: %.cmx
+	$(CAMLOPTLINK) $(ZDEBUG) $(ZFLAGS) -shared -o $@ $<
 
 %.vo %.glob: %.v
 	$(COQC) $(COQDEBUG) $(COQFLAGS) $*
@@ -207,80 +319,22 @@ all-gal.pdf: $(VFILES)
 	$(GALLINA) $<
 
 %.tex: %.v
-	$(COQDOC) -latex $< -o $@
+	$(COQDOC) $(COQDOCFLAGS) -latex $< -o $@
 
 %.html: %.v %.glob
-	$(COQDOC) -html $< -o $@
+	$(COQDOC) $(COQDOCFLAGS) -html $< -o $@
 
 %.g.tex: %.v
-	$(COQDOC) -latex -g $< -o $@
+	$(COQDOC) $(COQDOCFLAGS) -latex -g $< -o $@
 
 %.g.html: %.v %.glob
-	$(COQDOC) -html -g $< -o $@
+	$(COQDOC)$(COQDOCFLAGS)  -html -g $< -o $@
 
 %.v.d: %.v
 	$(COQDEP) -slash $(COQLIBS) "$<" > "$@" || ( RV=$$?; rm -f "$@"; exit $${RV} )
 
-byte:
-	$(MAKE) all "OPT:=-byte"
-
-opt:
-	$(MAKE) all "OPT:=-opt"
-
-install-natdynlink:
-	for i in $(CMXSFILES); do \
-	 install -d `dirname $(DSTROOT)$(COQLIB)user-contrib/ATBR/$$i`; \
-	 install $$i $(DSTROOT)$(COQLIB)user-contrib/ATBR/$$i; \
-	done
-
-install:$(if ifeq '$(HASNATDYNLINK)' 'true',install-natdynlink)
-	for i in $(VOFILES); do \
-	 install -d `dirname $(DSTROOT)$(COQLIB)user-contrib/ATBR/$$i`; \
-	 install $$i $(DSTROOT)$(COQLIB)user-contrib/ATBR/$$i; \
-	done
-	for i in $(CMOFILES); do \
-	 install -d `dirname $(DSTROOT)$(COQLIB)user-contrib/ATBR/$$i`; \
-	 install $$i $(DSTROOT)$(COQLIB)user-contrib/ATBR/$$i; \
-	done
-	for i in $(CMIFILES); do \
-	 install -d `dirname $(DSTROOT)$(COQLIB)user-contrib/ATBR/$$i`; \
-	 install $$i $(DSTROOT)$(COQLIB)user-contrib/ATBR/$$i; \
-	done
-
-install-doc:
-	install -d $(DSTROOT)$(DOCDIR)user-contrib/ATBR/html
-	for i in html/*; do \
-	 install $$i $(DSTROOT)$(DOCDIR)user-contrib/ATBR/$$i;\
-	done
-
-clean:
-	rm -f *~ Makefile-localvars.gen
-	rm -f $(CMOFILES) $(CMIFILES) $(CMXFILES) $(CMXSFILES) $(OFILES) $(MLFILES:.ml=.ml.d) $(MLIFILES:.mli=.mli.d) $(ML4FILES:.ml4=.ml4.d)
-	rm -f $(VOFILES) $(VIFILES) $(GFILES) $(VFILES:.v=.v.d)
-	rm -f all.ps all-gal.ps all.pdf all-gal.pdf all.glob $(VFILES:.v=.glob) $(VFILES:.v=.tex) $(VFILES:.v=.g.tex) all-mli.tex
-	- rm -rf html mlihtml
-
-archclean:
-	rm -f *.cmx *.o
-
-
-printenv: Makefile-localvars.gen
-	@cat $^
-	@echo CAMLC =	$(CAMLC)
-	@echo CAMLOPTC =	$(CAMLOPTC)
-	@echo PP =	$(PP)
-	@echo COQFLAGS =	$(COQFLAGS)
-
-Makefile: Make
-	mv -f $@ $@.bak
-	$(COQBIN)coq_makefile -f $< -o $@
-
-
--include $(VFILES:.v=.v.d)
-.SECONDARY: $(VFILES:.v=.v.d)
-
--include $(ML4FILES:.ml4=.ml4.d)
-.SECONDARY: $(ML4FILES:.ml4=.ml4.d)
+%.v.beautified:
+	$(COQC) $(COQDEBUG) $(COQFLAGS) -beautify $*
 
 # WARNING
 #
