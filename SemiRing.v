@@ -25,6 +25,7 @@ Require        Reification.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
+Set Asymmetric Patterns.
 
 Hint Extern 0 (equal _ _ _ _) => first [ 
     apply dot_ann_left

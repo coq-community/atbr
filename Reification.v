@@ -15,6 +15,7 @@ Require Import FMapPositive.
 Require Import Eqdep.
 Set Implicit Arguments.
 Unset Strict Implicit.
+Set Asymmetric Patterns.
 
 (* generic environments *)
 Definition sigma := PositiveMap.t.

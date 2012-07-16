@@ -29,6 +29,7 @@ Require        Reification.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
+Set Asymmetric Patterns.
 
 Module RegExp.
 
