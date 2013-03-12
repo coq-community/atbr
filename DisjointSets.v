@@ -34,14 +34,14 @@ Require Import Numbers.
 Module Type DISJOINTSETS (N : NUM).
   Import N.
 
-  Variable T: Type.
-  Variable empty : T.
+  Parameter T: Type.
+  Parameter empty : T.
   
-  Variable test_and_unify : T -> num -> num -> bool * T.
-  Variable equiv : T -> num -> num -> bool * T.
-  Variable union : T -> num -> num -> T.
+  Parameter test_and_unify : T -> num -> num -> bool * T.
+  Parameter equiv : T -> num -> num -> bool * T.
+  Parameter union : T -> num -> num -> T.
 
-  Variable class_of : T -> num -> NumSet.t.
+  Parameter class_of : T -> num -> NumSet.t.
 
   Parameter IsWF : T -> Prop.
   Class WF t: Prop := { wf: IsWF t }.
@@ -52,17 +52,17 @@ Module Type DISJOINTSETS (N : NUM).
   Declare Instance union_WF `{WF} x y : WF (union t x y).
   
   Parameter sameclass: T -> relation num.
-  Hypothesis sameclass_equiv : forall `{WF} x y, (fst (equiv t x y) = true <-> sameclass t x y).
+  Axiom sameclass_equiv : forall `{WF} x y, (fst (equiv t x y) = true <-> sameclass t x y).
   Declare Instance sameclass_Equivalence `{WF}: Equivalence (sameclass t).
 
-  Hypothesis sameclass_empty : forall x y, sameclass empty x y -> x = y.
-  Hypothesis sameclass_union : forall `{WF} a b x y, 
+  Axiom sameclass_empty : forall x y, sameclass empty x y -> x = y.
+  Axiom sameclass_union : forall `{WF} a b x y, 
     sameclass (union t a b) x y <-> 
     (sameclass t x y \/ (sameclass t x a /\ sameclass t y b) \/ (sameclass t y a /\ sameclass t x b)).
  
-  Hypothesis sameclass_class_of : forall `{WF} x y , sameclass t x y <-> NumSet.In x (class_of t y).
+  Axiom sameclass_class_of : forall `{WF} x y , sameclass t x y <-> NumSet.In x (class_of t y).
  
-  Hypothesis test_and_unify_eq: forall `{WF} x y, test_and_unify t x y = (fst (equiv t x y), union t x y).
+  Axiom test_and_unify_eq: forall `{WF} x y, test_and_unify t x y = (fst (equiv t x y), union t x y).
   
 End DISJOINTSETS.
 

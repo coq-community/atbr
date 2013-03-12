@@ -34,7 +34,7 @@ Set Implicit Arguments.
 (** * The [NUM] interface  *)
 Module Type NUM.
 
-  Variable num : Type.
+  Parameter num : Type.
   
   Parameter nat_of_num : num -> nat.
   Parameter num_of_nat : nat -> num.
@@ -68,42 +68,42 @@ Module Type NUM.
   Notation "n <= m" := (le n m) (at level 70).
 
   (* bijection with nat  *)
-  Hypothesis id_num : forall n, num_of_nat (nat_of_num n) = n.
-  Hypothesis id_nat : forall n, nat_of_num (num_of_nat n) = n.
+  Axiom id_num : forall n, num_of_nat (nat_of_num n) = n.
+  Axiom id_nat : forall n, nat_of_num (num_of_nat n) = n.
 
   (* specification of the boolean operations w.r.t. the predicates *)
-  Hypothesis le_spec : forall n m, reflect (le n m) (leb n m).
-  Hypothesis lt_spec : forall n m, reflect (lt n m) (ltb n m).
-  Hypothesis eq_spec : forall n m, reflect (n = m)  (eqb n m).
-  Hypothesis compare_spec : forall n m, compare_spec eq lt n m (compare n m).
+  Axiom le_spec : forall n m, reflect (le n m) (leb n m).
+  Axiom lt_spec : forall n m, reflect (lt n m) (ltb n m).
+  Axiom eq_spec : forall n m, reflect (n = m)  (eqb n m).
+  Axiom compare_spec : forall n m, compare_spec eq lt n m (compare n m).
 
   (* specification of operations and predicates, w.r.t. nat *)
-  Hypothesis S_nat_spec : forall n, nat_of_num (S n) = Datatypes.S (nat_of_num n).
-  Hypothesis max_spec : forall n m, nat_of_num (max n m) = Max.max (nat_of_num n) (nat_of_num m).
-  Hypothesis le_nat_spec : forall n m, n <= m <-> (nat_of_num n <= nat_of_num m)%nat.
-  Hypothesis lt_nat_spec : forall n m, n <  m <-> (nat_of_num n <  nat_of_num m)%nat.
+  Axiom S_nat_spec : forall n, nat_of_num (S n) = Datatypes.S (nat_of_num n).
+  Axiom max_spec : forall n m, nat_of_num (max n m) = Max.max (nat_of_num n) (nat_of_num m).
+  Axiom le_nat_spec : forall n m, n <= m <-> (nat_of_num n <= nat_of_num m)%nat.
+  Axiom lt_nat_spec : forall n m, n <  m <-> (nat_of_num n <  nat_of_num m)%nat.
 
   (* specifications of the equalities on maps and sets *)
-  Hypothesis set_eq_spec : forall x y, NumSet.E.eq x y <-> x = y.
-  Hypothesis map_eq_spec : forall x y, NumMap.E.eq x y <-> x = y.
+  Axiom set_eq_spec : forall x y, NumSet.E.eq x y <-> x = y.
+  Axiom map_eq_spec : forall x y, NumMap.E.eq x y <-> x = y.
 
   (* fold_num specification *)
-  Hypothesis fold_num_O: forall A (a: A) f, fold_num f 0 a = a.
-  Hypothesis fold_num_S: forall A (a: A) f n, fold_num f (S n) a = fold_num f n (f n a).
+  Axiom fold_num_O: forall A (a: A) f, fold_num f 0 a = a.
+  Axiom fold_num_S: forall A (a: A) f n, fold_num f (S n) a = fold_num f n (f n a).
 
   (* fold_num_sum specification *)
-  Hypothesis fold_num_sum_O: forall E T a f, @fold_num_sum E T f 0 a = inl a.
-  Hypothesis fold_num_sum_S: forall E T a f n, @fold_num_sum E T f (S n) a = 
+  Axiom fold_num_sum_O: forall E T a f, @fold_num_sum E T f 0 a = inl a.
+  Axiom fold_num_sum_S: forall E T a f n, @fold_num_sum E T f (S n) a = 
     match f n a with 
       | inl a => fold_num_sum f n a
       | e => e
     end.
 
   (* pi/match specification *)
-  Hypothesis match_pi0: forall n, pimatch (pi0 n) = inl n.
-  Hypothesis match_pi1: forall n, pimatch (pi1 n) = inr n.
-  Hypothesis lt_pi0: forall n m, n < m -> pi0 n < pi0 m.
-  Hypothesis lt_pi1: forall n m, n < m -> pi1 n < pi1 m.
+  Axiom match_pi0: forall n, pimatch (pi0 n) = inl n.
+  Axiom match_pi1: forall n, pimatch (pi1 n) = inr n.
+  Axiom lt_pi0: forall n m, n < m -> pi0 n < pi0 m.
+  Axiom lt_pi1: forall n m, n < m -> pi1 n < pi1 m.
 
 End NUM.
 
