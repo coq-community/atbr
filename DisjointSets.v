@@ -793,7 +793,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
         intuition try discriminate. 
         elim n.
         destruct H.
-        eauto using repr_inj_right.  
+        transitivity x0; eauto using repr_inj_right.
     Qed.
 
     Lemma sameclass_find : forall `{WF} x, sameclass t (fst (find t x)) x.
