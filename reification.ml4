@@ -341,5 +341,5 @@ let reify_goal ops goal =
 	
 
 (* tactic grammar entries *)
-TACTIC EXTEND kleene_reify [ "kleene_reify" ] -> [ reify_goal Reification.KA.ops ] END
-TACTIC EXTEND semiring_reify [ "semiring_reify" ] -> [ reify_goal Reification.Semiring.ops ] END
+TACTIC EXTEND kleene_reify [ "kleene_reify" ] -> [ Proofview.V82.tactic (reify_goal Reification.KA.ops) ] END
+TACTIC EXTEND semiring_reify [ "semiring_reify" ] -> [ Proofview.V82.tactic (reify_goal Reification.Semiring.ops) ] END
