@@ -130,15 +130,15 @@ Ltac display_counter_example e ce :=
     in x
   in
   match ce with
-    | DifferentAtomSets => fail 2 "Not a Kleene algebra theorem: different atom sets"
+    | DifferentAtomSets => fail 1 "Not a Kleene algebra theorem: different atom sets"
     | NotGeq ?w => 
       (try let u := eval_word w in 
-        fail 3 "Not a Kleene Algebra theorem: " u "does not belong to the left-hand side");
-      fail 2 "Not a Kleene Algebra theorem: the empty word (1) does not belong to the left-hand side"
+        fail 2 "Not a Kleene Algebra theorem: " u "does not belong to the left-hand side");
+      fail 1 "Not a Kleene Algebra theorem: the empty word (1) does not belong to the left-hand side"
     | NotLeq ?w => 
       (try let u := eval_word w in 
-        fail 3 "Not a Kleene Algebra theorem: " u "does not belong to the right-hand side");
-      fail 2 "Not a Kleene Algebra theorem: the empty word (1) does not belong to the right-hand side"
+        fail 2 "Not a Kleene Algebra theorem: " u "does not belong to the right-hand side");
+      fail 1 "Not a Kleene Algebra theorem: the empty word (1) does not belong to the right-hand side"
   end.
 
 
