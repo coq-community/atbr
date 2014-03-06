@@ -230,7 +230,7 @@ end = struct
 end
 
 (* is a constr [c] an operation to be reified ? *)
-let is c = function None -> false | Some x -> c = Lazy.force x
+let is c = function None -> false | Some x -> Constr.equal c (Lazy.force x)
 
 
 (* main entry point *)
@@ -255,8 +255,8 @@ let reify_goal ops goal =
     | App(c,ca) ->
 	(* we look for an (in)equation *)
 	let rel,shift =
-	  if c = Lazy.force Classes.equal then mkApp (c,[|ca.(0)|]), 0
-	  else if c = Lazy.force Classes.leq then mkApp (c,[|ca.(0);ca.(1)|]), 1
+	  if Constr.equal c (Lazy.force Classes.equal) then mkApp (c,[|ca.(0)|]), 0
+	  else if Constr.equal c (Lazy.force Classes.leq) then mkApp (c,[|ca.(0);ca.(1)|]), 1
 	  else error "unrecognised goal"
 	in
 	let gph = ca.(0) in	      (* graph *)
