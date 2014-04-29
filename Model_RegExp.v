@@ -187,7 +187,7 @@ Module RegExp.
     Notation var i := (var i: regex).  
 
     Transparent equal plus dot one zero star. 
-    Global Opaque T.
+    Arguments T : simpl never.
   
     Ltac fold_regex :=
       change RegExp.equal with (@equal re_Graph tt tt) ; 
@@ -246,7 +246,7 @@ Module RegExp.
       (** the rewriting procedure is correct *)
       Theorem correct: forall e, e == rewrite e.
       Proof.
-        induction e; simpl; trivial; fold_regex. 
+        induction e; cbn; trivial; fold_regex. 
         rewrite clean_dot; auto with compat. 
         rewrite clean_plus; auto with compat. 
         rewrite clean_star; auto with compat. 
@@ -258,7 +258,7 @@ Module RegExp.
     (** [rewrite] is idempotent *)
     Lemma rewrite_idem: forall x, rewrite (rewrite x) = rewrite x.
     Proof.
-      intro x; induction x; trivial; simpl; destruct_tests; trivial; simpl.
+      intro x; induction x; trivial; cbn; destruct_tests; trivial; simpl.
       rewrite IHx1, IHx2. destruct_tests. trivial.
       rewrite IHx1, IHx2. destruct_tests. trivial.
       rewrite IHx. destruct_tests. trivial.
@@ -267,7 +267,7 @@ Module RegExp.
     (** two equal terms equally rewrite two zero *)
     Lemma equal_rewrite_zero_equiv : forall x y, equal x y -> is_zero (rewrite x) = is_zero (rewrite y).
     Proof.
-      intros; induction H; simpl; destruct_tests; trivial.  
+      intros; induction H; cbn; destruct_tests; trivial.  
     Qed.
     
   End Clean.
@@ -333,7 +333,7 @@ Module RegExp.
     (** factorisation theorem  *)
     Theorem equal_to_sequal : forall x y, equal x y -> sequal (clean x) (clean y).
     Proof.
-      intros; induction H; simpl in *; trivial; destruct_tests; simpl; trivial;
+      intros; induction H; cbn in *; trivial; destruct_tests; simpl; trivial;
         try solve 
           [ constructor; rewrite ? Clean.rewrite_idem; trivial
           | match goal with H: sequal (clean _) zero |- _ => 

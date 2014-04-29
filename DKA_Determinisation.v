@@ -517,7 +517,8 @@ Section S.
     pose proof delta'_below as Hdelta'_below.
     pose proof theta_delta' as Htheta_delta'.
     pose proof mem_table_finals as Hmem_table_finals.
-    unfold NFA_to_DFA. destruct build_store as [[t d] n]. simpl in *.  
+    unfold NFA_to_DFA. destruct build_store as [[t d] n]. Opaque equal. simpl in *. Transparent equal.
+
     apply mx_to_scal_compat. apply right_filter with
     (mx_bool tt (nat_of_state n) size (fun s j => StateSet.mem j (theta (state_of_nat s))): KMX _ _).
 

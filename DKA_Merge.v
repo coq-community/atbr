@@ -86,7 +86,7 @@ Lemma sum_collapse': forall k f b (j: state), (j<k)%nat ->
   sum 0 k (fun i => xif (eqb (state_of_nat i) j && b i) (f i) (0: regex)) == xif (b j) (f j) 0.
 Proof.
   intros. rewrite (sum_collapse (n:=j)); auto.
-   simpl. rewrite id_num. bool_simpl. reflexivity.
+   cbn. rewrite id_num. bool_simpl. reflexivity.
    intros. num_analyse. num_omega. reflexivity.
 Qed.
 
@@ -95,7 +95,7 @@ Lemma and_neutral_left: forall (A B: Prop), A -> (A/\B <-> B). Proof. tauto. Qed
 Lemma compare_compat: SetoidList.compat_op eq NumSet.Equal (fun x acc => NumSet.add (pi0 x) acc).
 Proof. repeat intro. subst. rewrite H0. reflexivity. Qed.
 
-Local Opaque dot star plus one zero eq_state_bool leq NumSet.add.
+Local Opaque equal dot star plus one zero eq_state_bool leq NumSet.add.
 Lemma eval_left: forall (A B: DFA.t), bounded A ->
   eval (change_initial (merge_DFAs A B) (pi0 (initial A))) == eval A.
 Proof.
@@ -141,13 +141,14 @@ Proof.
      apply StateSetProps.Props.fold_rec_nodep. 
       StateSetProps.setdec.
       intros. StateSetProps.set_iff. intuition. discriminate.
-      
      intros p x IHx H2 H t H1.
+     Transparent NumSet.add.
      rewrite H1 at 1. rewrite (StateSetProps.fold_equal _ compare_compat _ H1); auto.
      rewrite StateSetProps.fold_add_above; ti_auto.
      StateSetProps.set_iff. rewrite <- IHx. intuition (try subst; auto using pi0_inj). 
      repeat intro. psubst. rewrite H3. reflexivity.
     apply -> lt_nat_spec. apply below_max_pi0. num_omega. 
+    Opaque NumSet.add.
   Qed.
 
 Lemma eval_right: forall (A B: DFA.t), bounded B -> max_label A = max_label B ->
@@ -194,11 +195,13 @@ Proof.
       intros p x IHx H2 H t H1.
       rewrite H1 at 1. rewrite StateSetProps.Props.fold_2; eauto with typeclass_instances. 
      StateSetProps.set_iff. rewrite <- IHx. intuition (try subst; auto using pi1_inj).
+     Transparent NumSet.add.
      repeat intro. subst. rewrite H3. reflexivity.
      repeat intro. StateSetProps.set_iff. tauto.
      intro. rewrite H1. StateSetProps.set_iff. tauto.
     intros x a _. StateSetProps.set_iff. intuition psubst. discriminate.
-    apply -> lt_nat_spec. apply below_max_pi1. num_omega. 
+    apply -> lt_nat_spec. apply below_max_pi1. num_omega.
+    Opaque NumSet.add.
 Qed.
 
 

@@ -202,6 +202,7 @@ Proof.
   rewrite simpl_regex_language.
   Opaque eq_nat_bool regex_language_f.
   simpl. bool_simpl. simpl. fold_langAlg label.
+  Transparent regex_language_f.
   setoid_rewrite sum_distr_left.
   setoid_rewrite functor_xif.
   Transparent regex_language_f. simpl. fold_langAlg label. 

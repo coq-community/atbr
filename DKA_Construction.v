@@ -146,7 +146,11 @@ Module Algebraic.
     apply add_compat; trivial.
   Qed.
 
-  Opaque star plus dot one zero.
+  Arguments star : simpl never.
+  Arguments plus : simpl never.
+  Arguments dot : simpl never.
+  Arguments one : simpl never.
+  Arguments zero : simpl never.
 
   Notation belong s A := (s < size A)%nat.
 
@@ -169,26 +173,26 @@ Module Algebraic.
   Lemma add_comm : forall a b i f s t M, add a i f (add b s t M) [=0=] add b s t (add a i f M).
   Proof.
     intros a b i f s t [m M].
-    constructor. simpl. semiring_reflexivity.
+    constructor. cbn. semiring_reflexivity.
   Qed.
 
   Lemma add_plus : forall a b i f M, add (a+b) i f M [=0=] add a i f (add b i f M).
   Proof.
     intros a b i f [m M].
-    constructor. simpl. rewrite <- mx_point_plus. semiring_reflexivity.
+    constructor. cbn. rewrite <- mx_point_plus. semiring_reflexivity.
   Qed.
 
   Lemma add_zero : forall i f M, add 0 i f M [=0=] M.
   Proof.
     intros i f [m M].
-    constructor. simpl. rewrite <- mx_point_zero. semiring_reflexivity.
+    constructor. cbn. rewrite <- mx_point_zero. semiring_reflexivity.
   Qed.
 
 
   Lemma incr_add : forall a s t M, belong s M -> belong t M ->
     incr (add a s t M) [=0=] add a s t (incr M).
   Proof.
-    intros a s t [n M] Hs Ht. constructor. simpl in *. 
+    intros a s t [n M] Hs Ht. constructor. cbn in *. 
     rewrite mx_point_blocks00 by assumption.
     rewrite mx_blocks_plus. auto with algebra. 
   Qed.
@@ -196,7 +200,7 @@ Module Algebraic.
   Lemma build_add: forall b i j s t M a, belong s M -> belong t M -> 
     build b i j (add a s t M) [=0=] add a s t (build b i j M).
   Proof. 
-    induction b;  intros i j s t M a Hs Ht ; simpl. 
+    induction b;  intros i j s t M a Hs Ht ; cbn. 
    
      apply add_comm.
     
@@ -236,15 +240,15 @@ Module Algebraic.
     eval i f (add c (size A) (size A) (add a s (size A) (add b (size A) t (incr A))))
     == eval i f (add (a*c#*b) s t A).
   Proof.   
-    intros [n M]; simpl; intros Hi Hf Hs Ht. 
-    apply mx_to_scal_compat; simpl.
+    intros [n M]; cbn; intros Hi Hf Hs Ht. 
+    apply mx_to_scal_compat; cbn.
     change 1%nat with (0+1)%nat.
     rewrite mx_point_blocks10 by trivial. 
     rewrite mx_point_blocks10 by trivial.    
     rewrite mx_point_blocks01 by trivial.
     rewrite mx_point_blocks11 by trivial.
     setoid_rewrite mx_point_blocks01 at 2; trivial.
-    simpl.
+    cbn.
     rewrite 2minus_diag.
     set (U := mx_point 1 n 0 i (1: regex)).
     set (V := mx_point n 1 f 0 (1: regex)).
@@ -268,7 +272,7 @@ Module Algebraic.
     eval i f (add b (size A) t (add a s (size A) (incr A)))
     == eval i f (add (a*b) s t A).
   Proof.
-    intros [n M]. simpl. intros Hi Hf Hs Ht.
+    intros [n M]. cbn - [eval]. intros Hi Hf Hs Ht.
     setoid_replace (a*b: regex) with (a*0#*b)%A using relation RegExp.equal. 
     rewrite add_comm; rewrite <- eval_master_theorem;auto. apply eval_compat. rewrite add_zero. reflexivity.
     fold_regex. rewrite star_zero. semiring_reflexivity.
@@ -279,7 +283,7 @@ Module Algebraic.
     eval i f (add a (size A) (size A) (add 1 s (size A) (add 1 (size A) t (incr A)))) 
     == eval i f (add (a#) s t A).
   Proof.
-    simpl; intros Hi Hf Hs Ht. 
+    cbn - [eval]; intros Hi Hf Hs Ht. 
     rewrite eval_master_theorem;auto.
     apply eval_compat, add_compat'; auto.
     semiring_reflexivity.
@@ -290,7 +294,7 @@ Module Algebraic.
     belong i A -> belong f A -> belong s A -> belong t A -> 
     eval i f (build a s t A) == eval i f (add a s t A).
   Proof.
-    induction a; intros A i f s t Hi Hf Hs Ht; simpl; trivial.
+    induction a; intros A i f s t Hi Hf Hs Ht; cbn - [eval]; trivial.
      rewrite add_zero; trivial.
 
      rewrite IHa1; auto.
@@ -619,6 +623,7 @@ Module Correctness.
   Lemma not_true_eq_false: forall b, ~ b = true -> b = false.
   Proof. intros [ ]; tauto. Qed.
 
+Opaque equal.
   Lemma commute_incr: forall A, bounded A ->
     Algebraic.incr (preNFA_to_preMAUT A) [=0=] preNFA_to_preMAUT (incr A).
   Proof.
@@ -627,12 +632,13 @@ Module Correctness.
     constructor. mx_intros i j Hi Hj. simpl. 
     destruct_blocks; trivial; fold_regex;
       (case_eq (epsilonbrel (mk (S s) epsilonmap0 deltamap0 max_label0) (state_of_nat i) (state_of_nat j)); 
-        intro Hij; [apply HA in Hij; simpl in *; exfalso; num_omega | 
+        intro Hij; [apply HA in Hij; cbn in *; exfalso; num_omega | 
           symmetry; rewrite labelling_empty; 
             [ auto with algebra | 
               intros a; apply not_true_eq_false; intro F; 
                 apply HA in F; simpl in *; exfalso; num_omega ]]).
   Qed.
+Transparent equal.
 
   Local Hint Resolve 
     Algebraic.equal_equiv Algebraic.eval_compat Algebraic.to_MAUT_compat

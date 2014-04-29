@@ -617,6 +617,7 @@ Section completeness.
     intro. simpl. tauto.
   Qed.
 
+Opaque equal.
   Theorem completeness: equiv A i j <> None -> ~ eval (change_initial A i) == eval (change_initial A j).
   Proof.
     remember (equiv A i j) as r. destruct r as [[b w]|]. 2: rewrite Heqr; firstorder. 
@@ -625,6 +626,7 @@ Section completeness.
     rewrite 2 language_DFA_eval in H by auto using bounded_change_initial.
     specialize (H w). destruct b; simpl in Heqr; tauto.
   Qed.
+Transparent equal.
 
 End completeness.
 

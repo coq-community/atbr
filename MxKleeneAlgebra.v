@@ -308,9 +308,11 @@ Section Defs.
   Proof.
     unfold star, mx_Star_Op. induction n; intro. 
     assumption.
-    simpl. 
+    Opaque equal.
+    cbn. 
     change (S n) with (1+n)%nat. 
     auto 13 with compat.
+    Transparent equal.
     (*
     apply mx_blocks_compat.
     apply mx_of_scal_compat.
@@ -429,8 +431,10 @@ Section Defs.
   Proof.
     intros. rewrite mx_blocks_star'. unfold mx_star_block, star_build. 
     repeat match goal with |- context[star_rec ?M] => change (star_rec M) with (M#) end.
+    Opaque equal.
     apply mx_blocks_compat;
     auto 9 using mx_block_00, mx_block_01, mx_block_10, mx_block_11 with compat.
+    Transparent equal.
   Qed.
 
   Lemma mx_blocks_star_trigonal n m (M: MX n n) (N: MX m m) (P: MX n m): 

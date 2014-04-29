@@ -27,7 +27,8 @@ Class Graph := {
   equal: forall A B, relation (X A B);
   equal_:> forall A B, Equivalence (equal A B)
 }.
-Global Opaque equal.
+
+Arguments equal : simpl never.
 
 Set Implicit Arguments.
 
