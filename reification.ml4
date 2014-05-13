@@ -15,6 +15,7 @@ open Term
 open Names
 open Proof_type
 
+DECLARE PLUGIN "reification"
 
 (* pick an element in an hashtbl *)
 let hashtbl_pick t = Hashtbl.fold (fun i x -> function None -> Some (i,x) | acc -> acc) t None
@@ -32,7 +33,7 @@ let fresh_name n goal =
     
 (* access to Coq constants *)
 let get_const dir s = 
-  lazy (Globnames.constr_of_global (Coqlib.find_reference "ATBR.reification" dir s))
+  lazy (Universes.constr_of_global (Coqlib.find_reference "ATBR.reification" dir s))
 
 (* make an application using a lazy value *)
 let force_app f = fun x -> mkApp (Lazy.force f,x)
