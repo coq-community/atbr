@@ -101,10 +101,10 @@ Section leq.
     intros x y E; unfold leq; rewrite E; apply plus_idem.
   Qed.
 
-  Global Instance equal_geq: subrelation (equal A B) (inverse (leq A B)).
+  Global Instance equal_geq: subrelation (equal A B) (Basics.flip (leq A B)).
   Proof. repeat intro; apply equal_leq; symmetry; auto. Qed.
 
-  Definition leq_antisym: Antisymmetric _ _ (leq A B).
+  Definition leq_antisym: Antisymmetric _ (leq A B).
     intros x y H1 H2; unfold leq in *; rewrite <- H2, plus_com, H1; reflexivity. 
   Qed.
 End leq.
