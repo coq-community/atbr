@@ -187,6 +187,7 @@ Module NumUtils (N : NUM).
       ==>
      pointwise_relation num (pointwise_relation T (@eq T))) (@fold_num T).
   Proof.
+    unfold pointwise_relation.
     intros f g H n. induction n using num_peano_rec; intro a; simpl. 
      rewrite 2fold_num_O. reflexivity.
      rewrite 2fold_num_S. rewrite IHn. rewrite H. reflexivity.
@@ -276,9 +277,9 @@ Module NumUtils (N : NUM).
   Lemma numseteqb_eq_nat_bool: forall i j, 
     NumSetProps.eqb i j = eq_nat_bool (nat_of_num i) (nat_of_num j). 
   Proof.
-    intros. rewrite <- eqb_eq_nat_bool. unfold NumSetProps.eqb. destruct (NumSetProps.P.Dec.F.eq_dec i j). 
-    rewrite set_eq_spec in e. subst. bool_simpl.  reflexivity. 
-    rewrite set_eq_spec in n. symmetry. num_prop. auto.
+    intros. rewrite <- eqb_eq_nat_bool. unfold NumSetProps.eqb. destruct (NumSetProps.P.Dec.F.eq_dec i j).
+    rewrite set_eq_spec in Heq. subst. bool_simpl. reflexivity.
+    rewrite set_eq_spec in Hnot. symmetry. num_prop. auto.
   Qed.
   Hint Rewrite numseteqb_eq_nat_bool : bool_simpl.
 

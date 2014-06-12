@@ -21,7 +21,7 @@ Require Import Graph.
 Require Import Monoid.
 Require Import SemiLattice.
 Require Import Numbers.
-Require        Reification.
+Require Import Reification.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

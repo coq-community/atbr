@@ -29,7 +29,9 @@
 Require Import Common.
 Require Import MyFSets.
 Require Import BoolView.
-Require Import Numbers. 
+Require Import Numbers.
+
+Local Unset Standard Proposition Elimination Names.
 
 Module Type DISJOINTSETS (N : NUM).
   Import N.
@@ -790,7 +792,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
       num_analyse; simpl; subst.
       intuition. 
         clear H. exists rx0; eauto.
-        intuition try discriminate. 
+        intuition try discriminate.
         elim n.
         destruct H.
         transitivity x0; eauto using repr_inj_right.
