@@ -278,8 +278,8 @@ Module NumUtils (N : NUM).
     NumSetProps.eqb i j = eq_nat_bool (nat_of_num i) (nat_of_num j). 
   Proof.
     intros. rewrite <- eqb_eq_nat_bool. unfold NumSetProps.eqb. destruct (NumSetProps.P.Dec.F.eq_dec i j).
-    rewrite set_eq_spec in Heq. subst. bool_simpl. reflexivity.
-    rewrite set_eq_spec in Hnot. symmetry. num_prop. auto.
+    rewrite set_eq_spec in e. subst. bool_simpl. reflexivity.
+    rewrite set_eq_spec in n. symmetry. num_prop. auto.
   Qed.
   Hint Rewrite numseteqb_eq_nat_bool : bool_simpl.
 
