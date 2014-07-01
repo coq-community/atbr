@@ -28,7 +28,7 @@ Class Graph := {
   equal_:> forall A B, Equivalence (equal A B)
 }.
 
-Arguments equal : simpl never.
+(*Arguments equal : simpl never.*)
 
 Set Implicit Arguments.
 
