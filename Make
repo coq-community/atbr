@@ -1,4 +1,5 @@
 -R . ATBR
+-I .
 Common.v
 BoolView.v
 MyFSets.v

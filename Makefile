@@ -46,9 +46,12 @@ TIMER=$(if $(TIMED), $(STDTIME), $(TIMECMD))
 #                        #
 ##########################
 
-OCAMLLIBS?=
-COQLIBS?= -R . ATBR
-COQDOCLIBS?=-R . ATBR
+OCAMLLIBS?=-I .
+COQLIBS?=\
+  -R . ATBR\
+  -I .
+COQDOCLIBS?=\
+  -R . ATBR
 
 ##########################
 #                        #
@@ -72,25 +75,30 @@ COQSRCLIBS?=-I "$(COQLIB)kernel" -I "$(COQLIB)lib" \
   -I "$(COQLIB)library" -I "$(COQLIB)parsing" -I "$(COQLIB)pretyping" \
   -I "$(COQLIB)interp" -I "$(COQLIB)printing" -I "$(COQLIB)intf" \
   -I "$(COQLIB)proofs" -I "$(COQLIB)tactics" -I "$(COQLIB)tools" \
-  -I "$(COQLIB)toplevel" -I "$(COQLIB)grammar" \
-  -I $(COQLIB)/plugins/btauto \
-  -I $(COQLIB)/plugins/cc \
-  -I $(COQLIB)/plugins/decl_mode \
-  -I $(COQLIB)/plugins/extraction \
-  -I $(COQLIB)/plugins/field \
-  -I $(COQLIB)/plugins/firstorder \
-  -I $(COQLIB)/plugins/fourier \
-  -I $(COQLIB)/plugins/funind \
-  -I $(COQLIB)/plugins/micromega \
-  -I $(COQLIB)/plugins/nsatz \
-  -I $(COQLIB)/plugins/omega \
-  -I $(COQLIB)/plugins/quote \
-  -I $(COQLIB)/plugins/ring \
-  -I $(COQLIB)/plugins/romega \
-  -I $(COQLIB)/plugins/rtauto \
-  -I $(COQLIB)/plugins/setoid_ring \
-  -I $(COQLIB)/plugins/syntax \
-  -I $(COQLIB)/plugins/xml
+  -I "$(COQLIB)toplevel" -I "$(COQLIB)stm" -I "$(COQLIB)grammar" \
+  -I "$(COQLIB)/plugins/Derive" \
+  -I "$(COQLIB)/plugins/btauto" \
+  -I "$(COQLIB)/plugins/cc" \
+  -I "$(COQLIB)/plugins/decl_mode" \
+  -I "$(COQLIB)/plugins/dp" \
+  -I "$(COQLIB)/plugins/extraction" \
+  -I "$(COQLIB)/plugins/field" \
+  -I "$(COQLIB)/plugins/firstorder" \
+  -I "$(COQLIB)/plugins/fourier" \
+  -I "$(COQLIB)/plugins/funind" \
+  -I "$(COQLIB)/plugins/groebner" \
+  -I "$(COQLIB)/plugins/interface" \
+  -I "$(COQLIB)/plugins/micromega" \
+  -I "$(COQLIB)/plugins/nsatz" \
+  -I "$(COQLIB)/plugins/omega" \
+  -I "$(COQLIB)/plugins/quote" \
+  -I "$(COQLIB)/plugins/ring" \
+  -I "$(COQLIB)/plugins/romega" \
+  -I "$(COQLIB)/plugins/rtauto" \
+  -I "$(COQLIB)/plugins/setoid_ring" \
+  -I "$(COQLIB)/plugins/subtac" \
+  -I "$(COQLIB)/plugins/syntax" \
+  -I "$(COQLIB)/plugins/xml"
 ZFLAGS=$(OCAMLLIBS) $(COQSRCLIBS) -I $(CAMLP4LIB)
 
 CAMLC?=$(OCAMLC) -c -rectypes
@@ -103,7 +111,7 @@ CAMLP4EXTEND=pa_extend.cmo q_MLast.cmo pa_macro.cmo
 else
 CAMLP4EXTEND=
 endif
-PP?=-pp '"$(CAMLP4O)" -I "$(CAMLLIB)" -I . $(COQSRCLIBS) compat5.cmo \
+PP?=-pp '$(CAMLP4O) -I $(CAMLLIB) -I . $(COQSRCLIBS) compat5.cmo \
   $(CAMLP4EXTEND) $(GRAMMARS) $(CAMLP4OPTIONS) -impl'
 
 ##################
@@ -176,9 +184,9 @@ VFILES:=ChurchRosser_Points_vs_Algebraic.v\
 -include $(addsuffix .d,$(VFILES))
 .SECONDARY: $(addsuffix .d,$(VFILES))
 
-VOFILES:=$(VFILES:.v=.vo)
+VO=vo
+VOFILES:=$(VFILES:.v=.$(VO))
 GLOBFILES:=$(VFILES:.v=.glob)
-VIFILES:=$(VFILES:.v=.vi)
 GFILES:=$(VFILES:.v=.g)
 HTMLFILES:=$(VFILES:.v=.html)
 GHTMLFILES:=$(VFILES:.v=.g.html)
@@ -207,8 +215,12 @@ endif
 
 all: $(VOFILES) $(CMOFILES) $(if $(HASNATDYNLINK_OR_EMPTY),$(CMXSFILES)) 
 
-spec: $(VIFILES)
-
+quick:
+	$(MAKE) -f $(firstword $(MAKEFILE_LIST)) all VO=vi
+vi2vo:
+	$(COQC) $(COQDEBUG) $(COQFLAGS) -schedule-vi2vo $(J) $(VOFILES:%.vo=%.vi)
+checkproofs:
+	$(COQC) $(COQDEBUG) $(COQFLAGS) -schedule-vi-checking $(J) $(VOFILES:%.vo=%.vi)
 gallina: $(GFILES)
 
 html: $(GLOBFILES) $(VFILES)
@@ -290,7 +302,7 @@ clean:
 	rm -f $(ALLCMOFILES) $(CMIFILES) $(CMAFILES)
 	rm -f $(ALLCMOFILES:.cmo=.cmx) $(CMXAFILES) $(CMXSFILES) $(ALLCMOFILES:.cmo=.o) $(CMXAFILES:.cmxa=.a)
 	rm -f $(addsuffix .d,$(MLFILES) $(MLIFILES) $(ML4FILES) $(MLLIBFILES) $(MLPACKFILES))
-	rm -f $(VOFILES) $(VIFILES) $(GFILES) $(VFILES:.v=.v.d) $(VFILES:=.beautified) $(VFILES:=.old)
+	rm -f $(VOFILES) $(VOFILES:.vo=.vi) $(GFILES) $(VFILES:.v=.v.d) $(VFILES:=.beautified) $(VFILES:=.old)
 	rm -f all.ps all-gal.ps all.pdf all-gal.pdf all.glob $(VFILES:.v=.glob) $(VFILES:.v=.tex) $(VFILES:.v=.g.tex) all-mli.tex
 	- rm -rf html mlihtml uninstall_me.sh
 
@@ -324,7 +336,7 @@ Makefile: Make
 	$(CAMLOPTC) $(ZDEBUG) $(ZFLAGS) $(PP) -impl $<
 
 %.ml4.d: %.ml4
-	$(COQDEP) -slash $(OCAMLLIBS) "$<" > "$@" || ( RV=$$?; rm -f "$@"; exit $${RV} )
+	$(COQDEP) $(OCAMLLIBS) -c "$<" > "$@" || ( RV=$$?; rm -f "$@"; exit $${RV} )
 
 %.cmxs: %.cmxa
 	$(CAMLOPTLINK) $(ZDEBUG) $(ZFLAGS) -linkall -shared -o $@ $<
@@ -336,7 +348,7 @@ Makefile: Make
 	$(COQC) $(COQDEBUG) $(COQFLAGS) $*
 
 %.vi: %.v
-	$(COQC) -i $(COQDEBUG) $(COQFLAGS) $*
+	$(COQC) -quick $(COQDEBUG) $(COQFLAGS) $*
 
 %.g: %.v
 	$(GALLINA) $<
@@ -354,7 +366,7 @@ Makefile: Make
 	$(COQDOC) $(COQDOCFLAGS)  -html -g $< -o $@
 
 %.v.d: %.v
-	$(COQDEP) -slash $(COQLIBS) "$<" > "$@" || ( RV=$$?; rm -f "$@"; exit $${RV} )
+	$(COQDEP) $(COQLIBS) "$<" > "$@" || ( RV=$$?; rm -f "$@"; exit $${RV} )
 
 %.v.beautified:
 	$(COQC) $(COQDEBUG) $(COQFLAGS) -beautify $*
