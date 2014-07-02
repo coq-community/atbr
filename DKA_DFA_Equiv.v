@@ -46,7 +46,7 @@ Section e.
   Let m := DFA.max_label A.
   Let final s := StateSet.mem s f.
   
-  Fixpoint loop n (w: list label) tarjan (x y: state) := 
+  Fixpoint loop n (w: list label) tarjan (x y: state) : DS.UF + bool * list num := 
     match n with 
       | Datatypes.S n => 
         let '(b,tarjan) := DS.test_and_unify tarjan x y in 
@@ -518,14 +518,14 @@ Section correctness.
        apply sum_incr; intros a Ha. simpl; fold_regex. fold_leq.
        xif_destruct; unfold xif at 1; trivial with algebra.
        leq_sum (delta a i). pose proof (bounded_delta Hbounds a i). num_omega.
-       bool_simpl. num_prop. num_simpl. rewrite H0. num_simpl.
+       bool_simpl. num_prop. rewrite H0.
        rewrite (simulation H); trivial. 
         unfold xif. semiring_reflexivity.
         num_omega. 
         num_omega. 
             
       (* y * v == v *)
-      mx_intros i j Hi Hj. clear - Hi. simpl; fold_regex.
+      mx_intros i j Hi Hj. clear - Hi Hbounds i' Hi' Hj' _H. simpl; fold_regex.
       apply leq_antisym. 
        apply sum_leq.
        intros n Hn Hn'. 
@@ -542,7 +542,7 @@ Section correctness.
        rewrite T_refl. xif_simpl. trivial with algebra.
 
       (* y * y <== y*)
-      clear. mx_intros i j Hi Hj. simpl; fold_regex.
+      mx_intros i j Hi Hj. simpl; fold_regex.
        apply sum_leq. intros k Hk Hk'. 
        xif_destruct; [semiring_normalize|semiring_reflexivity].
        xif_destruct; [semiring_normalize|semiring_reflexivity].
