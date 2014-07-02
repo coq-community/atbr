@@ -139,16 +139,19 @@ Section S.
   Qed.
 
   (** characterisation of [build_store] with [steps], as explained above *)
+  
   Lemma build_store_spec: build_store = steps (power size) initial_store initiaux (state_of_nat 0).
   Proof.
     unfold build_store.
-    rewrite (powerfix_linearfix (R:=pointwise_relation _ (pointwise_relation _ (@eq _)))). 
+    pose (Heq:=powerfix_linearfix (A:=Store) (B:=stateset -> num -> Store) (R:=pointwise_relation _ (pointwise_relation _ (@eq _)))).
+    unfold pointwise_relation at -1 -2 -3 in Heq.
+    rewrite Heq. 
     generalize (state_of_nat 0) initiaux initial_store. generalize (power size) as n. 
     induction n; intros s p np; simpl.
      reflexivity.
-     apply fold_num_compat, step_compat. repeat intro. apply IHn.  
-    intros f g H s ? <- p np. apply fold_num_compat, step_compat, H.  
-  Qed.    
+     apply fold_num_compat, step_compat. repeat intro. apply IHn.
+     intros f g H s ? <- p np. apply fold_num_compat, step_compat, H.  
+  Qed.
 
 
   Notation "s %t" := (fst (fst s)) (at level 1).
@@ -238,7 +241,7 @@ Section S.
      intro a. revert s Hsize H Hp. induction a using num_peano_rec; intros [[t d] n] Hsize H Hp.
       rewrite fold_num_O. split.
        apply reflexive_extends. assumption.
-       intros P HP m b Hm Hb. specialize (HP m b Hm Hb). intuition. num_omega_false.
+       intros P HP m b Hm Hb. specialize (HP m b Hm Hb). intuition auto. num_omega_false.
       rewrite fold_num_S. simpl. StateSetMapProps.find_analyse.
        (* existing state *)
        assert (H': invariant (t, StateLabelMap.add (np, a) x d, n)).

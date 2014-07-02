@@ -25,7 +25,7 @@ Require Import SemiLattice.
 Require Import SemiRing.
 Require Import KleeneAlgebra.
 Require Import MxGraph.
-Require        Reification.
+Require Import Reification.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -242,11 +242,11 @@ Module RegExp.
       Proof. 
         intros. unfold cleaning_star. destruct_tests; fold_regex; auto with algebra. 
       Qed.
-      
+
       (** the rewriting procedure is correct *)
       Theorem correct: forall e, e == rewrite e.
       Proof.
-        induction e; cbn; trivial; fold_regex. 
+        induction e; cbn; fold_regex; trivial.
         rewrite clean_dot; auto with compat. 
         rewrite clean_plus; auto with compat. 
         rewrite clean_star; auto with compat. 

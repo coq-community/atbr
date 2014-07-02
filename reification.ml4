@@ -233,6 +233,9 @@ end
 (* is a constr [c] an operation to be reified ? *)
 let is c = function None -> false | Some x -> Constr.equal c (Lazy.force x)
 
+let retype c gl = 
+  let sigma, ty = Tacmach.pf_apply Typing.e_type_of gl c in
+    Refiner.tclEVARS sigma gl
 
 (* main entry point *)
 let reify_goal ops goal =
@@ -334,8 +337,9 @@ let reify_goal ops goal =
 		mkNamedLetIn rn rv x (
 		  (mkApp (rel, [|Reification.typ gph env_ref src; Reification.typ gph env_ref tgt;l;r|]))))))
 	in
-	  
-	  (try Tactics.convert_concl reified DEFAULTcast goal
+	  (try 
+	     Tacticals.tclTHEN (retype reified)
+	       (Tactics.convert_concl reified DEFAULTcast) goal
 	   with e -> Pp.msg_warning (Printer.pr_lconstr reified); raise e)
 	    
     | _ -> error "unrecognised goal"

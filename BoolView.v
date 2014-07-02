@@ -47,14 +47,14 @@ Class Type_View {A} (f : A) := {
 
 (* TOTHINK: a-t'on vraiment besoin de passer par les instances, puisqu'on a toujours le lemme dans la main !? *)
 Ltac type_view f :=
-(** Find the view associated with [f] *)
-  let prf := constr:(type_view (f:=f)) in
-    on_call f ltac:(fun c =>
-      match c with
-          | context args [ f ] =>
-            let ind_app := context args [ prf ] in
-              destruct ind_app
-      end).
+  Tactics.on_call f
+   ltac:(fun c =>
+           match c with
+           | context args[f] =>
+               let ind_app := context args [type_view (f:=f)] in
+               let t := type of ind_app in
+               destruct ind_app
+           end).
   
 Inductive compare_spec {A} eq lt (x y : A) : comparison -> Prop :=
 | compare_spec_lt : lt x y -> compare_spec eq lt x y Lt

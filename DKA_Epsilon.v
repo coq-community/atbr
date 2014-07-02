@@ -8,6 +8,7 @@
 
 (* Removal of epsilon transitions: from eNFAs to NFAs *)
 
+
 Require Import Common.
 Require Import Classes.
 Require Import Graph.
@@ -437,7 +438,7 @@ Proof.
     apply xif_bool_incr. bool_connectors. intros [Hnx Hjn].
     apply -> StateSetProps.exists_iff. 2: repeat intro;  psubst; reflexivity.
     exists (sn n); split; assumption.
-  setoid_rewrite StateSetProps.empty_b. symmetry. rapply sum_fun_zero. 
+  symmetry. rapply sum_fun_zero. 
 
   (* u' = u*j' *)
   mx_intros i j Hi Hj. simpl; fold_regex.
@@ -450,7 +451,6 @@ Proof.
   mx_intros i j Hi Hj. simpl. fold_regex. apply xif_compat; trivial.
   bool_simpl. rewrite bool_prop_iff. num_prop. nat_prop. num_omega. 
 Qed. 
-
 
 
 Lemma rt_closure_bounded: forall f Hwf size, 

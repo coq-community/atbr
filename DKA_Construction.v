@@ -17,7 +17,6 @@
     transitions.
   *)
 
-
 Require Import Common.
 Require Import Classes.
 Require Import Graph.
@@ -151,6 +150,7 @@ Module Algebraic.
   Arguments dot : simpl never.
   Arguments one : simpl never.
   Arguments zero : simpl never.
+  Arguments Classes.equal : simpl never.
 
   Notation belong s A := (s < size A)%nat.
 
@@ -444,12 +444,13 @@ Module Correctness.
     epsilonbrel (add_one i j A) s t = epsilonbrel A s t || eq_state_bool i s && eq_state_bool j t.
   Proof.
     intros. destruct A. unfold epsilonbrel, epsilonfun, add_one, augment, statemap_set_to_fun. simpl.
+
     
     repeat StateMapProps.find_analyse; simpl; StateMapProps.find_tac; bool_simpl; simpl; trivial.
      rewrite eqb_eq_nat_bool. apply orb_comm. 
      num_analyse; bool_simpl; trivial; subst; auto.
      num_analyse; bool_simpl; trivial; subst; auto.
-     rewrite eqb_eq_nat_bool. apply orb_comm.
+     rewrite eqb_eq_nat_bool. trivial. 
      apply <- bool_prop_iff; bool_connectors; intuition. num_prop. subst. auto.
      apply <- bool_prop_iff; bool_connectors; intuition. num_prop. subst. auto.
   Qed.
@@ -492,7 +493,7 @@ Module Correctness.
      rewrite eqb_eq_nat_bool. apply orb_comm. 
      num_analyse; nat_analyse; bool_simpl; trivial; subst; auto. elim H. apply StateLabel.eq_refl. 
      num_analyse; nat_analyse; bool_simpl; trivial; subst; auto. elim H. apply StateLabel.eq_refl.
-     rewrite eqb_eq_nat_bool. apply orb_comm. 
+     rewrite eqb_eq_nat_bool. trivial. 
      apply <-bool_prop_iff; bool_connectors; intuition. 
        num_prop. nat_prop. subst. elim H2. apply StateLabel.eq_refl. 
      apply <-bool_prop_iff; bool_connectors; intuition. 
