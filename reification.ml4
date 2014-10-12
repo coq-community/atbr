@@ -339,7 +339,7 @@ let reify_goal ops goal =
 	in
 	  (try 
 	     Tacticals.tclTHEN (retype reified)
-	       (Tactics.convert_concl reified DEFAULTcast) goal
+	       (Proofview.V82.of_tactic (Tactics.convert_concl reified DEFAULTcast)) goal
 	   with e -> Pp.msg_warning (Printer.pr_lconstr reified); raise e)
 	    
     | _ -> error "unrecognised goal"
