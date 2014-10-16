@@ -685,7 +685,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
   
     Global Instance empty_WF : WF empty.
     Proof.
-      constructor; exists O; [apply DO; map_iff; auto| auto].
+      constructor; exists O; [apply DO; cbn; map_iff; auto| auto].
     Qed.
   
     Global Instance find_WF `{WF} x: WF (snd (find t x )).
@@ -1031,7 +1031,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
     erewrite (Z.fold_Add_Above (eqA := NumSet.Equal)) in H; ti_auto.
     2 :  repeat intro; subst; destruct (fst (equiv t y y0) && fst (equiv t y y1)); try NumSetProps.setdec. 
 
-     case_eq (fst (equiv t y x0) && (fst (equiv t y e))); intros; rewrite H2 in *.
+     case_eq (fst (equiv t y x0) && (fst (equiv t y e))); intros; cbn in *; rewrite H2 in *.
      2 :apply IHt0_1; auto.
 
 
