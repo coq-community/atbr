@@ -98,8 +98,8 @@ Proof.
   revert t. induction s; intros t H; simpl.
   (* the set of set contains at most the empty set *)
    destruct (StateSetSetProps.Props.cardinal_0 t) as (l&Hl&Hlt&->).
-   setoid_rewrite Hlt in H. clear Hlt.
-   destruct l as [|x [| y q]]; simpl; auto with arith. 
+   setoid_rewrite Hlt in H. clear Hlt. revert H Hl.
+   destruct l as [|x [| y q]]; intros H Hl; simpl; auto with arith. 
    exfalso. inversion_clear Hl. apply H0. left. clear H0 H1.
    rewrite (@below0_empty x), (@below0_empty y). reflexivity.
     apply H. right. left. reflexivity.
