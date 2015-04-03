@@ -12,7 +12,6 @@
    example, given a matrix [R] coding for the cost for moving from one
    state to another one, [R# i j] gives the cost of the shortest path
    from i to j. *)
-Add LoadPath "." as ATBR.
 Require Import Common.
 Require Import Classes.
 Require Import NPeano.
