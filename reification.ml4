@@ -234,7 +234,7 @@ end
 let is c = function None -> false | Some x -> Constr.equal c (Lazy.force x)
 
 let retype c gl = 
-  let sigma, ty = Tacmach.pf_apply Typing.e_type_of gl c in
+  let sigma, ty = Tacmach.pf_apply Typing.type_of gl c in
     Refiner.tclEVARS sigma gl
 
 (* main entry point *)
