@@ -927,7 +927,7 @@ Lemma build_max_label: forall a i e f A, i < max_label A -> i < max_label (build
 Proof.
   induction a; intros i e f A Hi; rewrite (psurj A); simpl; auto.
    rewrite max_label_add_one. auto.
-   num_simpl. eauto using Max.le_max_r with arith.
+   num_simpl. eauto 2 using Max.le_max_r with arith.
 Qed.
 
 Lemma collect_max_label: 
