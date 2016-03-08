@@ -782,7 +782,7 @@ Transparent equal.
        apply epsilon_rt_add_one in H as [H|[H1 H2]].
         auto using epsilon_rt_incr.
         not_epsilon.
-       apply epsilon_rt_add_one in H1. intuition not_epsilon.
+       apply epsilon_rt_add_one in H1. intuition (idtac; not_epsilon).
       apply IHa in H1; auto. apply IHa in H2; auto. 
        destruct H1 as [H1|[H3 [H4 ?]]].
         apply epsilon_rt_add_one in H1 as [H1|[H3 H4]]. 2: not_epsilon.
@@ -793,7 +793,7 @@ Transparent equal.
          apply epsilon_rt_add_one in H4 as [H4|[H5 H6]].
           not_epsilon.
           destruct A. auto.
-       apply epsilon_rt_add_one in H3. intuition not_epsilon.
+       apply epsilon_rt_add_one in H3. intuition (idtac; not_epsilon).
        destruct A. auto.
   Qed.
       
