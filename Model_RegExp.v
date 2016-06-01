@@ -546,8 +546,10 @@ Module RegExp.
         intros x y H.
         cut ((forall A B x', eval A B x x' -> exists2 y', eval A B y y' & x'==y')
                 /\ (forall A B y', eval A B y y' -> exists2 x', eval A B x x' & y'==x')); [tauto| ].
+        Unset Regular Subst Tactic.
         induction H; (apply and_idem || split); intros A B xe Hx; 
           eval_inversion; try solve [split_IHeval; eexists; [eauto; fail | eval_injection; auto with algebra ]].
+        Set Regular Subst Tactic.
   
         (* dot_distr_left *)
         destruct (eval_type_inj_left H4 H5) as [HB | Hz]; [ destruct HB | rewrite Hz in H; discriminate ].
