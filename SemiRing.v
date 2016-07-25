@@ -837,7 +837,7 @@ Section Props.
   Lemma sum_distr_right A B C (x: X A B) (f: nat -> X B C) i k:
     x * sum i k f == sum i k (fun u => x * f u).
   Proof.
-    revert i; induction k; intro i; simpl_sum_r.
+    revert i; induction k; intro i; simpl.
     apply dot_ann_right.
     rewrite dot_distr_right, IHk. reflexivity.
   Qed.
