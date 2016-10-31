@@ -255,7 +255,7 @@ let reify_goal ops goal =
   (* clear recorded operations *)
   let () = Classes.reset_ops () in
 
-  match kind_of_term (strip_outer_cast (Tacmach.pf_concl goal)) with
+  match kind_of_term (Termops.strip_outer_cast (Tacmach.pf_concl goal)) with
     | App(c,ca) ->
 	(* we look for an (in)equation *)
 	let rel,shift =
@@ -273,7 +273,7 @@ let reify_goal ops goal =
 
 	(* reification of a term [e], with domain [s] and codomain [t] *)
 	let rec reify s t e = 
-	  match kind_of_term (strip_outer_cast e) with
+	  match kind_of_term (Termops.strip_outer_cast e) with
 	    | App(c,ca) when is c ops.c_plus -> 
 		Classes.slo := Some ca.(1);
 		force_app ops.r_plus [|gph;env_ref;s;t;reify s t ca.(4);reify s t ca.(5)|]
