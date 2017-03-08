@@ -14,6 +14,7 @@
 open Term
 open Names
 open Proof_type
+open Ltac_plugin
 
 DECLARE PLUGIN "reification"
 
