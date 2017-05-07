@@ -12,6 +12,7 @@
 (*i camlp4use: "pa_extend.cmo" i*)
 
 open Term
+open EConstr
 open Names
 open Proof_type
 open Ltac_plugin
@@ -34,7 +35,7 @@ let fresh_name n goal =
     
 (* access to Coq constants *)
 let get_const dir s = 
-  lazy (Universes.constr_of_global (Coqlib.find_reference "ATBR.reification" dir s))
+  lazy (EConstr.of_constr (Universes.constr_of_global (Coqlib.find_reference "ATBR.reification" dir s)))
 
 (* make an application using a lazy value *)
 let force_app f = fun x -> mkApp (Lazy.force f,x)
@@ -232,7 +233,7 @@ end = struct
 end
 
 (* is a constr [c] an operation to be reified ? *)
-let is c = function None -> false | Some x -> Constr.equal c (Lazy.force x)
+let is sigma c = function None -> false | Some x -> EConstr.eq_constr sigma c (Lazy.force x)
 
 let retype c gl = 
   let sigma, ty = Tacmach.pf_apply Typing.type_of gl c in
@@ -255,13 +256,14 @@ let reify_goal ops goal =
 
   (* clear recorded operations *)
   let () = Classes.reset_ops () in
+  let sigma = Tacmach.project goal in
 
-  match kind_of_term (Termops.strip_outer_cast (Tacmach.pf_concl goal)) with
+  match kind sigma (Termops.strip_outer_cast sigma (Tacmach.pf_concl goal)) with
     | App(c,ca) ->
 	(* we look for an (in)equation *)
 	let rel,shift =
-	  if Constr.equal c (Lazy.force Classes.equal) then mkApp (c,[|ca.(0)|]), 0
-	  else if Constr.equal c (Lazy.force Classes.leq) then mkApp (c,[|ca.(0);ca.(1)|]), 1
+	  if EConstr.eq_constr sigma c (Lazy.force Classes.equal) then mkApp (c,[|ca.(0)|]), 0
+	  else if EConstr.eq_constr sigma c (Lazy.force Classes.leq) then mkApp (c,[|ca.(0);ca.(1)|]), 1
 	  else error "unrecognised goal"
 	in
 	let gph = ca.(0) in	      (* graph *)
@@ -274,24 +276,24 @@ let reify_goal ops goal =
 
 	(* reification of a term [e], with domain [s] and codomain [t] *)
 	let rec reify s t e = 
-	  match kind_of_term (Termops.strip_outer_cast e) with
-	    | App(c,ca) when is c ops.c_plus -> 
+	  match kind sigma (Termops.strip_outer_cast sigma e) with
+	    | App(c,ca) when is sigma c ops.c_plus -> 
 		Classes.slo := Some ca.(1);
 		force_app ops.r_plus [|gph;env_ref;s;t;reify s t ca.(4);reify s t ca.(5)|]
-	    | App(c,ca) when is c ops.c_dot -> 
+	    | App(c,ca) when is sigma c ops.c_dot -> 
 		Classes.mo := Some ca.(1);
 		let r = insert_type ca.(3) in 
 		  force_app ops.r_dot [|gph;env_ref;s;r;t;reify s r ca.(5);reify r t ca.(6)|]
-	    | App(c,ca) when is c ops.c_star -> (* invariant: s=t *)
+	    | App(c,ca) when is sigma c ops.c_star -> (* invariant: s=t *)
 		Classes.ko := Some ca.(1);
 		force_app ops.r_star [|gph;env_ref;s;reify s t ca.(3)|]
-	    | App(c,ca) when is c ops.c_conv -> 
+	    | App(c,ca) when is sigma c ops.c_conv -> 
 		Classes.co := Some ca.(1);
 		force_app ops.r_conv [|gph;env_ref;s;t;reify t s ca.(3)|]
-	    | App(c,ca) when is c ops.c_one -> (* invariant: s=t *)
+	    | App(c,ca) when is sigma c ops.c_one -> (* invariant: s=t *)
 		Classes.mo := Some ca.(1);
 		force_app ops.r_one [|gph;env_ref;s|]
-	    | App(c,ca) when is c ops.c_zero-> 
+	    | App(c,ca) when is sigma c ops.c_zero-> 
 		Classes.slo := Some ca.(1);
 		force_app ops.r_zero [|gph;env_ref;s;t|]
 	    | _ -> 
@@ -341,7 +343,7 @@ let reify_goal ops goal =
 	  (try 
 	     Tacticals.tclTHEN (retype reified)
 	       (Proofview.V82.of_tactic (Tactics.convert_concl reified DEFAULTcast)) goal
-	   with e -> Feedback.msg_warning (Printer.pr_lconstr reified); raise e)
+	   with e -> Feedback.msg_warning (Printer.pr_leconstr reified); raise e)
 	    
     | _ -> error "unrecognised goal"
 	
