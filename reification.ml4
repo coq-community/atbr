@@ -52,7 +52,7 @@ let get_fun_5 d s = let v = get_const d s in fun x y z t u -> force_app v [|x;y;
 (* Coq constants *)
 module Coq = struct
   (* binary positive numbers *)
-  let positive_path = ["Coq" ; "PArith"; "BinPos"]
+  let positive_path = ["Coq" ; "Numbers"; "BinNums"]
   let positive = get_const positive_path "positive"
   let xH = get_const positive_path "xH"
   let xI = get_fun_1 positive_path "xI"
