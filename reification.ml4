@@ -11,10 +11,10 @@
 (*i camlp4deps: "parsing/grammar.cma" i*)
 (*i camlp4use: "pa_extend.cmo" i*)
 
+open API
 open Term
 open EConstr
 open Names
-open Proof_type
 open Ltac_plugin
 
 DECLARE PLUGIN "reification"
