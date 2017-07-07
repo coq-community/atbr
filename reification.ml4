@@ -26,11 +26,11 @@ let hashtbl_pick t = Hashtbl.fold (fun i x -> function None -> Some (i,x) | acc 
 let error s = Printf.kprintf (fun s -> CErrors.user_err (Pp.str s)) ("[ATBR reification] "^^s)
 
 (* resolving a typeclass [cls] in a goal [gl] *)
-let tc_find gl cls = Typeclasses.resolve_one_typeclass (Tacmach.pf_env gl) (Tacmach.project gl) cls
+let tc_find env sigma cls = Typeclasses.resolve_one_typeclass env sigma cls
 
 (* creating a name a reference to that name *)
-let fresh_name n goal =
-  let vname = Tactics.fresh_id [] (Names.id_of_string n) goal in
+let fresh_name n env =
+  let vname = Tactics.fresh_id_in_env [] (Names.Id.of_string n) env in
     vname, mkVar vname 
     
 (* access to Coq constants *)
@@ -86,7 +86,7 @@ type ops = {
   (* type of terms *)
   r_x:  constr Lazy.t;
   (* evaluation function (eval gl gph env a b x) *)
-  eval: goal Evd.sigma -> constr -> constr -> constr -> constr -> constr -> constr;
+  eval: Environ.env -> Evd.evar_map -> constr -> constr -> constr -> constr -> constr -> constr;
   (* name (for error messages) *)
   name: string;
 }
@@ -124,15 +124,15 @@ module Classes = struct
     r_one  = one; 
     r_var  = one;			(* ici, on pourrait mettre une identité... *)
     r_x    = one;	
-    eval = (fun gl gph e a b x -> x);
+    eval = (fun env sigma gph e a b x -> x);
     name = "id reification (please report)" }
 
   (* ugly hack to optimise calls to [Typeclasses.resolve_one_typeclass]: 
      record encountered operations and resort to typeclass resolution only 
      if no operation was encountered *)
-  let get r o s = fun gl gph -> 
+  let get r o s = fun env sigma gph -> 
     try match !r with 
-      | None -> let x = snd (tc_find gl (force_app o [|gph|])) in r:=Some x; x
+      | None -> let x = snd (tc_find env sigma (force_app o [|gph|])) in r:=Some x; x
       | Some x -> x
     with Not_found -> error "could not find an instance of %s on the given graph" s
   let mo  = ref None
@@ -172,8 +172,8 @@ module Reification = struct
 	  r_one  = get_const path "one";	
 	  r_var  = get_const path "var";	
 	  r_x    = get_const path "X";	
-	  eval   = (fun gl g e a b x -> force_app eval 
-		      [|g;e;Classes.get_mo gl g;Classes.get_slo gl g;Classes.get_ko gl g;a;b;x|]);
+	  eval   = (fun env sigma g e a b x -> force_app eval 
+		      [|g;e;Classes.get_mo env sigma g;Classes.get_slo env sigma g;Classes.get_ko env sigma g;a;b;x|]);
 	  name = "kleene" }
   end
   module Semiring = struct
@@ -188,8 +188,8 @@ module Reification = struct
 	  r_one  = get_const path "one";	
 	  r_var  = get_const path "var";	
 	  r_x    = get_const path "X";	
-	  eval = (fun gl g e a b x -> force_app eval 
-		    [|g;e;Classes.get_mo gl g;Classes.get_slo gl g;a;b;x|]);
+	  eval = (fun env sigma g e a b x -> force_app eval 
+		    [|g;e;Classes.get_mo env sigma g;Classes.get_slo env sigma g;a;b;x|]);
 	  name = "semiring" }
   end
 end 
@@ -201,7 +201,7 @@ module Tbl : sig
   (* [insert gl t x y] adds the association [x->y] to [t] and returns 
      the corresponding (coq) index ; [gl] is the current goal, used 
      to compare terms *)
-  val insert: goal Evd.sigma -> t -> constr -> constr Lazy.t -> constr
+  val insert: Environ.env -> Evd.evar_map -> t -> constr -> constr Lazy.t -> constr
   (* [to_env t typ def] returns (coq) environment corresponding to [t], 
      yielding elements of type [typ], with [def] as default value *)
   val to_env: t -> constr -> constr -> constr
@@ -210,13 +210,13 @@ end = struct
 
   let create () = ref([],1)
 
-  let rec find gl x = function
+  let rec find env sigma x = function
     | [] -> raise Not_found
-    | (x',i,_)::q -> if Tacmach.pf_conv_x gl x x' then i else find gl x q
+    | (x',i,_)::q -> if Reductionops.is_conv env sigma x x' then i else find env sigma x q
 
-  let insert gl t x y =
+  let insert env sigma t x y =
     let l,i = !t in
-      try find gl x l
+      try find env sigma x l
       with Not_found -> 
 	let j = Coq.pos_of_int i in
 	  t := ((x,j,Lazy.force y)::l,i+1); j
@@ -235,30 +235,38 @@ end
 (* is a constr [c] an operation to be reified ? *)
 let is sigma c = function None -> false | Some x -> EConstr.eq_constr sigma c (Lazy.force x)
 
-let retype c gl = 
-  let sigma, ty = Tacmach.pf_apply Typing.type_of gl c in
-    Refiner.tclEVARS sigma gl
+let retype c = 
+  Proofview.Goal.enter begin fun gl ->
+  let env = Proofview.Goal.env gl in
+  let sigma = Proofview.Goal.sigma gl in
+  let sigma, ty = Typing.type_of env sigma c in
+  Proofview.Unsafe.tclEVARS sigma
+  end
 
 (* main entry point *)
-let reify_goal ops goal =
+let reify_goal ops =
+  Proofview.Goal.enter begin fun gl ->
+
+  let env = Proofview.Goal.env gl in
+  let sigma = Proofview.Goal.sigma gl in
+  let concl = Proofview.Goal.concl gl in
 
   (* variables for referring to the environments *)
-  let tenv_name,tenv_ref = fresh_name "t" goal in
-  let env_name,env_ref = fresh_name "e" goal in 
+  let tenv_name,tenv_ref = fresh_name "t" env in
+  let env_name,env_ref = fresh_name "e" env in 
 
   (* table associating indices to encountered types *)
   let tenv = Tbl.create() in 			
-  let insert_type t = Tbl.insert goal tenv t (lazy t) in
+  let insert_type t = Tbl.insert env sigma tenv t (lazy t) in
 
   (* table associating indices to encountered atoms *)
-  let env = Tbl.create() in
-  let insert_atom gph x s t = Tbl.insert goal env x (lazy (Reification.pack gph tenv_ref s t x)) in
+  let tenv' = Tbl.create() in
+  let insert_atom gph x s t = Tbl.insert env sigma tenv' x (lazy (Reification.pack gph tenv_ref s t x)) in
 
   (* clear recorded operations *)
   let () = Classes.reset_ops () in
-  let sigma = Tacmach.project goal in
 
-  match kind sigma (Termops.strip_outer_cast sigma (Tacmach.pf_concl goal)) with
+  match kind sigma (Termops.strip_outer_cast sigma concl) with
     | App(c,ca) ->
 	(* we look for an (in)equation *)
 	let rel,shift =
@@ -302,12 +310,12 @@ let reify_goal ops goal =
 	in
 
    	(* reification of left and right members *)
-	let lv,(ln,lr) = reify src tgt ca.(shift+3), fresh_name "l" goal in
-	let rv,(rn,rr) = reify src tgt ca.(shift+4), fresh_name "r" goal in
+	let lv,(ln,lr) = reify src tgt ca.(shift+3), fresh_name "l" env in
+	let rv,(rn,rr) = reify src tgt ca.(shift+4), fresh_name "r" env in
 	  
 	(* apply "eval" around the reified terms *)
-	let l = ops.eval goal gph env_ref src tgt lr in
-	let r = ops.eval goal gph env_ref src tgt rr in
+	let l = ops.eval env sigma gph env_ref src tgt lr in
+	let r = ops.eval env sigma gph env_ref src tgt rr in
 	let x = force_app ops.r_x [|gph;env_ref;src;tgt|] in
 
 	(* default value for the environment*)
@@ -315,11 +323,11 @@ let reify_goal ops goal =
 	  if ops.c_one <> None then 
 	    (* if we have a [one], use it *)
 	    Reification.pack gph tenv_ref src src
-	      (force_app Classes.ops.r_one [|gph;Classes.get_mo goal gph;src'|])
+	      (force_app Classes.ops.r_one [|gph;Classes.get_mo env sigma gph;src'|])
 	  else if ops.c_zero <> None then
 	    (* if we have a [zero], use it *)
 	    Reification.pack gph tenv_ref src tgt 
-	      (force_app Classes.ops.r_zero [|gph;Classes.get_slo goal gph;src';tgt'|])
+	      (force_app Classes.ops.r_zero [|gph;Classes.get_slo env sigma gph;src';tgt'|])
 	  else 			
 	    (* if the environment is empty, use the left-hand side of the equqtion *)
 	    (* nb: this branch is never used currently, since we always have either a one, or a zero *)
@@ -330,24 +338,24 @@ let reify_goal ops goal =
 	let tenv = Tbl.to_env tenv typ src' in
 	  
    	(* construction of coq' reification environment *)
-	let env = Reification.env gph tenv_ref (Tbl.to_env env pck def) in
+	let tenv' = Reification.env gph tenv_ref (Tbl.to_env tenv' pck def) in
 
 	(* reified goal conclusion: add the relation over the two evaluated members *)
 	let reified = 
 	  mkNamedLetIn tenv_name tenv (mkArrow (Lazy.force Coq.positive) typ) (
-	    mkNamedLetIn env_name env (Reification.env_type gph) (
+	    mkNamedLetIn env_name tenv' (Reification.env_type gph) (
 	      mkNamedLetIn ln lv x (
 		mkNamedLetIn rn rv x (
 		  (mkApp (rel, [|Reification.typ gph env_ref src; Reification.typ gph env_ref tgt;l;r|]))))))
 	in
 	  (try 
-	     Tacticals.tclTHEN (retype reified)
-	       (Proofview.V82.of_tactic (Tactics.convert_concl reified DEFAULTcast)) goal
+	     Tacticals.New.tclTHEN (retype reified)
+	       (Tactics.convert_concl reified DEFAULTcast)
 	   with e -> Feedback.msg_warning (Printer.pr_leconstr reified); raise e)
 	    
     | _ -> error "unrecognised goal"
-	
+  end 	
 
 (* tactic grammar entries *)
-TACTIC EXTEND kleene_reify [ "kleene_reify" ] -> [ Proofview.V82.tactic (reify_goal Reification.KA.ops) ] END
-TACTIC EXTEND semiring_reify [ "semiring_reify" ] -> [ Proofview.V82.tactic (reify_goal Reification.Semiring.ops) ] END
+TACTIC EXTEND kleene_reify [ "kleene_reify" ] -> [ reify_goal Reification.KA.ops ] END
+TACTIC EXTEND semiring_reify [ "semiring_reify" ] -> [ reify_goal Reification.Semiring.ops ] END
