@@ -465,7 +465,7 @@ endtests*)
     Proof. 
       induction x; constructor; assumption.
     Qed.
-    Hint Local Resolve sequal_refl.
+    Local Hint Resolve sequal_refl.
     
     Lemma sequal_clean_zero_equiv x : sequal (clean0 x) zero -> is_zero (clean0 x) = true.
     Proof.
@@ -522,7 +522,7 @@ endtests*)
     | e_plus: forall A B x y x' y', @eval A B x x' -> @eval A B y y' -> @eval A B (U.plus x y) (x'+y')
     | e_var: forall i, eval (U.var i) (unpack (val i)).
     Implicit Arguments eval [].
-    Hint Local Constructors eval.
+    Local Hint Constructors eval.
 
     (** evaluation of erased terms *)
     Lemma eval_erase_feval: forall n m a, eval n m (erase a) (feval a).
