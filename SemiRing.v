@@ -521,7 +521,7 @@ endtests*)
     | e_dot: forall A B C x y x' y', @eval A B x x' -> @eval B C y y' -> @eval A C (U.dot x y) (x'*y')
     | e_plus: forall A B x y x' y', @eval A B x x' -> @eval A B y y' -> @eval A B (U.plus x y) (x'+y')
     | e_var: forall i, eval (U.var i) (unpack (val i)).
-    Implicit Arguments eval [].
+    Arguments eval : clear implicits.
     Local Hint Constructors eval.
 
     (** evaluation of erased terms *)
@@ -741,7 +741,8 @@ endtests*)
     Qed.
 
   End faithful.
-  Implicit Arguments normalizer [[G] [Mo] [SLo] [ISR] [env] [n] [m] [R] [T] [H] norm a b].
+
+  Arguments normalizer [G] [Mo] [SLo] [ISR] [env] [n] [m] [R] [T] [H] [norm] Hnorm a b.
 
 End U.
 

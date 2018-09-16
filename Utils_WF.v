@@ -258,4 +258,4 @@ Section Fix_induction.
     rewrite <- Fix_F_eq. auto.
   Qed.
 End Fix_induction.
-Implicit Arguments Fix_induction [A R T F P].
+Arguments Fix_induction [A R] Hwf [T F P].

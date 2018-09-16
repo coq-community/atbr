@@ -151,13 +151,13 @@ End Structures.
 (** we want to keep the graph explicit, for better readability, (but
    we still want the graph to be maximally implicit in projections
    like [dot_assoc]. *)
-Implicit Arguments Monoid [[Mo]].
-Implicit Arguments SemiLattice [[SLo]].
-Implicit Arguments IdemSemiRing [[Mo] [SLo]].
-Implicit Arguments ConverseIdemSemiRing [[Mo] [SLo] [Co]].
-Implicit Arguments KleeneAlgebra [[Mo] [SLo] [Ko]].
-Implicit Arguments ConverseIdemSemiRing [[Mo] [SLo] [Co]].
-Implicit Arguments ConverseKleeneAlgebra [[Mo] [SLo] [Co] [Ko]].
+Arguments Monoid G [Mo].
+Arguments SemiLattice G [SLo].
+Arguments IdemSemiRing G [Mo SLo], G Mo SLo.
+Arguments ConverseIdemSemiRing G [Mo] [SLo] [Co].
+Arguments KleeneAlgebra G [Mo] [SLo] [Ko].
+Arguments ConverseIdemSemiRing G [Mo] [SLo] [Co].
+Arguments ConverseKleeneAlgebra G [Mo] [SLo] [Ko] [Co].
 
 
 

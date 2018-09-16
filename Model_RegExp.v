@@ -380,7 +380,7 @@ Module RegExp.
       | e_plus: forall A B x y x' y', @eval A B x x' -> @eval A B y y' -> @eval A B (RegExp.plus x y) (x'+y')
       | e_star: forall A x x', @eval A A x x' -> @eval A A (RegExp.star x) (x'#)
       | e_var: forall i, eval (RegExp.var i) (unpack (val i)).
-      Implicit Arguments eval [].
+      Arguments eval : clear implicits.
       Local Hint Constructors eval.
     
       (** evaluation of erased terms *)
