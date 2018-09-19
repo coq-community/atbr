@@ -298,7 +298,7 @@ Section Props1.
     rewrite sum_enter_left, plus_assoc.
     auto with compat omega.
   Qed.
-  Implicit Arguments sum_cut_nth [].
+  Arguments sum_cut_nth : clear implicits.
   
   Lemma sum_shift d (f: nat -> X A B) i k:
     sum (i+d) k f == sum i k (fun u => f (u+d)%nat).
@@ -420,7 +420,7 @@ Section Props1.
 
 
 End Props1.
-Implicit Arguments sum_cut_nth [[G] [SLo] [SL] A B].
+Arguments sum_cut_nth [G] [SLo] [SL] [A] [B].
 
 
 

@@ -29,7 +29,7 @@ let tc_find env sigma cls = Typeclasses.resolve_one_typeclass env sigma cls
 
 (* creating a name a reference to that name *)
 let fresh_name n env =
-  let vname = Tactics.fresh_id_in_env [] (Names.Id.of_string n) env in
+  let vname = Tactics.fresh_id_in_env Names.Id.Set.empty (Names.Id.of_string n) env in
     vname, mkVar vname 
     
 (* access to Coq constants *)

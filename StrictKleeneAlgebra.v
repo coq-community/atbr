@@ -57,7 +57,7 @@ Class StrictKleeneAlgebra {G: Graph} {Ops: SKA_Ops G} := {
   star_destruct_left: forall A B (a: X A A) (c: X A B), a*c <== c  ->  a#*c <== c;
   star_destruct_right: forall A B (a: X A A) (c: X B A), c*a <== c  ->  c*a# <== c
 }.
-Implicit Arguments StrictKleeneAlgebra [[Ops]].
+Arguments StrictKleeneAlgebra G [Ops].
 
 (** Lifting an equivalence relation to option types  *)
 

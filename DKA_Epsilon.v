@@ -43,7 +43,7 @@ Section fold'.
           | true => fun H => f i a H
           | false => fun _ => a
         end refl_equal) p a.
-  Implicit Arguments stateset_fold [].
+  Arguments stateset_fold : clear implicits.
 
   Lemma bool_dec' : forall a b: bool, a=b \/ a<>b.
   Proof. intros. destruct (bool_dec a b); auto. Qed.
@@ -71,7 +71,7 @@ Section fold'.
       discriminate.
   Qed.
 End fold'.    
-Implicit Arguments stateset_fold [A].
+Arguments stateset_fold [A].
 
 
 Section map_transitive_closure.
@@ -117,7 +117,7 @@ Definition eNFA_to_NFA A (Hwf: eNFA.well_founded A) :=
     (eps initial)
     (StateSet.singleton final)
     max_label.
-Implicit Arguments eNFA_to_NFA [].
+Arguments eNFA_to_NFA : clear implicits.
 
 
 
