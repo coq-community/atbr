@@ -11,7 +11,6 @@
 (*i camlp4deps: "parsing/grammar.cma" i*)
 (*i camlp4use: "pa_extend.cmo" i*)
 
-open API
 open Term
 open EConstr
 open Names
