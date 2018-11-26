@@ -29,7 +29,7 @@ supported_coq_versions:
   opam: '{= "dev"}'
 
 tested_coq_versions:
-- version_or_url: https://github.com/coq/coq/tarball/master
+- version_or_url: https://github.com/coq/coq/tarball/d6a5375460
 
 tested_coq_opam_version: dev
 
