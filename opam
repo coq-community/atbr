@@ -1,0 +1,29 @@
+opam-version: "1.2"
+maintainer: "palmskog@gmail.com"
+
+homepage: "https://github.com/coq-community/atbr"
+dev-repo: "https://github.com/coq-community/atbr.git"
+bug-reports: "https://github.com/coq-community/atbr/issues"
+license: "LGPL3"
+
+build: [make "-j%{jobs}%"]
+install: [make "install"]
+remove: ["rm" "-R" "%{lib}%/coq/user-contrib/ATBR"]
+depends: [
+  "coq" {= "dev"}
+]
+
+tags: [
+  "keyword:Kleene algebra"
+  "keyword:finite automata"
+  "keyword:semiring"
+  "keyword:matrices"
+  "keyword:decision procedure"
+  "keyword:reflexive tactic"
+  "category:Computer Science/Decision Procedures and Certified Algorithms/Decision procedures"
+  "logpath:ATBR"
+]
+authors: [
+  "Thomas Braibant"
+  "Damien Pous"
+]
