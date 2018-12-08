@@ -182,9 +182,10 @@ End Tactics.
   our setting.  *)
 
 
+Require ATBR_Matrices.
 Section Matrices.
 
-  Require Import ATBR_Matrices.
+  Import ATBR_Matrices.
 
   (** Assume an underlying idempotent semi-ring  *)
   Context `{ISR: IdemSemiRing}.
@@ -259,9 +260,10 @@ End Matrices.
      *)
 
 
+Require Model_Relations.
 Section Concrete.
 
-  Require Import Model_Relations.
+  Import Model_Relations.
   Import Load.
   (* the latter line is required in order to register binary relations
      to the typeclass mechanism *)
@@ -297,10 +299,12 @@ End Concrete.
     declared in Model_StdRelations, so that one can use our tactics to
     reason about these.  *)
 
+Require Relations.
+Require Model_StdRelations.
 Section Concrete'.
 
-  Require Import Relations.
-  Require Import Model_StdRelations.
+  Import Relations.
+  Import Model_StdRelations.
   Import Load.
   
   Variable A: Set.

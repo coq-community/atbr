@@ -1,6 +1,11 @@
 -R . ATBR
 -I .
 
+-arg -w -arg +default
+-arg -w -arg -variable-collision
+-arg -w -arg -projection-no-head-constant
+-arg -w -arg -undo-batch-mode
+
 Common.v
 BoolView.v
 MyFSets.v

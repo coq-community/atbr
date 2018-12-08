@@ -279,7 +279,7 @@ Proof.
      eapply proj1 in H. apply apply in H. 2: rewrite StateSetProps.singleton_iff; trivial.
      revert H. StateSetProps.set_iff. intro. psubst. 
      revert H. generalize (statesetelt_of_nat s). intro. num_omega.
-     apply in_classes_empty_below in H. specialize (H (Psucc (state_of_nat s))).
+     apply in_classes_empty_below in H. specialize (H (Pos.succ (state_of_nat s))).
      apply apply in H. num_omega. auto with set.
 Qed.
 
