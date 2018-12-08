@@ -7,14 +7,14 @@ matrix:
   include:
 
   # Test supported versions of Coq
-  - env: COQ=https://github.com/coq/coq/tarball/d6a5375460
+  - env: COQ=8.9
 
   # Test opam package
   - language: minimal
     sudo: required
     services: docker
     env:
-    - COQ_IMAGE=coqorg/coq:dev
+    - COQ_IMAGE=coqorg/coq:8.9
     - CONTRIB_NAME=atbr
     - NJOBS=2
     install: |
