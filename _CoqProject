@@ -1,6 +1,11 @@
 -R . ATBR
 -I .
 
+-arg -w -arg +default
+-arg -w -arg -variable-collision
+-arg -w -arg -projection-no-head-constant
+-arg -w -arg -undo-batch-mode
+
 Common.v
 BoolView.v
 MyFSets.v
@@ -11,7 +16,6 @@ Utils_WF.v
 Force.v
 DisjointSets.v  
 Classes.v
-reification.ml4
 Reification.v
 Functors.v
 Graph.v
@@ -47,3 +51,5 @@ ATBR_Matrices.v
 Examples.v
 ChurchRosser.v
 ChurchRosser_Points_vs_Algebraic.v
+
+reification.ml4

@@ -11,7 +11,7 @@
 (*i camlp4deps: "parsing/grammar.cma" i*)
 (*i camlp4use: "pa_extend.cmo" i*)
 
-open Term
+open Constr
 open EConstr
 open Names
 open Ltac_plugin
@@ -34,7 +34,7 @@ let fresh_name n env =
     
 (* access to Coq constants *)
 let get_const dir s = 
-  lazy (EConstr.of_constr (Universes.constr_of_global (Coqlib.find_reference "ATBR.reification" dir s)))
+  lazy (EConstr.of_constr (UnivGen.constr_of_global (Coqlib.find_reference "ATBR.reification" dir s)))
 
 (* make an application using a lazy value *)
 let force_app f = fun x -> mkApp (Lazy.force f,x)
@@ -350,7 +350,7 @@ let reify_goal ops =
 	  (try 
 	     Tacticals.New.tclTHEN (retype reified)
 	       (Tactics.convert_concl reified DEFAULTcast)
-	   with e -> Feedback.msg_warning (Printer.pr_leconstr reified); raise e)
+	   with e -> Feedback.msg_warning (Printer.pr_leconstr_env env sigma reified); raise e)
 	    
     | _ -> error "unrecognised goal"
   end 	

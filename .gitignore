@@ -1,0 +1,16 @@
+# build output
+.*.aux
+*.vo
+*.glob
+
+# make-related output
+/.coqdeps.d
+/Makefile.coq
+/Makefile.coq.conf
+
+# reification plugin
+*.cmi
+*.cmx
+*.cmxs
+*.ml4.d
+*.o
