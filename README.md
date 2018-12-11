@@ -21,14 +21,17 @@ This library provides algebraic tools for working with binary relations.
 The main tactic provided is a reflexive tactic for solving (in)equations
 in an arbitrary Kleene algebra. The decision procedure goes through
 standard finite automata constructions.
-
 The design and implementation of the library is described in the paper
-[An Efficient Coq Tactic for Deciding Kleene Algebras](https://hal.inria.fr/hal-00383070v3)
+[An Efficient Coq Tactic for Deciding Kleene Algebras][paper]
 (DOI:10.1007/978-3-642-14052-5_13).
 
-Note that the initial authors consider this library to be *superseded*
-by the [Relation Algebra library](https://github.com/damien-pous/relation-algebra),
-which uses derivatives rather than automata.
+Note that the initial authors consider this library to be **superseded**
+by the [Relation Algebra][library] library, which is based on derivatives
+rather than automata.
+
+[paper]: https://hal.inria.fr/hal-00383070v3
+[library]: https://github.com/damien-pous/relation-algebra
+
 
 ## Meta
 
