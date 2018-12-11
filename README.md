@@ -21,6 +21,7 @@ This library provides algebraic tools for working with binary relations.
 The main tactic provided is a reflexive tactic for solving (in)equations
 in an arbitrary Kleene algebra. The decision procedure goes through
 standard finite automata constructions.
+
 The design and implementation of the library is described in the paper
 [An Efficient Coq Tactic for Deciding Kleene Algebras][paper]
 (DOI:10.1007/978-3-642-14052-5_13).
