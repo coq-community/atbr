@@ -18,10 +18,17 @@
 [gitter-link]: https://gitter.im/coq-community/Lobby
 
 This library provides algebraic tools for working with binary relations.
-The main tactic we provide is a reflexive tactic for solving (in)equations
+The main tactic provided is a reflexive tactic for solving (in)equations
 in an arbitrary Kleene algebra. The decision procedure goes through
-standard finite automata constructions, that we formalized.
+standard finite automata constructions.
 
+The design and implementation of the library is described in the paper
+[An Efficient Coq Tactic for Deciding Kleene Algebras](https://hal.inria.fr/hal-00383070v3)
+(DOI:10.1007/978-3-642-14052-5_13).
+
+Note that the initial authors consider this library to be *superseded*
+by the [Relation Algebra library](https://github.com/damien-pous/relation-algebra),
+which uses derivatives rather than automata.
 
 ## Meta
 
@@ -193,10 +200,8 @@ The user can also refer to files `Examples.v` and `ChurchRosser.v`.
 
 ## Acknowledgements
 
-We would like to thank Guilhem Moulin and Sebastien Briais,
-who participated to a preliminary version of this project.
-
-We are also grateful to Assia Mahboubi, Matthieu Sozeau, Bruno Barras,
-and Hugo Herbelin for highly stimulating discussions, as well as
-numerous hints for solving various problems.
+The initial authors would like to thank Guilhem Moulin and Sebastien Briais,
+who participated to a preliminary version of this project. They are also grateful
+to Assia Mahboubi, Matthieu Sozeau, Bruno Barras, and Hugo Herbelin for highly
+stimulating discussions, as well as numerous hints for solving various problems.
 
