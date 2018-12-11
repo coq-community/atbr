@@ -23,7 +23,7 @@ in an arbitrary Kleene algebra. The decision procedure goes through
 standard finite automata constructions.
 
 The design and implementation of the library is described in the paper
-[Deciding Kleene Algebras in Coq][paper] (DOI:10.2168/LMCS-8(1:16)2012).
+[Deciding Kleene Algebras in Coq][paper] (DOI:`10.2168/LMCS-8(1:16)2012`).
 
 Note that the initial authors consider this library to be **superseded**
 by the [Relation Algebra][library] library, which is based on derivatives
