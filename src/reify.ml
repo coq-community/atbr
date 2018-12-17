@@ -18,7 +18,7 @@ let fresh_name n env =
     
 (* access to Coq constants *)
 let get_const dir s = 
-  lazy (EConstr.of_constr (UnivGen.constr_of_global (Coqlib.find_reference "ATBR.reification" dir s)))
+  lazy (EConstr.of_constr (UnivGen.constr_of_monomorphic_global (Coqlib.find_reference "ATBR.reification" dir s)))
 
 (* make an application using a lazy value *)
 let force_app f = fun x -> mkApp (Lazy.force f,x)

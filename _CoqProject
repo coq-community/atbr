@@ -1,13 +1,13 @@
 -R theories ATBR
 -I src
 
--arg -w -arg +default
 -arg -w -arg -variable-collision
 -arg -w -arg -projection-no-head-constant
 -arg -w -arg -undo-batch-mode
+-arg -w -arg -undeclared-scope
 
 src/reify.ml
-src/reification.ml4
+src/reification.mlg
 src/reification_plugin.mlpack
 
 theories/Common.v

@@ -10,9 +10,13 @@
 
 DECLARE PLUGIN "reification_plugin"
 
+{
+
 open Ltac_plugin
 open Reify
 
+}
+
 (* tactic grammar entries *)
-TACTIC EXTEND kleene_reify [ "kleene_reify" ] -> [ reify_goal Reify.Reification.KA.ops ] END
-TACTIC EXTEND semiring_reify [ "semiring_reify" ] -> [ reify_goal Reify.Reification.Semiring.ops ] END
+TACTIC EXTEND _kleene_reify_ | [ "kleene_reify" ] -> { reify_goal Reify.Reification.KA.ops } END
+TACTIC EXTEND _semiring_reify_ | [ "semiring_reify" ] -> { reify_goal Reify.Reification.Semiring.ops } END
