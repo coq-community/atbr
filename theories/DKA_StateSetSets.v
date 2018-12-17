@@ -86,7 +86,7 @@ Lemma compat_split s: compat_bool StateSet.Equal (fun p => StateSet.mem s p).
 Proof. intros ? ? H. rewrite H. trivial. Qed.
 Lemma compat_negsplit s: compat_bool StateSet.Equal (fun p => negb (StateSet.mem s p)).
 Proof. intros ? ? H. rewrite H. trivial. Qed.
-Local Hint Resolve compat_split compat_negsplit.
+Local Hint Resolve compat_split compat_negsplit : core.
 
 Ltac solve_p1 := intros ? ? H'; rewrite H'; reflexivity.
 

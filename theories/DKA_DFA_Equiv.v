@@ -258,7 +258,7 @@ Section correctness.
     rewrite <- DS.sameclass_equiv.  
     rewrite H; reflexivity.
   Qed.
-  Hint Resolve tarjan_equiv_true.
+  Hint Resolve tarjan_equiv_true : core.
 
   Lemma invariant_prog : forall tarjan x y,
     invariant tarjan ->
