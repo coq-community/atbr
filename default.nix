@@ -15,7 +15,7 @@ pkgs.stdenv.mkDerivation {
 
   name = "atbr";
 
-  buildInputs = with coq.ocamlPackages; [ ocaml findlib camlp5 ]
+  buildInputs = with coq.ocamlPackages; [ ocaml findlib ]
     ++ pkgs.lib.optionals shell [ merlin ocp-indent ocp-index ];
 
   propagatedBuildInputs = [

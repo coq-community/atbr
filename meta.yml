@@ -35,13 +35,13 @@ license:
 plugin: true
 
 supported_coq_versions:
-  text: Coq 8.9 (use the corresponding branch or release for other Coq versions)
-  opam: '{>= "8.9" & < "8.10~"}'
+  text: Coq master (use the corresponding branch or release for other Coq versions)
+  opam: '{= "dev"}'
 
 tested_coq_versions:
-- version_or_url: 8.9
+- version_or_url: https://github.com/coq/coq/tarball/master
 
-tested_coq_opam_version: 8.9
+tested_coq_opam_version: dev
 
 namespace: ATBR
 

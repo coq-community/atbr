@@ -41,7 +41,7 @@ rather than automata.
 - Coq-community maintainer(s):
   - Tej Chajed ([**@tchajed**](https://github.com/tchajed))
 - License: [GNU Lesser General Public License v3](LICENSE)
-- Compatible Coq versions: Coq 8.9 (use the corresponding branch or release for other Coq versions)
+- Compatible Coq versions: Coq master (use the corresponding branch or release for other Coq versions)
 - Compatible OCaml versions: all versions supported by Coq
 - Additional dependencies: none
 
