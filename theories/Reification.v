@@ -99,4 +99,4 @@ Module KA.
   End S.
 End KA.    
 
-Declare ML Module "reification". 
+Declare ML Module "reification_plugin". 

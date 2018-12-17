@@ -6,6 +6,10 @@
 -arg -w -arg -projection-no-head-constant
 -arg -w -arg -undo-batch-mode
 
+src/reify.ml
+src/reification.ml4
+src/reification_plugin.mlpack
+
 theories/Common.v
 theories/BoolView.v
 theories/MyFSets.v
@@ -51,5 +55,3 @@ theories/ATBR_Matrices.v
 theories/Examples.v
 theories/ChurchRosser.v
 theories/ChurchRosser_Points_vs_Algebraic.v
-
-src/reification.ml4
