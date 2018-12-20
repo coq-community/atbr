@@ -23,7 +23,7 @@ Lemma plus_neutral_right `{SemiLattice} A B: forall (x: X A B), x+0 == x.
 Proof. intros. rewrite plus_com; apply plus_neutral_left. Qed.
 
 (** Hints  *)
-Hint Extern 0 (leq _ _ _ _) => apply leq_refl.
+Hint Extern 0 (leq _ _ _ _) => apply leq_refl : core.
 
 Hint Extern 0 (equal _ _ _ _) => first [
     apply plus_assoc

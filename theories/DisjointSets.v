@@ -31,8 +31,6 @@ Require Import MyFSets.
 Require Import BoolView.
 Require Import Numbers.
 
-Local Unset Standard Proposition Elimination Names.
-
 Module Type DISJOINTSETS (N : NUM).
   Import N.
 
@@ -356,7 +354,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
       inversion 1; auto. 
     Qed. 
     
-    Hint Resolve repr_inv_In DO_inv_In.   
+    Hint Resolve repr_inv_In DO_inv_In : core.
     
     Lemma D_repr : forall x, D t x O <-> repr t x x. 
     Proof.
@@ -408,7 +406,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
       ]. 
   Qed.
   
-  Hint Resolve repr_idem DO_inv_In D_inv_n repr_D D_update update_In repr_inv_In.
+  Hint Resolve repr_idem DO_inv_In D_inv_n repr_D D_update update_In repr_inv_In : core.
   Lemma FEquiv_D : forall t t', FEquiv t t' -> (forall x, D t x O <-> D t' x O).
   Proof. 
     intros . unfold FEquiv in H.
@@ -567,7 +565,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
       apply repr_inv_In in repr_b. firstorder.
       eapply rsucc. 2 : eapply IHrepr; auto. map_iff. auto. 
     Qed.
-    Hint Resolve repr_x_inv_upd repr_inv_upd link_lemma_1 link_lemma_2 repr_update_fwd.
+    Hint Resolve repr_x_inv_upd repr_inv_upd link_lemma_1 link_lemma_2 repr_update_fwd : core.
     
     Lemma link_main_lemma :
       forall x y,
@@ -661,7 +659,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
   Section WF.
     Definition IsWF t : Prop := bounded (p t) (size t).
     Class WF t: Prop := { wf : IsWF t }.
-    Hint Constructors WF.
+    Hint Constructors WF : core.
   
     Inductive find_spec_decl t x : (num * T) -> Type :=
     | find_spec_1 : forall rx t'
@@ -997,51 +995,40 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
     intros  t Hwf x y.
     
     split; intros.
-    Focus 1.
-    
-    destruct H as [z H H'].
-    
-    assert (Hx := class_of_In_repr _ _ H).
-    assert (Hy := class_of_In_repr _ _ H').
-    
-    
-    
-    revert Hx Hy; unfold class_of; NumSetProps.set_iff; num_prop. intros [? |?] [? |?]; subst; auto.
-    clear H.
-    assert (h'' := class_of_In_repr' _ _ H'). unfold class_of in h''. revert h''. NumSetProps.set_iff. num_prop. intuition.
-    
-    rewrite <- (class_of_Equal_repr _ _ H').  auto.
+    - destruct H as [z H H'].
 
-    Focus 1.
-    unfold class_of in H.
-    unfold class_of', class_of in H.
+      assert (Hx := class_of_In_repr _ _ H).
+      assert (Hy := class_of_In_repr _ _ H').
+
+      revert Hx Hy; unfold class_of; NumSetProps.set_iff; num_prop. intros [? |?] [? |?]; subst; auto.
+      clear H.
+      assert (h'' := class_of_In_repr' _ _ H'). unfold class_of in h''. revert h''. NumSetProps.set_iff. num_prop. intuition.
     
-    revert H. NumSetProps.set_iff. num_prop. intros [? |?]. subst.  reflexivity.
+      rewrite <- (class_of_Equal_repr _ _ H').  auto.
+
+    - unfold class_of in H.
+      unfold class_of', class_of in H.
     
-    induction (p t) using Z.map_induction_max.
-    assert (H1 := NumMap_Equal_Empty_empty _ t0 H0).    
-    setoid_rewrite (Z.fold_Equal _ _ _ H1) in H .
+      revert H. NumSetProps.set_iff. num_prop. intros [? |?]. subst.  reflexivity.
     
-    rewrite (NumMapProps.fold_Empty (eqA := NumSet.Equal)) in H; ti_auto. 
-    clear - H Hwf.  revert H. NumSetProps.set_iff. num_prop. intuition. subst.
-
-    auto with map.
-
+      induction (p t) using Z.map_induction_max.
+      * assert (H1 := NumMap_Equal_Empty_empty _ t0 H0).
+        setoid_rewrite (Z.fold_Equal _ _ _ H1) in H .
     
-    erewrite (Z.fold_Add_Above (eqA := NumSet.Equal)) in H; ti_auto.
-    2 :  repeat intro; subst; destruct (fst (equiv t y y0) && fst (equiv t y y1)); try NumSetProps.setdec. 
+        rewrite (NumMapProps.fold_Empty (eqA := NumSet.Equal)) in H; ti_auto. 
+        clear - H Hwf.  revert H. NumSetProps.set_iff. num_prop. intuition. subst.
 
-     case_eq (fst (equiv t y x0) && (fst (equiv t y e))); intros; cbn in *; rewrite H2 in *.
-     2 :apply IHt0_1; auto.
+        auto with map.
+    
+      * erewrite (Z.fold_Add_Above (eqA := NumSet.Equal)) in H; ti_auto.
+        2 :  repeat intro; subst; destruct (fst (equiv t y y0) && fst (equiv t y y1)); try NumSetProps.setdec. 
+        case_eq (fst (equiv t y x0) && (fst (equiv t y e))); intros; cbn in *; rewrite H2 in *.
+        2 :apply IHt0_1; auto.
+        revert H. NumSetProps.set_iff; num_prop. intros [? | [? | ?]]; num_prop; subst. 
 
-
-
-     revert H. NumSetProps.set_iff; num_prop. intros [? | [? | ?]]; num_prop; subst. 
-
-     clear - H2 Hwf.  bool_connectors; rewrite sameclass_equiv in H2;try symmetry; auto.  intuition.
-     clear - H2 Hwf.  bool_connectors; rewrite 2 sameclass_equiv in H2;try symmetry; auto.  intuition.
-     
-     apply IHt0_1. auto.
+        + clear - H2 Hwf.  bool_connectors; rewrite sameclass_equiv in H2;try symmetry; auto.  intuition.
+        + clear - H2 Hwf.  bool_connectors; rewrite 2 sameclass_equiv in H2;try symmetry; auto.  intuition.
+        + apply IHt0_1. auto.
    Qed.
 
   End protect.

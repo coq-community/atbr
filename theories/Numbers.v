@@ -132,7 +132,7 @@ Module NumUtils (N : NUM).
   Instance le_preorder: PreOrder le.
   Proof.
     constructor.
-    intros x; unfold Ple. rewrite le_nat_spec. auto with arith.
+    intros x; unfold Pos.le. rewrite le_nat_spec. auto with arith.
     intros x y z Hxy Hyz. rewrite le_nat_spec in *. apply (le_trans _ (nat_of_num y)); auto. 
   Qed.
 
@@ -295,8 +295,8 @@ Module Positive <: NUM.
   Definition num := positive.
   Definition nat_of_num n := pred (nat_of_P n).
   Definition num_of_nat := P_of_succ_nat.
-  Definition le := Ple.
-  Definition lt := Plt.
+  Definition le := Pos.le.
+  Definition lt := Pos.lt.
   Definition compare := Pos.compare.
 
   Definition leb (n m: num) := 
@@ -311,8 +311,8 @@ Module Positive <: NUM.
     end.
   Definition eqb := eq_pos_bool.
 
-  Definition S := Psucc.
-  Definition max := Pmax.
+  Definition S := Pos.succ.
+  Definition max := Pos.max.
   Definition fold_num T (f: num -> T -> T) :=
     Prect (fun _ => T -> T) (fun acc => acc) (fun a aux acc => aux (f a acc)).
 
@@ -338,7 +338,7 @@ Module Positive <: NUM.
       unfold nat_of_num.
       pattern n.
       apply Pcase. simpl. reflexivity.
-      clear n. intros n. replace (nat_of_P (Psucc n)) with (Datatypes.S (nat_of_P n)). simpl.
+      clear n. intros n. replace (nat_of_P (Pos.succ n)) with (Datatypes.S (nat_of_P n)). simpl.
       apply P_of_succ_nat_o_nat_of_P_eq_succ.
       symmetry; apply nat_of_P_succ_morphism.
   Qed.
@@ -359,17 +359,17 @@ Module Positive <: NUM.
   Proof.  
     intros n m; unfold leb.
     case_eq (Pos.compare n m); intro H; try constructor.
-    apply Pcompare_Eq_eq in H. subst.  unfold le,Ple,Pos.compare. rewrite Pcompare_refl. intro; discriminate.
-    unfold le. unfold Ple. rewrite H. intro; discriminate.
-    apply ZC1 in H. unfold le, Ple. apply ZC2 in H. rewrite H. intro. tauto_false.
+    apply Pcompare_Eq_eq in H. subst.  unfold le,Pos.le,Pos.compare. rewrite Pcompare_refl. intro; discriminate.
+    unfold le. unfold Pos.le. rewrite H. intro; discriminate.
+    apply ZC1 in H. unfold le, Pos.le. apply ZC2 in H. rewrite H. intro. tauto_false.
   Qed.
   Lemma lt_spec : forall n m, reflect (lt n m) (ltb n m).
   Proof. 
     intros n m; unfold ltb.
     case_eq (Pos.compare n m); intro H; try constructor.
-    intro H'. apply Pcompare_Eq_eq in H. subst. refine (Plt_irrefl _ H').
+    intro H'. apply Pcompare_Eq_eq in H. subst. refine (Pos.lt_irrefl _ H').
     auto.
-    intro H'. apply ZC1 in H. assert (H'' := Plt_trans _ _ _ H H'). refine (Plt_irrefl _ H''). 
+    intro H'. apply ZC1 in H. assert (H'' := Pos.lt_trans _ _ _ H H'). refine (Pos.lt_irrefl _ H''). 
   Qed.
   Definition eq_spec := eq_pos_spec.
   Lemma compare_spec : forall n m, compare_spec eq lt n m (compare n m). 
@@ -398,7 +398,7 @@ Module Positive <: NUM.
     assert (Hy := lt_O_nat_of_P y).
 
     split; intro H.
-      assert (H' : ~nat_of_P x > nat_of_P y). unfold Ple in H. intro H'. 
+      assert (H' : ~nat_of_P x > nat_of_P y). unfold Pos.le in H. intro H'. 
       apply H.
       apply nat_of_P_gt_Gt_compare_complement_morphism. auto. 
       unfold nat_of_num .
@@ -430,7 +430,7 @@ Module Positive <: NUM.
 
   Lemma max_spec : forall n m, nat_of_num (max n m) = Max.max (nat_of_num n) (nat_of_num m).
   Proof.
-    intros n m. unfold max, Pmax. fold (compare n m). destruct (compare_spec n m).
+    intros n m. unfold max, Pos.max. fold (compare n m). destruct (compare_spec n m).
      rewrite Max.max_r; trivial. apply lt_le_weak. rewrite <- lt_nat_spec. assumption.
      subst. rewrite Max.max_r; trivial. 
      rewrite Max.max_l; trivial. apply lt_le_weak. rewrite <- lt_nat_spec. assumption.
@@ -484,7 +484,7 @@ Module Positive <: NUM.
       | k'~0 => k'*Pdouble_minus_one k'+i
       | k'~1 => k'*k+i
     end.
-  Definition enc i j := triangle (Ppred (i+j)) i.
+  Definition enc i j := triangle (Pos.pred (i+j)) i.
   Fixpoint code (x: NumSet.t): num :=
     match x with
       | NumSet'.Leaf => 1
@@ -499,7 +499,7 @@ Module Positive <: NUM.
             end); subst.
 
   (* and this hints to automatically prove some trivial facts, by reflexivity *)
-  Hint Extern 0 (Pos_as_OTA.compare _ _ = Eq) => apply Pos_as_OT.eq_refl.
+  Hint Extern 0 (Pos_as_OTA.compare _ _ = Eq) => apply Pos_as_OT.eq_refl : core.
 
   Lemma pcompare_prop: forall x y, Pos_as_OTA.compare x y = Eq <-> x = y. 
   Proof. intros. intuition; psubst; trivial. Qed. 

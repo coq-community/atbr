@@ -164,11 +164,11 @@ Module Algebraic.
   Proof. intros. apply belong_add. trivial. Qed.
   Lemma belong_add_var: forall i j n A s, belong s A -> belong s (add_var i j n A).
   Proof. intros. apply belong_add. trivial. Qed.
-  Local Hint Resolve belong_incr belong_incr' belong_add belong_add_one belong_add_var.
+  Local Hint Resolve belong_incr belong_incr' belong_add belong_add_one belong_add_var : core.
 
   Lemma belong_build: forall a i j A s, belong s A -> belong s (build a i j A).
   Proof. induction a; simpl; intros; auto. Qed.
-  Local Hint Resolve belong_build.
+  Local Hint Resolve belong_build : core.
 
   Lemma add_comm : forall a b i f s t M, add a i f (add b s t M) [=0=] add b s t (add a i f M).
   Proof.
@@ -434,11 +434,11 @@ Module Correctness.
   Proof. intros. destruct A. assumption. Qed.
   Lemma belong_add_var: forall i j n A s, belong s A -> belong s (add_var i j n A).
   Proof. intros. destruct A. assumption. Qed.
-  Local Hint Resolve belong_incr belong_incr' belong_add_one belong_add_var.
+  Local Hint Resolve belong_incr belong_incr' belong_add_one belong_add_var : core.
 
   Lemma belong_build: forall a i j A s, belong s A -> belong s (build a i j A).
   Proof. induction a; simpl; intros; auto. Qed.
-  Local Hint Resolve belong_build.
+  Local Hint Resolve belong_build : core.
   
   Lemma epsilonbrel_add_one: forall i j A s t, 
     epsilonbrel (add_one i j A) s t = epsilonbrel A s t || eq_state_bool i s && eq_state_bool j t.
@@ -527,11 +527,11 @@ Module Correctness.
      destruct A. simpl. num_simpl. apply Max.le_max_l.
      destruct A. simpl. auto.
   Qed.
-  Local Hint Resolve bounded_incr bounded_add_one bounded_add_var.
+  Local Hint Resolve bounded_incr bounded_add_one bounded_add_var : core.
 
   Lemma bounded_build: forall a i j A, belong i A -> belong j A -> bounded A -> bounded (build a i j A).
   Proof. induction a; simpl; intros; auto. Qed.
-  Local Hint Resolve bounded_build.
+  Local Hint Resolve bounded_build : core.
 
   Lemma bounded_empty: bounded empty.
   Proof.
@@ -751,7 +751,7 @@ Transparent equal.
     end.
      
 
-  Local Hint Constructors non_strict.
+  Local Hint Constructors non_strict : core.
   Lemma epsilon_rt_build: forall a i j A s t, 
     bounded A ->
     belong i A -> belong j A ->

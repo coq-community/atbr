@@ -110,15 +110,15 @@ Section leq.
 End leq.
 
 
-Hint Resolve @equal_refl.
-Hint Immediate @equal_sym.
+Hint Resolve @equal_refl : core.
+Hint Immediate @equal_sym : core.
  
 (* BUG : If we add [equal_refl_fit] as hints, they are added as eapply ...*)
 
-Hint Resolve @equal_refl_f1 @equal_refl_f2.
+Hint Resolve @equal_refl_f1 @equal_refl_f2 : core.
 (* Hint Resolve @equal_refl_f1t @equal_refl_f2t *)
 
-Hint Extern 1 (equal ?A ?B (?f (_: nat) ?t) (?f _ ?t)) => apply @equal_refl_f1t.
-Hint Extern 2 (equal ?A ?B (?f (_: nat) (_: nat) ?t) (?f _ _ ?t)) => apply @equal_refl_f2t.  
+Hint Extern 1 (equal ?A ?B (?f _ ?t) (?f _ ?t)) => apply @equal_refl_f1t : core.
+Hint Extern 2 (equal ?A ?B (?f _ _ ?t) (?f _ _ ?t)) => apply @equal_refl_f2t : core.
 
-Hint Extern 3 (_ == _) => apply @xif_compat.
+Hint Extern 3 (_ == _) => apply @xif_compat : core.

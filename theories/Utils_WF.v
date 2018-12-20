@@ -215,8 +215,9 @@ End powerfix.
 
 (** Another way to construct well-founded relations: start with a well-founded one (e.g., the empty one), 
    and progressively add pairs satisfying some acyclicity property w.r.t. the current relation *)
+Require Relations.
 Section add_pair.
-  Require Import Relations.
+  Import Relations.
 
   Variable T: Set.
   Definition add_pair i j R: relation T := fun s t => s=i /\ t=j \/ R s t.

@@ -4,9 +4,19 @@ shortname: atbr
 
 description: |
   This library provides algebraic tools for working with binary relations.
-  The main tactic we provide is a reflexive tactic for solving (in)equations
+  The main tactic provided is a reflexive tactic for solving (in)equations
   in an arbitrary Kleene algebra. The decision procedure goes through
-  standard finite automata constructions, that we formalized.
+  standard finite automata constructions.
+
+  The design and implementation of the library is described in the paper
+  [Deciding Kleene Algebras in Coq][paper] (DOI:`10.2168/LMCS-8(1:16)2012`).
+  
+  Note that the initial authors consider this library to be **superseded**
+  by the [Relation Algebra][library] library, which is based on derivatives
+  rather than automata.
+
+  [paper]: https://arxiv.org/abs/1105.4537
+  [library]: https://github.com/damien-pous/relation-algebra
 
 authors:
 - name: Thomas Braibant
@@ -20,7 +30,7 @@ maintainers:
 
 license:
   fullname: GNU Lesser General Public License v3
-  shortname: LGPL3
+  shortname: LGPL 3
 
 plugin: true
 
@@ -29,7 +39,7 @@ supported_coq_versions:
   opam: '{= "dev"}'
 
 tested_coq_versions:
-- version_or_url: https://github.com/coq/coq/tarball/d6a5375460
+- version_or_url: https://github.com/coq/coq/tarball/master
 
 tested_coq_opam_version: dev
 
@@ -43,7 +53,9 @@ keywords:
 - name: decision procedure
 - name: reflexive tactic
 
-category: Computer Science/Decision Procedures and Certified Algorithms/Decision procedures
+categories:
+- name: Miscellaneous/Coq Extensions
+- name: Computer Science/Decision Procedures and Certified Algorithms/Decision procedures
 
 documentation: |
   ## Documentation
@@ -182,10 +194,8 @@ documentation: |
 
   ## Acknowledgements
 
-  We would like to thank Guilhem Moulin and Sebastien Briais,
-  who participated to a preliminary version of this project.
-
-  We are also grateful to Assia Mahboubi, Matthieu Sozeau, Bruno Barras,
-  and Hugo Herbelin for highly stimulating discussions, as well as
-  numerous hints for solving various problems.
+  The initial authors would like to thank Guilhem Moulin and Sebastien Briais,
+  who participated to a preliminary version of this project. They are also grateful
+  to Assia Mahboubi, Matthieu Sozeau, Bruno Barras, and Hugo Herbelin for highly
+  stimulating discussions, as well as numerous hints for solving various problems.
 ---

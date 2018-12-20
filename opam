@@ -4,7 +4,7 @@ maintainer: "palmskog@gmail.com"
 homepage: "https://github.com/coq-community/atbr"
 dev-repo: "https://github.com/coq-community/atbr.git"
 bug-reports: "https://github.com/coq-community/atbr/issues"
-license: "LGPL3"
+license: "LGPL 3"
 
 build: [make "-j%{jobs}%"]
 install: [make "install"]
@@ -20,6 +20,7 @@ tags: [
   "keyword:matrices"
   "keyword:decision procedure"
   "keyword:reflexive tactic"
+  "category:Miscellaneous/Coq Extensions"
   "category:Computer Science/Decision Procedures and Certified Algorithms/Decision procedures"
   "logpath:ATBR"
 ]

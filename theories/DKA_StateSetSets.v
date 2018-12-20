@@ -86,7 +86,7 @@ Lemma compat_split s: compat_bool StateSet.Equal (fun p => StateSet.mem s p).
 Proof. intros ? ? H. rewrite H. trivial. Qed.
 Lemma compat_negsplit s: compat_bool StateSet.Equal (fun p => negb (StateSet.mem s p)).
 Proof. intros ? ? H. rewrite H. trivial. Qed.
-Local Hint Resolve compat_split compat_negsplit.
+Local Hint Resolve compat_split compat_negsplit : core.
 
 Ltac solve_p1 := intros ? ? H'; rewrite H'; reflexivity.
 
@@ -279,7 +279,7 @@ Proof.
      eapply proj1 in H. apply apply in H. 2: rewrite StateSetProps.singleton_iff; trivial.
      revert H. StateSetProps.set_iff. intro. psubst. 
      revert H. generalize (statesetelt_of_nat s). intro. num_omega.
-     apply in_classes_empty_below in H. specialize (H (Psucc (state_of_nat s))).
+     apply in_classes_empty_below in H. specialize (H (Pos.succ (state_of_nat s))).
      apply apply in H. num_omega. auto with set.
 Qed.
 

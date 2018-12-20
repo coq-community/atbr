@@ -1,0 +1,58 @@
+-R theories ATBR
+-I src
+
+-arg -w -arg +default
+-arg -w -arg -variable-collision
+-arg -w -arg -projection-no-head-constant
+-arg -w -arg -undo-batch-mode
+-arg -w -arg -undeclared-scope
+
+src/reify.ml
+src/reification.mlg
+src/reification_plugin.mlpack
+
+theories/Common.v
+theories/BoolView.v
+theories/MyFSets.v
+theories/MyFSetProperties.v
+theories/MyFMapProperties.v
+theories/Numbers.v
+theories/Utils_WF.v
+theories/Force.v
+theories/DisjointSets.v  
+theories/Classes.v
+theories/Reification.v
+theories/Functors.v
+theories/Graph.v
+theories/SemiLattice.v
+theories/Monoid.v
+theories/SemiRing.v
+theories/KleeneAlgebra.v
+theories/Converse.v
+theories/Model_Relations.v
+theories/Model_StdRelations.v
+theories/Model_Languages.v
+theories/Model_RegExp.v
+theories/Model_MinPlus.v
+theories/StrictStarForm.v
+theories/MxGraph.v
+theories/MxSemiLattice.v
+theories/MxSemiRing.v
+theories/MxKleeneAlgebra.v
+theories/MxFunctors.v
+theories/DKA_Definitions.v
+theories/DKA_StateSetSets.v
+theories/DKA_CheckLabels.v
+theories/DKA_Construction.v
+theories/DKA_Epsilon.v
+theories/DKA_Determinisation.v
+theories/DKA_Merge.v
+theories/DKA_DFA_Language.v
+theories/DKA_DFA_Equiv.v
+theories/DecideKleeneAlgebra.v
+theories/StrictKleeneAlgebra.v
+theories/ATBR.v
+theories/ATBR_Matrices.v
+theories/Examples.v
+theories/ChurchRosser.v
+theories/ChurchRosser_Points_vs_Algebraic.v
