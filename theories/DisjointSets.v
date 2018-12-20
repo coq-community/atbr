@@ -354,7 +354,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
       inversion 1; auto. 
     Qed. 
     
-    Hint Resolve repr_inv_In DO_inv_In.   
+    Hint Resolve repr_inv_In DO_inv_In : core.
     
     Lemma D_repr : forall x, D t x O <-> repr t x x. 
     Proof.
@@ -406,7 +406,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
       ]. 
   Qed.
   
-  Hint Resolve repr_idem DO_inv_In D_inv_n repr_D D_update update_In repr_inv_In.
+  Hint Resolve repr_idem DO_inv_In D_inv_n repr_D D_update update_In repr_inv_In : core.
   Lemma FEquiv_D : forall t t', FEquiv t t' -> (forall x, D t x O <-> D t' x O).
   Proof. 
     intros . unfold FEquiv in H.
@@ -565,7 +565,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
       apply repr_inv_In in repr_b. firstorder.
       eapply rsucc. 2 : eapply IHrepr; auto. map_iff. auto. 
     Qed.
-    Hint Resolve repr_x_inv_upd repr_inv_upd link_lemma_1 link_lemma_2 repr_update_fwd.
+    Hint Resolve repr_x_inv_upd repr_inv_upd link_lemma_1 link_lemma_2 repr_update_fwd : core.
     
     Lemma link_main_lemma :
       forall x y,
@@ -659,7 +659,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
   Section WF.
     Definition IsWF t : Prop := bounded (p t) (size t).
     Class WF t: Prop := { wf : IsWF t }.
-    Hint Constructors WF.
+    Hint Constructors WF : core.
   
     Inductive find_spec_decl t x : (num * T) -> Type :=
     | find_spec_1 : forall rx t'

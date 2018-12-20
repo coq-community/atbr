@@ -1,22 +1,6 @@
-(**************************************************************************)
-(*  This is part of ATBR, it is distributed under the terms of the        *)
-(*         GNU Lesser General Public License version 3                    *)
-(*              (see file LICENSE for more details)                       *)
-(*                                                                        *)
-(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
-(**************************************************************************)
-
-(** Generic reification, for the classes from [Classes.v] to the inductives from [Reification.v] *)
-
-(*i camlp4deps: "parsing/grammar.cma" i*)
-(*i camlp4use: "pa_extend.cmo" i*)
-
 open Constr
 open EConstr
 open Names
-open Ltac_plugin
-
-DECLARE PLUGIN "reification"
 
 (* pick an element in an hashtbl *)
 let hashtbl_pick t = Hashtbl.fold (fun i x -> function None -> Some (i,x) | acc -> acc) t None
@@ -205,7 +189,7 @@ module Tbl : sig
      yielding elements of type [typ], with [def] as default value *)
   val to_env: t -> constr -> constr -> constr
 end = struct
-  type t = ref ((constr*constr*constr) list * int)
+  type t = ((constr*constr*constr) list * int) ref
 
   let create () = ref([],1)
 
@@ -353,8 +337,4 @@ let reify_goal ops =
 	   with e -> Feedback.msg_warning (Printer.pr_leconstr_env env sigma reified); raise e)
 	    
     | _ -> error "unrecognised goal"
-  end 	
-
-(* tactic grammar entries *)
-TACTIC EXTEND kleene_reify [ "kleene_reify" ] -> [ reify_goal Reification.KA.ops ] END
-TACTIC EXTEND semiring_reify [ "semiring_reify" ] -> [ reify_goal Reification.Semiring.ops ] END
+  end

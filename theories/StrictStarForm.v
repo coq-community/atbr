@@ -221,8 +221,8 @@ Ltac kleene_ssf := kleene_normalize_ ssf_correct'.
 
 (** below: completeness of the rewriting procedure *)
 
-Local Hint Constructors strict_star_form.
-Local Hint Constructors strict.
+Local Hint Constructors strict_star_form : core.
+Local Hint Constructors strict : core.
 
 Lemma remove_nf: forall a, strict_star_form a -> strict_star_form (remove a).
 Proof.
@@ -247,7 +247,7 @@ Proof.
   destruct (contains_one a1); auto. 
   destruct (contains_one a1); auto. discriminate.
 Qed.
-Local Hint Resolve contains_one_false_strict.
+Local Hint Resolve contains_one_false_strict : core.
 
 Lemma remove_strict: forall a, strict_star_form a -> RegExp.is_one (remove a) = false -> strict (remove a).
 Proof.

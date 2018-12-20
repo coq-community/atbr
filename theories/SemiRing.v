@@ -235,8 +235,8 @@ endtests*)
     Lemma equal_refl: forall x, equal x x.
     Proof. induction x; constructor; assumption. Qed.
   
-    Local Hint Constructors equal.
-    Local Hint Resolve equal_refl.
+    Local Hint Constructors equal : core.
+    Local Hint Resolve equal_refl : core.
   
     Instance equivalence_equal: Equivalence equal.
     Proof. 
@@ -465,7 +465,7 @@ endtests*)
     Proof. 
       induction x; constructor; assumption.
     Qed.
-    Local Hint Resolve sequal_refl.
+    Local Hint Resolve sequal_refl : core.
     
     Lemma sequal_clean_zero_equiv x : sequal (clean0 x) zero -> is_zero (clean0 x) = true.
     Proof.
@@ -522,7 +522,7 @@ endtests*)
     | e_plus: forall A B x y x' y', @eval A B x x' -> @eval A B y y' -> @eval A B (U.plus x y) (x'+y')
     | e_var: forall i, eval (U.var i) (unpack (val i)).
     Arguments eval : clear implicits.
-    Local Hint Constructors eval.
+    Local Hint Constructors eval : core.
 
     (** evaluation of erased terms *)
     Lemma eval_erase_feval: forall n m a, eval n m (erase a) (feval a).

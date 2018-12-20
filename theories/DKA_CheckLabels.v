@@ -86,7 +86,7 @@ Qed.
 Lemma NumSetEqual_refl: forall x, x [=] x.
 Proof. reflexivity. Qed.
 
-Local Hint Resolve collect_compat' collect_idem collect_com NumSetEqual_refl.
+Local Hint Resolve collect_compat' collect_idem collect_com NumSetEqual_refl : core.
 
 Notation clean := RegExp.Clean.rewrite.
 

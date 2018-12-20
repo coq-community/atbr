@@ -321,8 +321,8 @@ Module RegExp.
     Proof. 
       induction x; constructor; assumption.
     Qed.
-    Local Hint Resolve sequal_refl.
-    Local Hint Constructors sequal.
+    Local Hint Resolve sequal_refl : core.
+    Local Hint Constructors sequal : core.
     
     Lemma sequal_clean_zero_equiv x : sequal (clean x) zero -> is_zero (clean x) = true.
     Proof.
@@ -381,7 +381,7 @@ Module RegExp.
       | e_star: forall A x x', @eval A A x x' -> @eval A A (RegExp.star x) (x'#)
       | e_var: forall i, eval (RegExp.var i) (unpack (val i)).
       Arguments eval : clear implicits.
-      Local Hint Constructors eval.
+      Local Hint Constructors eval : core.
     
       (** evaluation of erased terms *)
       Lemma eval_erase_feval: forall n m a, eval n m (erase a) (feval a).
