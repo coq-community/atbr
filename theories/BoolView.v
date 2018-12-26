@@ -40,6 +40,7 @@ Require Import Equality Program Sumbool Peano.
                                (* analyse *)
                                (***********)
 
+#[universes(template)]
 Class Type_View {A} (f : A) := { 
   type_view_ty : Type; 
   type_view : type_view_ty 

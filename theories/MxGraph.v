@@ -25,6 +25,7 @@ Section Defs.
   Notation X := (X A A).
 
   (** [n] and [m] are phantom types, a matrix is a function from two [nat] to X *)
+  #[universes(template)]
   Inductive MX (n m: nat) := 
     box: (nat -> nat -> X) -> MX n m.
 

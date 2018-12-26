@@ -16,6 +16,7 @@ Require Import KleeneAlgebra.
 Set Implicit Arguments.
 Unset Strict Implicit.
 
+#[universes(template)]
 Record functor (G1 G2: Graph) := {
   fT: @T G1 -> @T G2;
   fX:> forall A B, X A B -> X (fT A) (fT B)

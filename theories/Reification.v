@@ -29,9 +29,11 @@ Definition sigma_empty := @PositiveMap.empty.
 
 
 (* packaged typed values *)
+#[universes(template)]
 Record Pack {G: Graph} typ := pack { src_p: positive; tgt_p: positive; unpack: X (typ src_p) (typ tgt_p) }.
 
 (* Value environment *)
+#[universes(template)]
 Class Env {G: Graph} := env { typ: positive -> T; val: positive -> Pack typ }.
 
 (* acces to domain/codomain informations *)

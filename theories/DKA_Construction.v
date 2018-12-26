@@ -46,6 +46,7 @@ Unset Printing Implicit Defensive.
 (** Algebraic, not really efficient, presentation of the construction algorithm *)
 Module Algebraic.
 
+  #[universes(template)]
   Record pre_MAUT := mk {
     size: nat;
     delta: KMX size size 
@@ -334,6 +335,7 @@ Definition statelabelmap_set_to_fun d := fun ia => optionset_to_set (StateLabelM
 
 Module Concrete.
 
+  #[universes(template)]
   Record pre_eNFA := mk {
     size:       state;                  (** next fresh state (= size) *)
     epsilonmap: statemap stateset;      (** epsilon-transitions *)

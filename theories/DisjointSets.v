@@ -229,7 +229,8 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
   Notation "M '[' key ']' " := (NumMap.find key M)(at level 0, no associativity).
   Notation "M '[' key '>-' v ']' " := (NumMap.add key v M)(at level 0, no associativity).
   Notation "'[]'" :=(NumMap.empty _).
-  
+
+  #[universes(template)]
   Structure UF :=
     { 
       p : NumMap.t num; 
@@ -660,7 +661,8 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
     Definition IsWF t : Prop := bounded (p t) (size t).
     Class WF t: Prop := { wf : IsWF t }.
     Hint Constructors WF : core.
-  
+
+    #[universes(template)]
     Inductive find_spec_decl t x : (num * T) -> Type :=
     | find_spec_1 : forall rx t'
       (Heq:FEquiv (p t) (p t'))

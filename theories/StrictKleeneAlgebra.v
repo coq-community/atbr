@@ -19,6 +19,7 @@ Unset Printing Implicit Defensive.
 Bind Scope SA_scope with X.
 
 (** Strict Kleene Algebras operations *)
+#[universes(template)]
 Class SKA_Ops (G: Graph) := {
   dot:  forall A B C, X A B -> X B C -> X A C;
   one:  forall A,     X A A;

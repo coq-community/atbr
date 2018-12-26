@@ -97,6 +97,7 @@ Definition labelling max (mem: label -> bool): regex :=
 
 (** High-level automata, represented with matrices *)
 Module MAUT.
+  #[universes(template)]
   Record t := mk {
     size:    nat; 
     initial: KMX 1    size;
@@ -144,6 +145,7 @@ End MAUT.
 
 (** Non deterministic automata, with epsilon transitions *)
 Module eNFA.
+  #[universes(template)]
   Record t := mk {
     size:      state;                  (* next fresh state (= size) *)
     epsilon:   state -> stateset;      (* epsilon-transitions *)
@@ -186,6 +188,7 @@ End eNFA.
 
 (** Non deterministic, epsilon-free automata *)
 Module NFA.
+  #[universes(template)]
   Record t := mk {
     size:      state;          
     delta:     label -> state -> stateset; 
@@ -224,6 +227,7 @@ End NFA.
 
 (** Deterministic automata *)
 Module DFA.
+  #[universes(template)]
   Record t := mk {
     size:      state;          
     delta:     label -> state -> state;

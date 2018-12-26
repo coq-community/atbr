@@ -83,6 +83,7 @@ Module MySetProps (X : FSetInterface.S).
 
   (** set_induction_below *)
   Section ListViewBelow.
+    #[universes(template)]
     Inductive lvb : t -> Type :=
     | lnil :  forall s, Equal s empty ->  lvb s
     | lcons : forall x p, lvb p -> ~In x p -> Below x p -> forall s, Equal s (add x p) ->  lvb s.
@@ -140,6 +141,7 @@ Module MySetProps (X : FSetInterface.S).
 
   (** set_induction_above *)
   Section ListViewAbove.
+    #[universes(template)]
     Inductive lva : t -> Type :=
     | lnila :  forall s, Equal s empty ->  lva s
     | lconsa : forall x p, lva p -> ~In x p -> Above x p -> forall s, Equal s (add x p) ->  lva s.

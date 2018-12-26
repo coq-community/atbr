@@ -79,6 +79,7 @@ Section comb.
 
   Local Hint Resolve @DS.union_WF @DS.empty_WF: typeclass_instances.
 
+  #[universes(template)]
   Inductive combine_no_length X Y : list X -> list Y -> Type :=
   |cnl_nil : combine_no_length nil nil
   |cnl_cons : forall lx ly x y, combine_no_length lx ly -> combine_no_length (x::lx) (y::ly).

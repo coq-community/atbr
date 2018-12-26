@@ -21,6 +21,7 @@ Require Import Common.
    lemmas with maximally inserted implicit arguments changes. 
    *)
 
+#[universes(template)]
 Class Graph := {
   T: Type;
   X: T -> T -> Type;
@@ -42,21 +43,25 @@ Section Ops.
 *)
   Context (G: Graph).
 
+  #[universes(template)]
   Class Monoid_Ops := {
     dot: forall A B C, X A B -> X B C -> X A C;
     one: forall A,     X A A      
   }.
-  
+
+  #[universes(template)]
   Class SemiLattice_Ops := {
     plus: forall A B, X A B -> X A B -> X A B;
     zero: forall A B, X A B;
     leq: forall A B: T, relation (X A B) := fun A B x y => equal A B (plus A B x y) y
   }.
-  
+
+  #[universes(template)]
   Class Star_Op := {
     star: forall A, X A A -> X A A
   }.
-  
+
+  #[universes(template)]
   Class Converse_Op := {
     conv: forall A B, X A B -> X B A
   }.
