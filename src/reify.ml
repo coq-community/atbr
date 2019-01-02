@@ -1,3 +1,11 @@
+(**************************************************************************)
+(*  This is part of ATBR, it is distributed under the terms of the        *)
+(*         GNU Lesser General Public License version 3                    *)
+(*              (see file LICENSE for more details)                       *)
+(*                                                                        *)
+(*       Copyright 2009-2010: Thomas Braibant, Damien Pous.               *)
+(**************************************************************************)
+
 open Constr
 open EConstr
 open Names
