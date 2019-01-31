@@ -73,12 +73,12 @@ Section Defs.
       nat_analyse; semiring_reflexivity.
   Qed.
   
-  Global Instance mx_Monoid: Monoid (mx_Graph A) := {
+  Global Program Instance mx_Monoid: Monoid (mx_Graph A) := {
     dot_assoc := mx_dot_assoc;
     dot_neutral_left := mx_dot_neutral_left;
     dot_neutral_right := mx_dot_neutral_right
   }. 
-  Proof. repeat intro. simpl. auto with compat. Qed.
+  Obligation 1. repeat intro. simpl. auto with compat. Qed.
   
   Global Instance mx_SemiRing: IdemSemiRing (mx_Graph A).
   Proof.

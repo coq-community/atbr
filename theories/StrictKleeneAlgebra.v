@@ -86,12 +86,12 @@ Unset Strict Implicit.
 Section F.
   Context G Ops `{@StrictKleeneAlgebra G Ops}.
 
-  Instance oGraph: Graph := {
+  Program Instance oGraph: Graph := {
     T := T; 
     X A B := option (X A B);
     equal A B := oequal (equal A B)
   }.
-  Proof.
+  Obligation 1.
     intros. apply oequal_equivalence, G. 
   Defined.
 

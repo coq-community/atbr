@@ -194,17 +194,17 @@ Module Dual. Section Protect.
   Instance Star_Op: Star_Op Graph := {
     star := @star _ Ko
   }.
-      
+
   Instance Converse_Op: Converse_Op Graph := {
     conv A B := @conv _ Co B A
   }.
 
-  Instance Monoid {M: Monoid G}: Monoid Graph := {
+  Program Instance Monoid {M: Monoid G}: Monoid Graph := {
     dot_neutral_left := @dot_neutral_right _ _ M;
     dot_neutral_right := @dot_neutral_left _ _ M;
     dot_compat A B C x x' Hx y y' Hy := @dot_compat _ _ M C B A _ _ Hy _ _ Hx
   }.
-  Proof.
+  Obligation 1.
     intros. symmetry. simpl. apply dot_assoc. 
   Defined.
 
