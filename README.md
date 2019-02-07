@@ -4,6 +4,10 @@
 [![Contributing][contributing-shield]][contributing-link]
 [![Code of Conduct][conduct-shield]][conduct-link]
 [![Gitter][gitter-shield]][gitter-link]
+[![DOI][doi-shield]][doi-link]
+
+[doi-shield]: https://zenodo.org/badge/DOI/10.2168/LMCS-8(1:16)2012.svg
+[doi-link]: https://doi.org/10.2168/LMCS-8(1:16)2012
 
 [travis-shield]: https://travis-ci.com/coq-community/atbr.svg?branch=master
 [travis-link]: https://travis-ci.com/coq-community/atbr/builds
@@ -22,17 +26,15 @@ The main tactic provided is a reflexive tactic for solving (in)equations
 in an arbitrary Kleene algebra. The decision procedure goes through
 standard finite automata constructions.
 
-The design and implementation of the library is described in the paper
-[Deciding Kleene Algebras in Coq][paper] (DOI:`10.2168/LMCS-8(1:16)2012`).
-
 Note that the initial authors consider this library to be **superseded**
 by the [Relation Algebra][library] library, which is based on derivatives
 rather than automata.
 
-[paper]: https://arxiv.org/abs/1105.4537
 [library]: https://github.com/damien-pous/relation-algebra
 
 
+More details about the project can be found in the paper
+[Deciding Kleene Algebras in Coq](https://arxiv.org/abs/1105.4537).
 
 ## Meta
 
