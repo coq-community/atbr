@@ -10,6 +10,8 @@ open Constr
 open EConstr
 open Names
 
+let mkArrow x y = mkArrow x Sorts.Relevant y
+
 (* pick an element in an hashtbl *)
 let hashtbl_pick t = Hashtbl.fold (fun i x -> function None -> Some (i,x) | acc -> acc) t None
 
@@ -213,8 +215,8 @@ end = struct
 	  t := ((x,j,Lazy.force y)::l,i+1); j
     
   let to_env t typ def = match fst !t with
-    | [] -> mkLambda (Anonymous,Lazy.force Coq.positive,def)
-    | [_,_,x] -> mkLambda (Anonymous,Lazy.force Coq.positive,x)
+    | [] -> mkLambda (Context.make_annot Anonymous Sorts.Relevant,Lazy.force Coq.positive,def)
+    | [_,_,x] -> mkLambda (Context.make_annot Anonymous Sorts.Relevant,Lazy.force Coq.positive,x)
     | (_,_,x)::q ->
 	Reification.sigma_get typ x
 	  (List.fold_left
@@ -333,10 +335,10 @@ let reify_goal ops =
 
 	(* reified goal conclusion: add the relation over the two evaluated members *)
 	let reified = 
-	  mkNamedLetIn tenv_name tenv (mkArrow (Lazy.force Coq.positive) typ) (
-	    mkNamedLetIn env_name tenv' (Reification.env_type gph) (
-	      mkNamedLetIn ln lv x (
-		mkNamedLetIn rn rv x (
+	  mkNamedLetIn (Context.make_annot tenv_name Sorts.Relevant) tenv (mkArrow (Lazy.force Coq.positive) typ) (
+	    mkNamedLetIn (Context.make_annot env_name Sorts.Relevant) tenv' (Reification.env_type gph) (
+	      mkNamedLetIn (Context.make_annot ln Sorts.Relevant) lv x (
+		mkNamedLetIn (Context.make_annot rn Sorts.Relevant) rv x (
 		  (mkApp (rel, [|Reification.typ gph env_ref src; Reification.typ gph env_ref tgt;l;r|]))))))
 	in
 	  (try 
