@@ -6,9 +6,6 @@
 [![Gitter][gitter-shield]][gitter-link]
 [![DOI][doi-shield]][doi-link]
 
-[doi-shield]: https://zenodo.org/badge/DOI/10.2168/LMCS-8(1:16)2012.svg
-[doi-link]: https://doi.org/10.2168/LMCS-8(1:16)2012
-
 [travis-shield]: https://travis-ci.com/coq-community/atbr.svg?branch=master
 [travis-link]: https://travis-ci.com/coq-community/atbr/builds
 
@@ -21,16 +18,17 @@
 [gitter-shield]: https://img.shields.io/badge/chat-on%20gitter-%23c1272d.svg
 [gitter-link]: https://gitter.im/coq-community/Lobby
 
+[doi-shield]: https://zenodo.org/badge/DOI/10.2168/LMCS-8(1:16)2012.svg
+[doi-link]: https://doi.org/10.2168/LMCS-8(1:16)2012
+
 This library provides algebraic tools for working with binary relations.
 The main tactic provided is a reflexive tactic for solving (in)equations
 in an arbitrary Kleene algebra. The decision procedure goes through
 standard finite automata constructions.
 
-Note that the initial authors consider this library to be **superseded**
-by the [Relation Algebra][library] library, which is based on derivatives
-rather than automata.
-
-[library]: https://github.com/damien-pous/relation-algebra
+Note that the initial authors consider this library to be superseded
+by the Relation Algebra library, which is based on derivatives
+rather than automata: https://github.com/damien-pous/relation-algebra
 
 
 More details about the project can be found in the paper
