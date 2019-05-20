@@ -6,9 +6,6 @@
 [![Gitter][gitter-shield]][gitter-link]
 [![DOI][doi-shield]][doi-link]
 
-[doi-shield]: https://zenodo.org/badge/DOI/10.2168/LMCS-8(1:16)2012.svg
-[doi-link]: https://doi.org/10.2168/LMCS-8(1:16)2012
-
 [travis-shield]: https://travis-ci.com/coq-community/atbr.svg?branch=master
 [travis-link]: https://travis-ci.com/coq-community/atbr/builds
 
@@ -21,16 +18,17 @@
 [gitter-shield]: https://img.shields.io/badge/chat-on%20gitter-%23c1272d.svg
 [gitter-link]: https://gitter.im/coq-community/Lobby
 
+[doi-shield]: https://zenodo.org/badge/DOI/10.2168/LMCS-8(1:16)2012.svg
+[doi-link]: https://doi.org/10.2168/LMCS-8(1:16)2012
+
 This library provides algebraic tools for working with binary relations.
 The main tactic provided is a reflexive tactic for solving (in)equations
 in an arbitrary Kleene algebra. The decision procedure goes through
 standard finite automata constructions.
 
-Note that the initial authors consider this library to be **superseded**
-by the [Relation Algebra][library] library, which is based on derivatives
-rather than automata.
-
-[library]: https://github.com/damien-pous/relation-algebra
+Note that the initial authors consider this library to be superseded
+by the Relation Algebra library, which is based on derivatives
+rather than automata: https://github.com/damien-pous/relation-algebra
 
 
 More details about the project can be found in the paper
@@ -44,14 +42,14 @@ More details about the project can be found in the paper
 - Coq-community maintainer(s):
   - Tej Chajed ([**@tchajed**](https://github.com/tchajed))
 - License: [GNU Lesser General Public License v3.0 or later](LICENSE)
-- Compatible Coq versions: Coq 8.9 (use the corresponding branch or release for other Coq versions)
+- Compatible Coq versions: 8.9 (use the corresponding branch or release for other Coq versions)
 - Compatible OCaml versions: all versions supported by Coq
-- Additional dependencies: none
+- Additional Coq dependencies: none
 
 ## Building and installation instructions
 
-The easiest way to install the latest released version is via
-[OPAM](https://opam.ocaml.org/doc/Install.html):
+The easiest way to install the latest released version of ATBR
+is via [OPAM](https://opam.ocaml.org/doc/Install.html):
 
 ```shell
 opam repo add coq-released https://coq.inria.fr/opam/released
@@ -69,6 +67,7 @@ make install
 
 After installation, the included modules are available under
 the `ATBR` namespace.
+
 
 ## Documentation
 

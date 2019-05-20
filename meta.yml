@@ -1,6 +1,10 @@
 ---
 fullname: ATBR
 shortname: atbr
+organization: coq-community
+community: true
+
+synopsis: A Coq tactic for deciding Kleene algebras
 
 description: |
   This library provides algebraic tools for working with binary relations.
@@ -8,11 +12,9 @@ description: |
   in an arbitrary Kleene algebra. The decision procedure goes through
   standard finite automata constructions.
   
-  Note that the initial authors consider this library to be **superseded**
-  by the [Relation Algebra][library] library, which is based on derivatives
-  rather than automata.
-
-  [library]: https://github.com/damien-pous/relation-algebra
+  Note that the initial authors consider this library to be superseded
+  by the Relation Algebra library, which is based on derivatives
+  rather than automata: https://github.com/damien-pous/relation-algebra
 
 paper:
   doi: 10.2168/LMCS-8(1:16)2012
@@ -36,13 +38,14 @@ license:
 plugin: true
 
 supported_coq_versions:
-  text: Coq 8.9 (use the corresponding branch or release for other Coq versions)
+  text: 8.9 (use the corresponding branch or release for other Coq versions)
   opam: '{>= "8.9" & < "8.10~"}'
 
-tested_coq_versions:
+tested_coq_nix_versions:
 - version_or_url: 8.9
 
-tested_coq_opam_version: 8.9
+tested_coq_opam_versions:
+- version: 8.9
 
 namespace: ATBR
 
