@@ -1,15 +1,27 @@
-opam-version: "1.2"
+opam-version: "2.0"
 maintainer: "palmskog@gmail.com"
 
 homepage: "https://github.com/coq-community/atbr"
-dev-repo: "https://github.com/coq-community/atbr.git"
+dev-repo: "git+https://github.com/coq-community/atbr.git"
 bug-reports: "https://github.com/coq-community/atbr/issues"
 license: "LGPL-3.0-or-later"
 
+synopsis: "A Coq tactic for deciding Kleene algebras"
+description: """
+This library provides algebraic tools for working with binary relations.
+The main tactic provided is a reflexive tactic for solving (in)equations
+in an arbitrary Kleene algebra. The decision procedure goes through
+standard finite automata constructions.
+
+Note that the initial authors consider this library to be superseded
+by the Relation Algebra library, which is based on derivatives
+rather than automata: https://github.com/damien-pous/relation-algebra
+"""
+
 build: [make "-j%{jobs}%"]
 install: [make "install"]
-remove: ["rm" "-R" "%{lib}%/coq/user-contrib/ATBR"]
 depends: [
+  "ocaml"
   "coq" {>= "8.9" & < "8.10~"}
 ]
 
