@@ -62,8 +62,8 @@ Section sssm.
     intros q Hq. 
     StateSetSetProps.Facts.set_iff. specialize (IH q Hq). rewrite Hf by auto. tauto.   
     intros Ht'.
-    rewrite (StateSetSetProps.Props.cardinal_2 (s:=a) (x:=f p)); auto with map. 
-    symmetry. rewrite (StateSetSetProps.Props.cardinal_2 (s:=t') (x:=p)); auto with map. 
+    rewrite (StateSetSetProps.Props.cardinal_2 (s:=a) (x:=f p)); auto with set.
+    symmetry. rewrite (StateSetSetProps.Props.cardinal_2 (s:=t') (x:=p)); auto with set. 
     symmetry. rewrite IHc; auto. intros q Hq. apply Ht'. StateSetSetProps.setdec.
     rewrite IH; auto.
   Qed.
@@ -187,8 +187,8 @@ Section domain.
     intro q. StateSetSetProps.set_iff. StateSetMapProps.map_iff. specialize (IH q). tauto.
     rewrite (StateSetMapProps.cardinal_2 Hp') by (intro; reflexivity). 
     rewrite (StateSetSetProps.Props.cardinal_2 (s:=a) (x:=p)). congruence. rewrite IH; trivial.
-    auto with map.
-  Qed.  
+    auto with set.
+  Qed.
 
 End domain.  
 
