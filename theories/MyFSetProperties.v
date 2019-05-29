@@ -317,12 +317,12 @@ Module MySetProps (X : FSetInterface.S).
       repeat intro.  subst. rewrite (Hcompat _ _ H). reflexivity. 
       induction x using set_induction_below; intros init init' Hinit.
 
-      rewrite (fold_empty); auto. 
+      rewrite (fold_empty); auto with typeclass_instances.
       rewrite (exists_compat _ _ H). rewrite Hinit.
-      rewrite (exists_empty). reflexivity. 
+      rewrite (exists_empty). reflexivity.
       
       rewrite (fold_equal _ Hf' _ H1).
-      rewrite (fold_add_below ); auto.
+      rewrite (fold_add_below ); auto with typeclass_instances.
       rewrite (exists_compat _ _ H1). 
       rewrite (exists_add _ _ H). rewrite <- orb_assoc. rewrite (@IHx1 (f x2 || init) (f x2 || init')).
       reflexivity.
@@ -349,14 +349,14 @@ Module MySetProps (X : FSetInterface.S).
     revert x' init init'.
     induction x using set_induction_below.
     intros x' init init' Hf Hg Hx Hinit Hcompat. 
-    rewrite 2 fold_empty; auto. rewrite <- Hx. auto. 
+    rewrite 2 fold_empty; auto with typeclass_instances. rewrite <- Hx. auto.
 
     
     intros x' init init' Hf Hg Hx Hinit Hcompat. 
     
     rewrite (fold_equal _ Hf _ H1). 
     rewrite H1 in Hx. symmetry in Hx.      rewrite (fold_equal _ Hg _ Hx).
-    rewrite 2 fold_add_below; auto. apply IHx1. apply Hf.  apply Hg. reflexivity. 
+    rewrite 2 fold_add_below; auto with typeclass_instances. apply IHx1. apply Hf.  apply Hg. reflexivity.
     
     rewrite Hinit. apply Hcompat. rewrite H1. apply add_1. auto.
     intros e acc He. 

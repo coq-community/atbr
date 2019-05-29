@@ -20,11 +20,9 @@ rather than automata: https://github.com/damien-pous/relation-algebra
 
 build: [make "-j%{jobs}%"]
 install: [make "install"]
-remove: ["rm" "-R" "%{lib}%/coq/user-contrib/ATBR"]
-flags: light-uninstall
 depends: [
   "ocaml"
-  "coq" {= "dev"}
+  "coq" {>= "8.10" & < "8.11~"}
 ]
 
 tags: [
