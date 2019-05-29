@@ -43,7 +43,7 @@ More details about the project can be found in the paper
   - Tej Chajed ([**@tchajed**](https://github.com/tchajed))
   - Karl Palmskog ([**@palmskog**](https://github.com/palmskog))
 - License: [GNU Lesser General Public License v3.0 or later](LICENSE)
-- Compatible Coq versions: master (use the corresponding branch or release for other Coq versions)
+- Compatible Coq versions: 8.10 (use the corresponding branch or release for other Coq versions)
 - Compatible OCaml versions: all versions supported by Coq
 - Additional Coq dependencies: none
 
