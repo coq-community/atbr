@@ -1,5 +1,6 @@
 opam-version: "2.0"
 maintainer: "palmskog@gmail.com"
+version: "dev"
 
 homepage: "https://github.com/coq-community/atbr"
 dev-repo: "git+https://github.com/coq-community/atbr.git"
@@ -15,8 +16,7 @@ standard finite automata constructions.
 
 Note that the initial authors consider this library to be superseded
 by the Relation Algebra library, which is based on derivatives
-rather than automata: https://github.com/damien-pous/relation-algebra
-"""
+rather than automata: https://github.com/damien-pous/relation-algebra"""
 
 build: [make "-j%{jobs}%"]
 install: [make "install"]
