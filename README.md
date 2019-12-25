@@ -30,10 +30,6 @@ Note that the initial authors consider this library to be superseded
 by the Relation Algebra library, which is based on derivatives
 rather than automata: https://github.com/damien-pous/relation-algebra
 
-
-More details about the project can be found in the paper
-[Deciding Kleene Algebras in Coq](https://arxiv.org/abs/1105.4537).
-
 ## Meta
 
 - Author(s):
@@ -46,6 +42,9 @@ More details about the project can be found in the paper
 - Compatible Coq versions: master (use the corresponding branch or release for other Coq versions)
 - Compatible OCaml versions: all versions supported by Coq
 - Additional Coq dependencies: none
+- Coq namespace: `ATBR`
+- Related publication(s):
+  - [Deciding Kleene Algebras in Coq](https://arxiv.org/abs/1105.4537) doi:[10.2168/LMCS-8(1:16)2012](https://doi.org/10.2168/LMCS-8(1:16)2012)
 
 ## Building and installation instructions
 
@@ -65,9 +64,6 @@ cd atbr
 make   # or make -j <number-of-cores-on-your-machine>
 make install
 ```
-
-After installation, the included modules are available under
-the `ATBR` namespace.
 
 
 ## Documentation

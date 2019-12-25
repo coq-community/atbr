@@ -6,7 +6,7 @@
 -arg -w -arg -projection-no-head-constant
 -arg -w -arg -undo-batch-mode
 -arg -w -arg -undeclared-scope
--arg -w -arg -auto-template
+-arg -w -arg -ambiguous-paths
 
 src/reify.ml
 src/reification.mlg

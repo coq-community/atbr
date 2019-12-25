@@ -3,10 +3,12 @@ fullname: ATBR
 shortname: atbr
 organization: coq-community
 community: true
+travis: true
+doi: 10.2168/LMCS-8(1:16)2012
 
 synopsis: A Coq tactic for deciding Kleene algebras
 
-description: |
+description: |-
   This library provides algebraic tools for working with binary relations.
   The main tactic provided is a reflexive tactic for solving (in)equations
   in an arbitrary Kleene algebra. The decision procedure goes through
@@ -16,10 +18,10 @@ description: |
   by the Relation Algebra library, which is based on derivatives
   rather than automata: https://github.com/damien-pous/relation-algebra
 
-paper:
-  doi: 10.2168/LMCS-8(1:16)2012
-  url: https://arxiv.org/abs/1105.4537
-  title: Deciding Kleene Algebras in Coq
+publications:
+- pub_url: https://arxiv.org/abs/1105.4537
+  pub_title: Deciding Kleene Algebras in Coq
+  pub_doi: 10.2168/LMCS-8(1:16)2012
 
 authors:
 - name: Thomas Braibant
@@ -32,6 +34,10 @@ maintainers:
   nickname: tchajed
 - name: Karl Palmskog
   nickname: palmskog
+
+opam-file-maintainer: palmskog@gmail.com
+
+opam-file-version: dev
 
 license:
   fullname: GNU Lesser General Public License v3.0 or later
