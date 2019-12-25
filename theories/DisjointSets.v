@@ -133,7 +133,7 @@ Module DSUtils (Import N : NUM) (Import M: DISJOINTSETS N).
   Proof.
     intros x y.
     rewrite <- sameclass_class_of. 
-    split; intros H. rewrite (sameclass_empty _ _ H). auto with set.
+    split; intros H. rewrite (sameclass_empty _ _ H). apply NumSet.singleton_2. apply NumSet.E.eq_refl.
     replace y with x. reflexivity.
     apply -> set_eq_spec. 
     apply NumSet.singleton_1, H. 

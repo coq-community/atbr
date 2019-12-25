@@ -3,6 +3,8 @@
 *.vo
 *.glob
 *.d
+*.vos
+*.vok
 
 # make-related output
 Makefile.coq
