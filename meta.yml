@@ -37,7 +37,7 @@ maintainers:
 
 opam-file-maintainer: palmskog@gmail.com
 
-opam-file-version: 8.10.dev
+opam-file-version: 8.11.dev
 
 license:
   fullname: GNU Lesser General Public License v3.0 or later
@@ -46,14 +46,14 @@ license:
 plugin: true
 
 supported_coq_versions:
-  text: 8.10 (use the corresponding branch or release for other Coq versions)
-  opam: '{>= "8.10" & < "8.11~"}'
+  text: 8.11 (use the corresponding branch or release for other Coq versions)
+  opam: '{>= "8.11" & < "8.12~"}'
 
 tested_coq_nix_versions:
-- version_or_url: '8.10'
+- version_or_url: '8.11'
 
 tested_coq_opam_versions:
-- version: '8.10'
+- version: '8.11'
 
 namespace: ATBR
 

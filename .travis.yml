@@ -40,13 +40,13 @@ matrix:
 
   # Test supported versions of Coq via Nix
   - env:
-    - COQ=8.10
+    - COQ=8.11
     <<: *NIX
 
   # Test supported versions of Coq via OPAM
   - env:
-    - COQ_IMAGE=coqorg/coq:8.10
-    - PACKAGE=coq-atbr.8.10.dev
+    - COQ_IMAGE=coqorg/coq:8.11
+    - PACKAGE=coq-atbr.8.11.dev
     - NJOBS=2
     <<: *OPAM
 
