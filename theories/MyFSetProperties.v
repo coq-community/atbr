@@ -358,8 +358,8 @@ Module MySetProps (X : FSetInterface.S).
     rewrite H1 in Hx. symmetry in Hx.      rewrite (fold_equal _ Hg _ Hx).
     rewrite 2 fold_add_below; auto with typeclass_instances. apply IHx1. apply Hf.  apply Hg. reflexivity.
     
-    rewrite Hinit. apply Hcompat. rewrite H1. apply add_1. auto.
-    intros e acc He. 
+    rewrite Hinit. apply Hcompat. rewrite H1. apply add_1. setdec.
+    intros e acc He.
     apply Hcompat. rewrite H1. setdec.
   Qed.
 

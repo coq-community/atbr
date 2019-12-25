@@ -22,7 +22,7 @@ Module MyMapProps (X : FMapInterface.S).
   Proof. intros. exists y. assumption. Qed.
 
   Lemma in_add_1: forall T x (y: T) d, In x (add x y d).
-  Proof. intros. exists y. auto with map. Qed.
+  Proof. intros. exists y. apply add_1. apply E.eq_refl. Qed.
 
   Lemma in_add_2: forall T x y (z: T) d, In x d -> In x (add y z d).
   Proof.
