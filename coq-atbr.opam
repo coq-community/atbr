@@ -5,6 +5,7 @@ version: "dev"
 homepage: "https://github.com/coq-community/atbr"
 dev-repo: "git+https://github.com/coq-community/atbr.git"
 bug-reports: "https://github.com/coq-community/atbr/issues"
+doc: "https://coq-community.github.io/atbr/"
 license: "LGPL-3.0-or-later"
 
 synopsis: "A Coq tactic for deciding Kleene algebras"

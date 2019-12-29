@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<link href="coqdoc.css" rel="stylesheet" type="text/css" />
+<link href="coqdocjs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="config.js"></script>
+<script type="text/javascript" src="coqdocjs.js"></script>
+</head>
+
+<body onload="document.getElementById('content').focus()">
+  <div id="header">
+    <span class="left">
+      <span class="modulename"> <script> document.write(document.title) </script> </span>
+    </span>
+
+    <span class="button" id="toggle-proofs"></span>
+
+    <span class="right">
+      <a href="./">Project Page</a>
+      <a href="./indexpage.html">Index</a>
+      <a href="./toc.html">Table of Contents</a>
+    </span>
+</div>
+    <div id="content" tabindex="-1" onblur="document.getElementById('content').focus()">
+    <div id="main">
+<h1 class="libtitle">ATBR.MxFunctors</h1>
+
+<div class="code">
+<span class="comment">(**************************************************************************)</span><br/>
+<span class="comment">(*&nbsp;&nbsp;This&nbsp;is&nbsp;part&nbsp;of&nbsp;ATBR,&nbsp;it&nbsp;is&nbsp;distributed&nbsp;under&nbsp;the&nbsp;terms&nbsp;of&nbsp;the&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*)</span><br/>
+<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GNU&nbsp;Lesser&nbsp;General&nbsp;Public&nbsp;License&nbsp;version&nbsp;3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*)</span><br/>
+<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(see&nbsp;file&nbsp;LICENSE&nbsp;for&nbsp;more&nbsp;details)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*)</span><br/>
+<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*)</span><br/>
+<span class="comment">(*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Copyright&nbsp;2009-2011:&nbsp;Thomas&nbsp;Braibant,&nbsp;Damien&nbsp;Pous.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*)</span><br/>
+<span class="comment">(**************************************************************************)</span><br/>
+
+<br/>
+<span class="comment">(*&nbsp;Extension&nbsp;of&nbsp;functors&nbsp;on&nbsp;base&nbsp;structures&nbsp;to&nbsp;functors&nbsp;on&nbsp;matrices&nbsp;*)</span><br/>
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="ATBR.Common.html#"><span class="id" title="library">Common</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="ATBR.Classes.html#"><span class="id" title="library">Classes</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="ATBR.Monoid.html#"><span class="id" title="library">Monoid</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="ATBR.SemiLattice.html#"><span class="id" title="library">SemiLattice</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="ATBR.SemiRing.html#"><span class="id" title="library">SemiRing</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="ATBR.KleeneAlgebra.html#"><span class="id" title="library">KleeneAlgebra</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="ATBR.MxGraph.html#"><span class="id" title="library">MxGraph</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="ATBR.MxSemiLattice.html#"><span class="id" title="library">MxSemiLattice</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="ATBR.MxSemiRing.html#"><span class="id" title="library">MxSemiRing</span></a>.<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="ATBR.MxKleeneAlgebra.html#"><span class="id" title="library">MxKleeneAlgebra</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Require</span> <span class="id" title="keyword">Import</span> <a class="idref" href="ATBR.Functors.html#"><span class="id" title="library">Functors</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Set Implicit Arguments</span>.<br/>
+<span class="id" title="keyword">Unset</span> <span class="id" title="keyword">Strict</span> <span class="id" title="keyword">Implicit</span>.<br/>
+<span class="id" title="keyword">Unset</span> <span class="id" title="keyword">Printing</span> <span class="id" title="keyword">Implicit</span> <span class="id" title="var">Defensive</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">Transparent</span> <a class="idref" href="ATBR.Classes.html#equal"><span class="id" title="method">equal</span></a>.<br/>
+
+<br/>
+<span class="id" title="keyword">Section</span> <a name="Defs"><span class="id" title="section">Defs</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Context</span> {<span class="id" title="var">G1</span>: <a class="idref" href="ATBR.Classes.html#Graph"><span class="id" title="class">Graph</span></a>} {<span class="id" title="var">G2</span>: <a class="idref" href="ATBR.Classes.html#Graph"><span class="id" title="class">Graph</span></a>}<br/>
+&nbsp;&nbsp;{<span class="id" title="var">SLo1</span>: <a class="idref" href="ATBR.Classes.html#SemiLattice_Ops"><span class="id" title="class">SemiLattice_Ops</span></a> <a class="idref" href="ATBR.MxFunctors.html#G1"><span class="id" title="variable">G1</span></a>} {<span class="id" title="var">SLo2</span>: <a class="idref" href="ATBR.Classes.html#SemiLattice_Ops"><span class="id" title="class">SemiLattice_Ops</span></a> <a class="idref" href="ATBR.MxFunctors.html#G2"><span class="id" title="variable">G2</span></a>}<br/>
+&nbsp;&nbsp;{<span class="id" title="var">Mo1</span>: <a class="idref" href="ATBR.Classes.html#Monoid_Ops"><span class="id" title="class">Monoid_Ops</span></a> <a class="idref" href="ATBR.MxFunctors.html#G1"><span class="id" title="variable">G1</span></a>} {<span class="id" title="var">Mo2</span>: <a class="idref" href="ATBR.Classes.html#Monoid_Ops"><span class="id" title="class">Monoid_Ops</span></a> <a class="idref" href="ATBR.MxFunctors.html#G2"><span class="id" title="variable">G2</span></a>}<br/>
+&nbsp;&nbsp;{<span class="id" title="var">So1</span>: <a class="idref" href="ATBR.Classes.html#Star_Op"><span class="id" title="class">Star_Op</span></a> <a class="idref" href="ATBR.MxFunctors.html#G1"><span class="id" title="variable">G1</span></a>} {<span class="id" title="var">So2</span>: <a class="idref" href="ATBR.Classes.html#Star_Op"><span class="id" title="class">Star_Op</span></a> <a class="idref" href="ATBR.MxFunctors.html#G2"><span class="id" title="variable">G2</span></a>}.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <a name="Defs.F"><span class="id" title="variable">F</span></a>: <a class="idref" href="ATBR.Functors.html#functor"><span class="id" title="record">functor</span></a> <a class="idref" href="ATBR.MxFunctors.html#Defs.G1"><span class="id" title="variable">G1</span></a> <a class="idref" href="ATBR.MxFunctors.html#Defs.G2"><span class="id" title="variable">G2</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Variable</span> <a name="Defs.A"><span class="id" title="variable">A</span></a>: @<a class="idref" href="ATBR.Classes.html#T"><span class="id" title="method">T</span></a> <a class="idref" href="ATBR.MxFunctors.html#Defs.G1"><span class="id" title="variable">G1</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> <a name="MG1"><span class="id" title="abbreviation">MG1</span></a> := (@<a class="idref" href="ATBR.MxGraph.html#mx_Graph"><span class="id" title="instance">mx_Graph</span></a> <a class="idref" href="ATBR.MxFunctors.html#Defs.G1"><span class="id" title="variable">G1</span></a> <a class="idref" href="ATBR.MxFunctors.html#Defs.A"><span class="id" title="variable">A</span></a>).<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Notation</span> <a name="MG2"><span class="id" title="abbreviation">MG2</span></a> := (@<a class="idref" href="ATBR.MxGraph.html#mx_Graph"><span class="id" title="instance">mx_Graph</span></a> <a class="idref" href="ATBR.MxFunctors.html#Defs.G2"><span class="id" title="variable">G2</span></a> (<a class="idref" href="ATBR.Functors.html#fT"><span class="id" title="projection">fT</span></a> <a class="idref" href="ATBR.MxFunctors.html#Defs.F"><span class="id" title="variable">F</span></a> <a class="idref" href="ATBR.MxFunctors.html#Defs.A"><span class="id" title="variable">A</span></a>)).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Definition</span> <a name="mxF"><span class="id" title="definition">mxF</span></a>: <a class="idref" href="ATBR.Functors.html#functor"><span class="id" title="record">functor</span></a> <a class="idref" href="ATBR.MxFunctors.html#MG1"><span class="id" title="abbreviation">MG1</span></a> <a class="idref" href="ATBR.MxFunctors.html#MG2"><span class="id" title="abbreviation">MG2</span></a> :=<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;@<a class="idref" href="ATBR.Functors.html#Build_functor"><span class="id" title="constructor">Build_functor</span></a> <a class="idref" href="ATBR.MxFunctors.html#MG1"><span class="id" title="abbreviation">MG1</span></a> <a class="idref" href="ATBR.MxFunctors.html#MG2"><span class="id" title="abbreviation">MG2</span></a> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">fun</span> <span class="id" title="var">n</span> ⇒ <a class="idref" href="ATBR.MxFunctors.html#n"><span class="id" title="variable">n</span></a>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;(<span class="id" title="keyword">fun</span> <span class="id" title="var">n</span> <span class="id" title="var">m</span> <span class="id" title="var">M</span> ⇒ <a class="idref" href="ATBR.MxGraph.html#box"><span class="id" title="constructor">box</span></a> <a class="idref" href="ATBR.MxFunctors.html#n"><span class="id" title="variable">n</span></a> <a class="idref" href="ATBR.MxFunctors.html#m"><span class="id" title="variable">m</span></a> (<span class="id" title="keyword">fun</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> ⇒ <a class="idref" href="ATBR.MxFunctors.html#Defs.F"><span class="id" title="variable">F</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span> (<a class="idref" href="ATBR.MxGraph.html#97339dfc3a4ff30ad955674520d1f12a"><span class="id" title="notation">!</span></a><a class="idref" href="ATBR.MxFunctors.html#M"><span class="id" title="variable">M</span></a> <a class="idref" href="ATBR.MxFunctors.html#i"><span class="id" title="variable">i</span></a> <a class="idref" href="ATBR.MxFunctors.html#j"><span class="id" title="variable">j</span></a>))).<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Global Instance</span> <a name="mxgraph_functor"><span class="id" title="instance">mxgraph_functor</span></a> {<span class="id" title="var">HF</span>: <a class="idref" href="ATBR.Functors.html#graph_functor"><span class="id" title="class">graph_functor</span></a> <a class="idref" href="ATBR.MxFunctors.html#Defs.F"><span class="id" title="variable">F</span></a>}: <a class="idref" href="ATBR.Functors.html#graph_functor"><span class="id" title="class">graph_functor</span></a> <a class="idref" href="ATBR.MxFunctors.html#mxF"><span class="id" title="definition">mxF</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">constructor</span>. <span class="id" title="tactic">repeat</span> <span class="id" title="tactic">intro</span>. <span class="id" title="tactic">simpl</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="ATBR.Functors.html#functor_compat"><span class="id" title="method">functor_compat</span></a>. <span class="id" title="tactic">auto</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Global Instance</span> <a name="mxsemilattice_functor"><span class="id" title="instance">mxsemilattice_functor</span></a> {<span class="id" title="var">HF</span>: <a class="idref" href="ATBR.Functors.html#semilattice_functor"><span class="id" title="class">semilattice_functor</span></a> <a class="idref" href="ATBR.MxFunctors.html#Defs.F"><span class="id" title="variable">F</span></a>}: <a class="idref" href="ATBR.Functors.html#semilattice_functor"><span class="id" title="class">semilattice_functor</span></a> <a class="idref" href="ATBR.MxFunctors.html#mxF"><span class="id" title="definition">mxF</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">constructor</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="ATBR.MxFunctors.html#mxgraph_functor"><span class="id" title="instance">mxgraph_functor</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> <span class="id" title="tactic">intro</span>; <span class="id" title="tactic">simpl</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="ATBR.Functors.html#functor_plus"><span class="id" title="method">functor_plus</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> <span class="id" title="tactic">intro</span>; <span class="id" title="tactic">simpl</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="ATBR.Functors.html#functor_zero"><span class="id" title="method">functor_zero</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Global Instance</span> <a name="mxsemiring_functor"><span class="id" title="instance">mxsemiring_functor</span></a> {<span class="id" title="var">SL1</span>: <a class="idref" href="ATBR.Classes.html#SemiLattice"><span class="id" title="class">SemiLattice</span></a> <a class="idref" href="ATBR.MxFunctors.html#Defs.G1"><span class="id" title="variable">G1</span></a>} {<span class="id" title="var">SL2</span>: <a class="idref" href="ATBR.Classes.html#SemiLattice"><span class="id" title="class">SemiLattice</span></a> <a class="idref" href="ATBR.MxFunctors.html#Defs.G2"><span class="id" title="variable">G2</span></a>} <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id" title="var">HF</span>: <a class="idref" href="ATBR.Functors.html#semiring_functor"><span class="id" title="class">semiring_functor</span></a> <a class="idref" href="ATBR.MxFunctors.html#Defs.F"><span class="id" title="variable">F</span></a>}: <a class="idref" href="ATBR.Functors.html#semiring_functor"><span class="id" title="class">semiring_functor</span></a> <a class="idref" href="ATBR.MxFunctors.html#mxF"><span class="id" title="definition">mxF</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">constructor</span>. <span class="id" title="tactic">constructor</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="ATBR.MxFunctors.html#mxgraph_functor"><span class="id" title="instance">mxgraph_functor</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> <span class="id" title="tactic">intro</span>; <span class="id" title="tactic">simpl</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> <a class="idref" href="ATBR.Functors.html#functor_sum"><span class="id" title="lemma">functor_sum</span></a>. <span class="id" title="tactic">apply</span> <a class="idref" href="ATBR.SemiLattice.html#sum_compat"><span class="id" title="lemma">sum_compat</span></a>. <span class="id" title="tactic">intros</span>. <span class="id" title="tactic">apply</span> <a class="idref" href="ATBR.Functors.html#functor_dot"><span class="id" title="method">functor_dot</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> <span class="id" title="tactic">intro</span>; <span class="id" title="tactic">simpl</span>. <span class="id" title="tactic">intros</span>. <span class="id" title="var">BoolView.nat_analyse</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="ATBR.Functors.html#functor_one"><span class="id" title="method">functor_one</span></a>. <span class="id" title="tactic">apply</span> <a class="idref" href="ATBR.Functors.html#functor_zero"><span class="id" title="method">functor_zero</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="ATBR.MxFunctors.html#mxsemilattice_functor"><span class="id" title="instance">mxsemilattice_functor</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="functor_mx_blocks"><span class="id" title="lemma">functor_mx_blocks</span></a>: <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> <span class="id" title="var">n</span> <span class="id" title="var">m</span> <span class="id" title="var">a</span> <span class="id" title="var">b</span> <span class="id" title="var">c</span> <span class="id" title="var">d</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="ATBR.MxFunctors.html#mxF"><span class="id" title="definition">mxF</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span> (@<a class="idref" href="ATBR.MxGraph.html#mx_blocks"><span class="id" title="definition">mx_blocks</span></a> <span class="id" title="var">_</span> <a class="idref" href="ATBR.MxFunctors.html#Defs.A"><span class="id" title="variable">A</span></a> <a class="idref" href="ATBR.MxFunctors.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="ATBR.MxFunctors.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="ATBR.MxFunctors.html#n"><span class="id" title="variable">n</span></a> <a class="idref" href="ATBR.MxFunctors.html#m"><span class="id" title="variable">m</span></a> <a class="idref" href="ATBR.MxFunctors.html#a"><span class="id" title="variable">a</span></a> <a class="idref" href="ATBR.MxFunctors.html#b"><span class="id" title="variable">b</span></a> <a class="idref" href="ATBR.MxFunctors.html#c"><span class="id" title="variable">c</span></a> <a class="idref" href="ATBR.MxFunctors.html#d"><span class="id" title="variable">d</span></a>) <a class="idref" href="ATBR.Classes.html#60ab9d9fc0a104376fc17e0989420a38"><span class="id" title="notation">==</span></a> <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="ATBR.MxGraph.html#mx_blocks"><span class="id" title="definition">mx_blocks</span></a> (<a class="idref" href="ATBR.MxFunctors.html#mxF"><span class="id" title="definition">mxF</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <a class="idref" href="ATBR.MxFunctors.html#a"><span class="id" title="variable">a</span></a>) (<a class="idref" href="ATBR.MxFunctors.html#mxF"><span class="id" title="definition">mxF</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <a class="idref" href="ATBR.MxFunctors.html#b"><span class="id" title="variable">b</span></a>) (<a class="idref" href="ATBR.MxFunctors.html#mxF"><span class="id" title="definition">mxF</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <a class="idref" href="ATBR.MxFunctors.html#c"><span class="id" title="variable">c</span></a>) (<a class="idref" href="ATBR.MxFunctors.html#mxF"><span class="id" title="definition">mxF</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <a class="idref" href="ATBR.MxFunctors.html#d"><span class="id" title="variable">d</span></a>).<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">repeat</span> <span class="id" title="tactic">intro</span>; <span class="id" title="tactic">simpl</span>. <span class="id" title="var">destruct_blocks</span>; <span class="id" title="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="functor_mx_sub"><span class="id" title="lemma">functor_mx_sub</span></a>: <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">n'</span> <span class="id" title="var">m'</span> <span class="id" title="var">x</span> <span class="id" title="var">y</span> <span class="id" title="var">n</span> <span class="id" title="var">m</span> <span class="id" title="var">M</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="ATBR.MxFunctors.html#mxF"><span class="id" title="definition">mxF</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span> (@<a class="idref" href="ATBR.MxGraph.html#mx_sub"><span class="id" title="definition">mx_sub</span></a> <span class="id" title="var">_</span> <a class="idref" href="ATBR.MxFunctors.html#Defs.A"><span class="id" title="variable">A</span></a> <a class="idref" href="ATBR.MxFunctors.html#n'"><span class="id" title="variable">n'</span></a> <a class="idref" href="ATBR.MxFunctors.html#m'"><span class="id" title="variable">m'</span></a> <a class="idref" href="ATBR.MxFunctors.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="ATBR.MxFunctors.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="ATBR.MxFunctors.html#n"><span class="id" title="variable">n</span></a> <a class="idref" href="ATBR.MxFunctors.html#m"><span class="id" title="variable">m</span></a> <a class="idref" href="ATBR.MxFunctors.html#M"><span class="id" title="variable">M</span></a>) <a class="idref" href="http://coq.inria.fr/distrib/V8.10.2/stdlib//Coq.Init.Logic.html#6cd0f7b28b6092304087c7049437bb1a"><span class="id" title="notation">=</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="ATBR.MxGraph.html#mx_sub"><span class="id" title="definition">mx_sub</span></a> <a class="idref" href="ATBR.MxFunctors.html#x"><span class="id" title="variable">x</span></a> <a class="idref" href="ATBR.MxFunctors.html#y"><span class="id" title="variable">y</span></a> <a class="idref" href="ATBR.MxFunctors.html#n"><span class="id" title="variable">n</span></a> <a class="idref" href="ATBR.MxFunctors.html#m"><span class="id" title="variable">m</span></a> (<a class="idref" href="ATBR.MxFunctors.html#mxF"><span class="id" title="definition">mxF</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <a class="idref" href="ATBR.MxFunctors.html#M"><span class="id" title="variable">M</span></a>).<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Proof</span>. <span class="id" title="tactic">reflexivity</span>. <span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="functor_mx_of_scal"><span class="id" title="lemma">functor_mx_of_scal</span></a>: <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">a</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="ATBR.MxFunctors.html#mxF"><span class="id" title="definition">mxF</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span> (<a class="idref" href="ATBR.MxGraph.html#mx_of_scal"><span class="id" title="definition">mx_of_scal</span></a> <a class="idref" href="ATBR.MxFunctors.html#a"><span class="id" title="variable">a</span></a>) <a class="idref" href="http://coq.inria.fr/distrib/V8.10.2/stdlib//Coq.Init.Logic.html#6cd0f7b28b6092304087c7049437bb1a"><span class="id" title="notation">=</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="ATBR.MxGraph.html#mx_of_scal"><span class="id" title="definition">mx_of_scal</span></a> (<a class="idref" href="ATBR.MxFunctors.html#Defs.F"><span class="id" title="variable">F</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <a class="idref" href="ATBR.MxFunctors.html#a"><span class="id" title="variable">a</span></a>).<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Proof</span>. <span class="id" title="tactic">reflexivity</span>. <span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Lemma</span> <a name="functor_mx_to_scal"><span class="id" title="lemma">functor_mx_to_scal</span></a>: <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">∀</span> <span class="id" title="var">M</span>, <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="ATBR.MxFunctors.html#Defs.F"><span class="id" title="variable">F</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span> (<a class="idref" href="ATBR.MxGraph.html#mx_to_scal"><span class="id" title="definition">mx_to_scal</span></a> <a class="idref" href="ATBR.MxFunctors.html#M"><span class="id" title="variable">M</span></a>) <a class="idref" href="http://coq.inria.fr/distrib/V8.10.2/stdlib//Coq.Init.Logic.html#6cd0f7b28b6092304087c7049437bb1a"><span class="id" title="notation">=</span></a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a class="idref" href="ATBR.MxGraph.html#mx_to_scal"><span class="id" title="definition">mx_to_scal</span></a> (<a class="idref" href="ATBR.MxFunctors.html#mxF"><span class="id" title="definition">mxF</span></a> <span class="id" title="var">_</span> <span class="id" title="var">_</span> <a class="idref" href="ATBR.MxFunctors.html#M"><span class="id" title="variable">M</span></a>).<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Proof</span>. <span class="id" title="tactic">reflexivity</span>. <span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Global Instance</span> <a name="mxkleene_functor"><span class="id" title="instance">mxkleene_functor</span></a> {<span class="id" title="var">KA1</span>: <a class="idref" href="ATBR.Classes.html#KleeneAlgebra"><span class="id" title="class">KleeneAlgebra</span></a> <a class="idref" href="ATBR.MxFunctors.html#Defs.G1"><span class="id" title="variable">G1</span></a>} {<span class="id" title="var">KA2</span>: <a class="idref" href="ATBR.Classes.html#KleeneAlgebra"><span class="id" title="class">KleeneAlgebra</span></a> <a class="idref" href="ATBR.MxFunctors.html#Defs.G2"><span class="id" title="variable">G2</span></a>} <br/>
+&nbsp;&nbsp;&nbsp;&nbsp;{<span class="id" title="var">HF</span>: <a class="idref" href="ATBR.Functors.html#kleene_functor"><span class="id" title="class">kleene_functor</span></a> <a class="idref" href="ATBR.MxFunctors.html#Defs.F"><span class="id" title="variable">F</span></a>}: <a class="idref" href="ATBR.Functors.html#kleene_functor"><span class="id" title="class">kleene_functor</span></a> <a class="idref" href="ATBR.MxFunctors.html#mxF"><span class="id" title="definition">mxF</span></a>.<br/>
+&nbsp;&nbsp;<span class="id" title="keyword">Proof</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">constructor</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">apply</span> <a class="idref" href="ATBR.MxFunctors.html#mxsemiring_functor"><span class="id" title="instance">mxsemiring_functor</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intro</span> <span class="id" title="var">n</span>. <span class="id" title="tactic">induction</span> <span class="id" title="var">n</span>; <span class="id" title="tactic">intro</span> <span class="id" title="var">a</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">intros</span> <span class="id" title="var">i</span> <span class="id" title="var">j</span> <span class="id" title="var">Hi</span>; <span class="id" title="tactic">inversion</span> <span class="id" title="var">Hi</span>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">unfold</span> <a class="idref" href="ATBR.Classes.html#star"><span class="id" title="method">star</span></a>, <a class="idref" href="ATBR.MxKleeneAlgebra.html#mx_Star_Op"><span class="id" title="instance">mx_Star_Op</span></a> <span class="id" title="tactic">in</span> ×.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">unfold</span> <a class="idref" href="ATBR.MxKleeneAlgebra.html#star_rec"><span class="id" title="definition">star_rec</span></a> <span class="id" title="tactic">at</span> 1. <span class="id" title="tactic">fold</span> (<a class="idref" href="ATBR.MxKleeneAlgebra.html#star_rec"><span class="id" title="definition">star_rec</span></a> (<span class="id" title="var">A</span>:=<a class="idref" href="ATBR.MxFunctors.html#Defs.A"><span class="id" title="variable">A</span></a>) (<span class="id" title="var">n</span>:=<span class="id" title="var">n</span>)). <span class="id" title="tactic">unfold</span> <a class="idref" href="ATBR.MxKleeneAlgebra.html#star_build"><span class="id" title="definition">star_build</span></a>.<br/>
+
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">change</span> (<a class="idref" href="http://coq.inria.fr/distrib/V8.10.2/stdlib//Coq.Init.Datatypes.html#S"><span class="id" title="constructor">S</span></a> <span class="id" title="var">n</span>) <span class="id" title="keyword">with</span> (1<a class="idref" href="http://coq.inria.fr/distrib/V8.10.2/stdlib//Coq.Init.Peano.html#0dacc1786c5ba797d47dd85006231633"><span class="id" title="notation">+</span></a><span class="id" title="var">n</span>)%<span class="id" title="var">nat</span>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> <a class="idref" href="ATBR.MxFunctors.html#functor_mx_blocks"><span class="id" title="lemma">functor_mx_blocks</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> <a class="idref" href="ATBR.Functors.html#functor_plus"><span class="id" title="method">functor_plus</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> !<a class="idref" href="ATBR.Functors.html#functor_dot"><span class="id" title="method">functor_dot</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> !<a class="idref" href="ATBR.MxFunctors.html#functor_mx_of_scal"><span class="id" title="lemma">functor_mx_of_scal</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> <a class="idref" href="ATBR.Functors.html#functor_star"><span class="id" title="method">functor_star</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> <a class="idref" href="ATBR.MxFunctors.html#functor_mx_to_scal"><span class="id" title="lemma">functor_mx_to_scal</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> <a class="idref" href="ATBR.Functors.html#functor_plus"><span class="id" title="method">functor_plus</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">rewrite</span> <a class="idref" href="ATBR.Functors.html#functor_dot"><span class="id" title="method">functor_dot</span></a>.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">do</span> 4 <span class="id" title="tactic">rewrite</span> <a class="idref" href="ATBR.Functors.html#functor_dot"><span class="id" title="method">functor_dot</span></a> <span class="id" title="tactic">at</span> 1.<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="id" title="tactic">do</span> 9 <span class="id" title="tactic">rewrite</span> <span class="id" title="var">IHn</span> <span class="id" title="tactic">at</span> 1. <span class="id" title="tactic">reflexivity</span>.<br/>
+&nbsp;&nbsp;&nbsp;<span class="id" title="keyword">Qed</span>.<br/>
+
+<br/>
+<span class="id" title="keyword">End</span> <a class="idref" href="ATBR.MxFunctors.html#Defs"><span class="id" title="section">Defs</span></a>.<br/>
+</div>
+</div>
+<div id="footer">
+  Generated by <a href="http://coq.inria.fr/">coqdoc</a> and improved with <a href="https://github.com/tebbi/coqdocjs">CoqdocJS</a>
+</div>
+</div>
+</body>
+
+</html>
