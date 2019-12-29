@@ -4,6 +4,7 @@
 [![Contributing][contributing-shield]][contributing-link]
 [![Code of Conduct][conduct-shield]][conduct-link]
 [![Gitter][gitter-shield]][gitter-link]
+[![coqdoc][coqdoc-shield]][coqdoc-link]
 [![DOI][doi-shield]][doi-link]
 
 [travis-shield]: https://travis-ci.com/coq-community/atbr.svg?branch=master
@@ -17,6 +18,9 @@
 
 [gitter-shield]: https://img.shields.io/badge/chat-on%20gitter-%23c1272d.svg
 [gitter-link]: https://gitter.im/coq-community/Lobby
+
+[coqdoc-shield]: https://img.shields.io/badge/docs-coqdoc-blue.svg
+[coqdoc-link]: https://coq-community.github.io/atbr/toc.html
 
 [doi-shield]: https://zenodo.org/badge/DOI/10.2168/LMCS-8(1:16)2012.svg
 [doi-link]: https://doi.org/10.2168/LMCS-8(1:16)2012
@@ -68,8 +72,12 @@ make install
 
 ## Documentation
 
-Here is a succinct description of each file.
-The user can also refer to files `Examples.v` and `ChurchRosser.v`.
+The development and underlying theory of the library is described in the paper
+[Deciding Kleene Algebras in Coq][paper], Logical Methods in Computer Science,
+Volume 8, Issue 1.
+
+Below are succinct descriptions of each file and tactic. See also the
+[coqdoc presentation][coqdoc] of the Coq source files.
 
 ### Library files
 
@@ -206,4 +214,7 @@ The initial authors would like to thank Guilhem Moulin and Sebastien Briais,
 who participated to a preliminary version of this project. They are also grateful
 to Assia Mahboubi, Matthieu Sozeau, Bruno Barras, and Hugo Herbelin for highly
 stimulating discussions, as well as numerous hints for solving various problems.
+
+[paper]: https://arxiv.org/abs/1105.4537
+[coqdoc]: https://coq-community.github.io/atbr/toc.html
 
