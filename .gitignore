@@ -1,4 +1,5 @@
 # build output
+_build
 *.aux
 *.vo
 *.glob
@@ -18,3 +19,4 @@ Makefile.coq.conf
 *.a
 *.cmxa
 src/reification.ml
+src/.merlin

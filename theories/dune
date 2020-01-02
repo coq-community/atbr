@@ -1,0 +1,10 @@
+(coq.theory
+ (name ATBR)
+ (public_name coq-atbr.theory)
+ (libraries coq-atbr.plugin)
+ (flags :standard
+   -w -variable-collision
+   -w -projection-no-head-constant
+   -w -undo-batch-mode
+   -w -undeclared-scope
+   -w -ambiguous-paths))

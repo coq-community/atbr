@@ -1,0 +1,8 @@
+(library
+ (name reification_plugin)
+ (public_name coq-atbr.plugin)
+ (synopsis "ATBR Plugin")
+ (flags :standard -rectypes -w -27 -w -3)
+ (libraries coq.plugins.ltac))
+
+(coq.pp (modules reification))
