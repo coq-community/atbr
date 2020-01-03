@@ -202,7 +202,9 @@ Section Props1.
   Variables A B: T.
   
   Lemma zero_inf: forall (x: X A B), 0 <== x.
-  Proof (@plus_neutral_left _ _ _ A B).  
+  Proof.
+    exact (@plus_neutral_left _ _ _ A B).
+  Qed.
   
   Lemma plus_make_left: forall (x y: X A B), x <== x+y.
   Proof. intros; unfold leq. rewrite plus_assoc, plus_idem. reflexivity. Qed.

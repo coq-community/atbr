@@ -197,7 +197,9 @@ Section Props2.
   Qed.
 
   Lemma a_star_a_leq_star_a: forall (a: X A A), a*a# <== a#.
-  Proof star_a_a_leq_star_a (KA:=Dual.KleeneAlgebra) (A:=A).
+  Proof.
+    exact (star_a_a_leq_star_a (KA:=Dual.KleeneAlgebra) (A:=A)).
+  Qed.
 
   Lemma star_distr (a b: X A A): (a + b)# == a# * (b*a#)#.
   Proof.
@@ -247,10 +249,14 @@ Section Props3.
   Context `{KA: KleeneAlgebra}.
   
   Lemma semicomm_iter_left: forall A B (a: X A A) (b: X B B) (c: X A B), a*c <== c*b -> a#*c <== c*b#.
-  Proof semicomm_iter_right (KA:=Dual.KleeneAlgebra).
+  Proof.
+    exact (semicomm_iter_right (KA:=Dual.KleeneAlgebra)).
+  Qed.
 
   Lemma wsemicomm_iter_left: forall A (b a : X A A), a*b <== b*a#  ->  a#*b <== b*a#.
-  Proof wsemicomm_iter_right (KA:=Dual.KleeneAlgebra).
+  Proof.
+    exact (wsemicomm_iter_right (KA:=Dual.KleeneAlgebra)).
+  Qed.
 
   Lemma comm_iter_left A B (x : X A B) a b:  a * x == x * b -> a# * x == x * b# .
   Proof.
@@ -272,6 +278,8 @@ Section Props4.
   Context `{KA: KleeneAlgebra}.
   
   Lemma comm_iter_right: forall B A (x : X A B) a b,  x * a == b * x -> x * a# == b# * x .
-  Proof comm_iter_left (KA:=Dual.KleeneAlgebra).
+  Proof.
+    exact (comm_iter_left (KA:=Dual.KleeneAlgebra)).
+  Qed.
 
 End Props4.
