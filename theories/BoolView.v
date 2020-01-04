@@ -28,8 +28,7 @@
    simplification lemmas, in order to transform, e.g., [eq_nat_bool x x]
    into [true]
    
-   *)
-
+*)
 
 Require Import Common.
 Require Export Bool.

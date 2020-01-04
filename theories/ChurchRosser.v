@@ -6,10 +6,10 @@
 (*       Copyright 2009-2011: Thomas Braibant, Damien Pous.               *)
 (**************************************************************************)
 
-(** Short mechanised proofs of the Church-Rosser Theorems mentioned by Georg Struth in 
+(** Short mechanised proofs of the Church-Rosser Theorems mentioned by Georg Struth in
    #<a href="http://link.springer.de/link/service/series/0558/bibs/2561/25610276.htm">
    Calculating Church-Rosser Proofs in Kleene Algebra</a>#.
-   *)
+*)
 
 Require Import ATBR.
 

@@ -80,6 +80,7 @@ Section wf_to.
     rel_to_intro: forall a' a, R a' a -> rel_to (f a') (f a).
   Hypothesis HR: well_founded rel_to.
   Theorem rel_to_wf: well_founded R.
+  Proof.
     intro a. remember (f a) as fa. revert a Heqfa.
     induction fa as [fa IHa] using (well_founded_induction HR).
     constructor. intros a' H. subst. eapply IHa; trivial. constructor. trivial.
@@ -102,7 +103,7 @@ Section wf_lexico_incl.
     intros [a' b'] [a b] [u' u Hab]. auto. 
   Qed.
 End wf_lexico_incl.
-   
+
 
 (** Lazy partial fixpoint operators (lazy iterator):
     we use these functions to avoid the computation of a (2^n) worst-case
