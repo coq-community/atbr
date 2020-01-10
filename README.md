@@ -216,5 +216,5 @@ to Assia Mahboubi, Matthieu Sozeau, Bruno Barras, and Hugo Herbelin for highly
 stimulating discussions, as well as numerous hints for solving various problems.
 
 [paper]: https://arxiv.org/abs/1105.4537
-[coqdoc]: https://coq-community.github.io/huffman/docs/latest/coqdoc/toc.html
+[coqdoc]: https://coq-community.github.io/atbr/docs/latest/coqdoc/toc.html
 
