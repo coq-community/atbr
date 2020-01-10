@@ -20,7 +20,7 @@
 [gitter-link]: https://gitter.im/coq-community/Lobby
 
 [coqdoc-shield]: https://img.shields.io/badge/docs-coqdoc-blue.svg
-[coqdoc-link]: https://coq-community.github.io/atbr/toc.html
+[coqdoc-link]: https://coq-community.github.io/atbr/docs/latest/coqdoc/toc.html
 
 [doi-shield]: https://zenodo.org/badge/DOI/10.2168/LMCS-8(1:16)2012.svg
 [doi-link]: https://doi.org/10.2168/LMCS-8(1:16)2012
@@ -77,7 +77,7 @@ The development and underlying theory of the library is described in the paper
 Volume 8, Issue 1.
 
 Below are succinct descriptions of each file and tactic. See also the
-[coqdoc presentation][coqdoc] of the Coq source files.
+[coqdoc presentation][coqdoc] of the Coq source files from the latest release.
 
 ### Library files
 
@@ -216,5 +216,5 @@ to Assia Mahboubi, Matthieu Sozeau, Bruno Barras, and Hugo Herbelin for highly
 stimulating discussions, as well as numerous hints for solving various problems.
 
 [paper]: https://arxiv.org/abs/1105.4537
-[coqdoc]: https://coq-community.github.io/atbr/toc.html
+[coqdoc]: https://coq-community.github.io/huffman/docs/latest/coqdoc/toc.html
 
