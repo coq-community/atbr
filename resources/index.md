@@ -34,7 +34,9 @@ The current stable release of ATBR can be [downloaded from GitHub](https://githu
 
 ## Documentation
 
-The [coqdoc presentation](toc.html) of the source files from the latest release can be browsed online.
+The coqdoc presentations of releases can be browsed online:
+
+- [v8.10.0](docs/v8.10.0/coqdoc/toc.html)
 
 Other related publications, if any, are listed below.
 
