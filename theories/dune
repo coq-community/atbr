@@ -1,6 +1,6 @@
 (coq.theory
  (name ATBR)
- (public_name coq-atbr.theory)
+ (public_name coq-atbr.ATBR)
  (libraries coq-atbr.plugin)
  (flags :standard
    -w -variable-collision
