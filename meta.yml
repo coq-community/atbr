@@ -42,8 +42,6 @@ license:
   fullname: GNU Lesser General Public License v3.0 or later
   identifier: LGPL-3.0-or-later
 
-plugin: true
-
 supported_coq_versions:
   text: master (use the corresponding branch or release for other Coq versions)
   opam: '{= "dev"}'
