@@ -4,9 +4,10 @@ shortname: atbr
 organization: coq-community
 community: true
 travis: true
+coqdoc: true
 doi: 10.2168/LMCS-8(1:16)2012
 
-synopsis: A Coq tactic for deciding Kleene algebras
+synopsis: Coq library and tactic for deciding Kleene algebras
 
 description: |-
   This library provides algebraic tools for working with binary relations.
@@ -32,8 +33,6 @@ authors:
 maintainers:
 - name: Tej Chajed
   nickname: tchajed
-- name: Karl Palmskog
-  nickname: palmskog
 
 opam-file-maintainer: palmskog@gmail.com
 
@@ -43,11 +42,13 @@ license:
   fullname: GNU Lesser General Public License v3.0 or later
   identifier: LGPL-3.0-or-later
 
-plugin: true
-
 supported_coq_versions:
   text: 8.11 (use the corresponding branch or release for other Coq versions)
   opam: '{>= "8.11" & < "8.12~"}'
+
+supported_ocaml_versions:
+    text: 4.05.0 or later
+    opam: '{>= "4.05.0"}'
 
 tested_coq_nix_versions:
 - version_or_url: '8.11'
@@ -72,8 +73,12 @@ categories:
 documentation: |
   ## Documentation
 
-  Here is a succinct description of each file.
-  The user can also refer to files `Examples.v` and `ChurchRosser.v`.
+  The development and underlying theory of the library is described in the paper
+  [Deciding Kleene Algebras in Coq][paper], Logical Methods in Computer Science,
+  Volume 8, Issue 1, 2012.
+
+  Below are succinct descriptions of each file and tactic. See also the
+  [coqdoc presentation][coqdoc] of the Coq source files from the latest release.
 
   ### Library files
 
@@ -210,4 +215,7 @@ documentation: |
   who participated to a preliminary version of this project. They are also grateful
   to Assia Mahboubi, Matthieu Sozeau, Bruno Barras, and Hugo Herbelin for highly
   stimulating discussions, as well as numerous hints for solving various problems.
+
+  [paper]: https://arxiv.org/abs/1105.4537
+  [coqdoc]: https://coq-community.github.io/atbr/docs/latest/coqdoc/toc.html
 ---

@@ -5,9 +5,10 @@ version: "8.11.dev"
 homepage: "https://github.com/coq-community/atbr"
 dev-repo: "git+https://github.com/coq-community/atbr.git"
 bug-reports: "https://github.com/coq-community/atbr/issues"
+doc: "https://coq-community.github.io/atbr/"
 license: "LGPL-3.0-or-later"
 
-synopsis: "A Coq tactic for deciding Kleene algebras"
+synopsis: "Coq library and tactic for deciding Kleene algebras"
 description: """
 This library provides algebraic tools for working with binary relations.
 The main tactic provided is a reflexive tactic for solving (in)equations
@@ -21,7 +22,7 @@ rather than automata: https://github.com/damien-pous/relation-algebra"""
 build: [make "-j%{jobs}%"]
 install: [make "install"]
 depends: [
-  "ocaml"
+  "ocaml" {>= "4.05.0"}
   "coq" {>= "8.11" & < "8.12~"}
 ]
 

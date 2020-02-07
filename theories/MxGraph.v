@@ -49,7 +49,9 @@ Section Defs.
 
   Lemma mx_equal': forall n m (M N: @Classes.X mx_Graph n m) 
     (H: forall i j, i<n -> j<m -> get M i j == get N i j), M == N.
-  Proof (fun _ _ _ _ H => H).
+  Proof.
+    exact (fun _ _ _ _ H => H).
+  Qed.
   
   Definition mx_equal_at p q n m n' m' (M : MX n m) (N : MX n' m') := 
     forall i j, i < p -> j < q -> get M i j == get N i j.
