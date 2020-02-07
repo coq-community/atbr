@@ -41,11 +41,10 @@ rather than automata: https://github.com/damien-pous/relation-algebra
   - Damien Pous (initial)
 - Coq-community maintainer(s):
   - Tej Chajed ([**@tchajed**](https://github.com/tchajed))
-  - Karl Palmskog ([**@palmskog**](https://github.com/palmskog))
 - License: [GNU Lesser General Public License v3.0 or later](LICENSE)
 - Compatible Coq versions: master (use the corresponding branch or release for other Coq versions)
-- Compatible OCaml versions: all versions supported by Coq
-- Additional Coq dependencies: none
+- Compatible OCaml versions: 4.05.0 or later
+- Additional dependencies: none
 - Coq namespace: `ATBR`
 - Related publication(s):
   - [Deciding Kleene Algebras in Coq](https://arxiv.org/abs/1105.4537) doi:[10.2168/LMCS-8(1:16)2012](https://doi.org/10.2168/LMCS-8(1:16)2012)
@@ -74,7 +73,7 @@ make install
 
 The development and underlying theory of the library is described in the paper
 [Deciding Kleene Algebras in Coq][paper], Logical Methods in Computer Science,
-Volume 8, Issue 1.
+Volume 8, Issue 1, 2012.
 
 Below are succinct descriptions of each file and tactic. See also the
 [coqdoc presentation][coqdoc] of the Coq source files from the latest release.
