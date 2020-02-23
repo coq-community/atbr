@@ -117,7 +117,7 @@ Ltac display_counter_example e ce :=
   let eval_word w :=
     let rec build w :=
       lazymatch w with
-      | nil => fail 1
+      | nil => fail 0
       | ?x::nil => constr:(Reification.unpack (@Reification.val _ e x))
       | ?x::?q => let q := build q in constr:(q * Reification.unpack (@Reification.val _ e x))
       end
