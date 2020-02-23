@@ -91,6 +91,26 @@ Section Tactics.
     rewrite <- H.
     kleene_reflexivity.
   Qed.
+
+  (** kleene_reflexivity is a decision procedure, which means it also produces a
+  counter-example when the goal is false. It typically reports a single string
+  that appears on one side but not the other. *)
+  Goal b# <== a*b*c.
+    Fail kleene_reflexivity.
+  Abort.
+
+  Goal a <== b.
+    Fail kleene_reflexivity.
+  Abort.
+
+  Goal a*b# <== a*b*c.
+    Fail kleene_reflexivity.
+  Abort.
+
+  Goal b#*a# == b#*1*a.
+    Fail kleene_reflexivity.
+  Abort.
+
   End DKA.
   
 
@@ -150,7 +170,7 @@ Section Tactics.
 
   Goal c*d <== 0 -> a*b*c*d <== 0.
     intro H.
-    (** parentheses do not match *) 
+    (** parentheses do not match *)
     try rewrite H.
     monoid_rewrite H.
     semiring_reflexivity.
@@ -213,14 +233,14 @@ Section Matrices.
   Lemma square_constant a: constant a * constant a == constant (a*a).
   Proof. 
     (** since the dimensions are known (and finite), the matricial product can be computed *)
-    simpl.                     
+    simpl.
     (** the [mx_intros] simple tactic introduces indices to prove a
     matricial equality; it is useful when considering vectors: only
     one dimension is introduced *)
-    mx_intros i j Hi Hj.        
+    mx_intros i j Hi Hj.
     simpl.
     (* easy goal, on the underlying algebra *)
-    semiring_reflexivity.            
+    semiring_reflexivity.
   Qed.
 
   (** Our tactics automatically work for matrices (matrices are just another idempotent semiring) *)
@@ -228,7 +248,7 @@ Section Matrices.
     M*1*N + P == P+M*N.
   Proof.
     intros.
-    semiring_reflexivity.       
+    semiring_reflexivity.
   Qed.
 
   (** Block matrices manipulation *)
@@ -256,7 +276,7 @@ End Matrices.
      For example, it is shown in Model_Relations.v that
      (heterogeneous) binary relations form a Kleene algebra with
      converse. This file can easily be adapted to use other
-     definitions.  
+     definitions.
      *)
 
 
