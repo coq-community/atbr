@@ -5,6 +5,7 @@ organization: coq-community
 community: true
 travis: true
 coqdoc: true
+plugin: true
 doi: 10.2168/LMCS-8(1:16)2012
 
 synopsis: Coq library and tactic for deciding Kleene algebras
