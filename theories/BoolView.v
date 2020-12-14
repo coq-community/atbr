@@ -124,6 +124,7 @@ Definition eq_bool_bool := Bool.eqb.
 Lemma eq_bool_spec : forall a b, reflect (a=b) (eq_bool_bool a b).
 Proof.
   intros [|] [|]; simpl; constructor; firstorder.
+  congruence.
 Qed.
 
 Instance eq_bool_view : Type_View eq_bool_bool := { type_view := eq_bool_spec }.
@@ -208,7 +209,7 @@ Proof. intros [|]; firstorder. Qed.
 Lemma negb_false  : forall b, negb b = false <-> b = true. 
 Proof. intros [|]; firstorder. Qed.
 Lemma eq_not_negb  : forall b c, b = c <-> ~ (b = negb c). 
-Proof. intros [|] [|]; firstorder. Qed.
+Proof. intros [|] [|]; firstorder; simpl; try congruence. Qed.
 
 Hint Rewrite andb_false_iff andb_true_iff orb_false_iff orb_true_iff negb_true negb_false : bool_connectors.
 

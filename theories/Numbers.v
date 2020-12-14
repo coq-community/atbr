@@ -75,7 +75,7 @@ Module Type NUM.
   Axiom le_spec : forall n m, reflect (le n m) (leb n m).
   Axiom lt_spec : forall n m, reflect (lt n m) (ltb n m).
   Axiom eq_spec : forall n m, reflect (n = m)  (eqb n m).
-  Axiom compare_spec : forall n m, compare_spec eq lt n m (compare n m).
+  Axiom compare_spec : forall n m, BoolView.compare_spec eq lt n m (compare n m).
 
   (* specification of operations and predicates, w.r.t. nat *)
   Axiom S_nat_spec : forall n, nat_of_num (S n) = Datatypes.S (nat_of_num n).
@@ -372,7 +372,7 @@ Module Positive <: NUM.
     intro H'. apply ZC1 in H. assert (H'' := Pos.lt_trans _ _ _ H H'). refine (Pos.lt_irrefl _ H''). 
   Qed.
   Definition eq_spec := eq_pos_spec.
-  Lemma compare_spec : forall n m, compare_spec eq lt n m (compare n m). 
+  Lemma compare_spec : forall n m, BoolView.compare_spec eq lt n m (compare n m). 
   Proof. 
    intros.
    case_eq (compare n m); intro H;  constructor.

@@ -66,7 +66,7 @@ Fixpoint contains_one e : bool :=
     | RegExp.one => true
     | RegExp.plus a b => contains_one a ||| contains_one b
     | RegExp.dot a b => contains_one a &&& contains_one b
-    | e => false
+    | _ => false
   end.
 
 Definition plus_but_one a b := 

@@ -152,7 +152,7 @@ Proof.
   subst t0 t1. clear t0'. intro x. 
   setoid_rewrite StateSetSetProps.mem_iff. 
   do 2 rewrite StateSetSetProps.EqProps.filter_mem by solve_p1.
-  StateSetProps.mem_analyse; StateSetSetProps.mem_analyse; simpl; firstorder. 
+  StateSetProps.mem_analyse; StateSetSetProps.mem_analyse; simpl; firstorder congruence.
   
   subst t0 t1. clear t0'. intro x. 
   rewrite StateSetSetProps.EqProps.union_filter by trivial.

@@ -97,13 +97,14 @@ Transparent dot plus star one zero.
 Lemma lang_sum: forall (f: nat -> language) w n i, sum i n f w <-> exists2 j, j<n & f (i+j)%nat w.
 Proof.
   induction n. 
-   compute. firstorder.
-   intros j. simpl. unfold lang_union. rewrite IHn. clear IHn. intuition. 
-   exists O; auto with arith. rewrite plus_comm. assumption.
-   destruct H0 as [k ? ?]. exists (Datatypes.S k); auto with arith. rewrite <- plus_n_Sm. assumption.
-   destruct H as [[|k] ? ?].
-    left. rewrite plus_comm in H0. assumption.
-    right. exists k; auto with arith. rewrite <- plus_n_Sm in H0. assumption.
+  - compute. firstorder.
+    omega.
+  - intros j. simpl. unfold lang_union. rewrite IHn. clear IHn. intuition. 
+    exists O; auto with arith. rewrite plus_comm. assumption.
+    destruct H0 as [k ? ?]. exists (Datatypes.S k); auto with arith. rewrite <- plus_n_Sm. assumption.
+    destruct H as [[|k] ? ?].
+    + left. rewrite plus_comm in H0. assumption.
+    + right. exists k; auto with arith. rewrite <- plus_n_Sm in H0. assumption.
 Qed.   
 
 Lemma mx_leq_pointwise `{SL: SemiLattice}: forall n m A (M N: MX_ A n m), 

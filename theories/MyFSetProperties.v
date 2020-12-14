@@ -297,12 +297,13 @@ Module MySetProps (X : FSetInterface.S).
         rewrite <- (Hcompat _ _ H0) in H1. auto. 
         firstorder. 
         firstorder. 
-        firstorder. 
+        eauto using E.eq_refl.
     Qed.
 
     Lemma exists_empty :  exists_ f empty = false.
     Proof.
       assert (forall b, b = false <-> ~b=true). clear. intros [|]; firstorder.
+      congruence.
       rewrite H.  clear H. intro. 
       rewrite <- exists_iff in H. destruct H. setdec.
       apply Hcompat.

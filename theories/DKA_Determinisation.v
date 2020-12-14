@@ -144,13 +144,14 @@ Section S.
   Proof.
     unfold build_store.
     pose (Heq:=powerfix_linearfix (A:=Store) (B:=stateset -> num -> Store) (R:=pointwise_relation _ (pointwise_relation _ (@eq _)))).
-    unfold pointwise_relation at -1 -2 -3 in Heq.
     rewrite Heq. 
     generalize (state_of_nat 0) initiaux initial_store. generalize (power size) as n. 
     induction n; intros s p np; simpl.
      reflexivity.
      apply fold_num_compat, step_compat. repeat intro. apply IHn.
-     intros f g H s ? <- p np. apply fold_num_compat, step_compat, H.  
+     intros f g H s ? <- p np. apply fold_num_compat, step_compat.  
+     unfold pointwise_relation; simpl.
+     apply H.
   Qed.
 
 
