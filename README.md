@@ -1,14 +1,14 @@
 # ATBR
 
-[![Travis][travis-shield]][travis-link]
+[![CI][action-shield]][action-link]
 [![Contributing][contributing-shield]][contributing-link]
 [![Code of Conduct][conduct-shield]][conduct-link]
-[![Gitter][gitter-shield]][gitter-link]
+[![Zulip][zulip-shield]][zulip-link]
 [![coqdoc][coqdoc-shield]][coqdoc-link]
 [![DOI][doi-shield]][doi-link]
 
-[travis-shield]: https://travis-ci.com/coq-community/atbr.svg?branch=master
-[travis-link]: https://travis-ci.com/coq-community/atbr/builds
+[action-shield]: https://github.com/coq-community/atbr/workflows/CI/badge.svg?branch=master
+[action-link]: https://github.com/coq-community/atbr/actions?query=workflow%3ACI
 
 [contributing-shield]: https://img.shields.io/badge/contributions-welcome-%23f7931e.svg
 [contributing-link]: https://github.com/coq-community/manifesto/blob/master/CONTRIBUTING.md
@@ -16,11 +16,11 @@
 [conduct-shield]: https://img.shields.io/badge/%E2%9D%A4-code%20of%20conduct-%23f15a24.svg
 [conduct-link]: https://github.com/coq-community/manifesto/blob/master/CODE_OF_CONDUCT.md
 
-[gitter-shield]: https://img.shields.io/badge/chat-on%20gitter-%23c1272d.svg
-[gitter-link]: https://gitter.im/coq-community/Lobby
+[zulip-shield]: https://img.shields.io/badge/chat-on%20zulip-%23c1272d.svg
+[zulip-link]: https://coq.zulipchat.com/#narrow/stream/237663-coq-community-devs.20.26.20users
 
 [coqdoc-shield]: https://img.shields.io/badge/docs-coqdoc-blue.svg
-[coqdoc-link]: https://coq-community.github.io/atbr/docs/latest/coqdoc/toc.html
+[coqdoc-link]: https://coq-community.org/atbr
 
 [doi-shield]: https://zenodo.org/badge/DOI/10.2168/LMCS-8(1:16)2012.svg
 [doi-link]: https://doi.org/10.2168/LMCS-8(1:16)2012
@@ -62,9 +62,9 @@ opam install coq-atbr
 To instead build and install manually, do:
 
 ``` shell
-git clone https://github.com/coq-community/atbr
+git clone https://github.com/coq-community/atbr.git
 cd atbr
-make   # or make -j <number-of-cores-on-your-machine>
+make   # or make -j <number-of-cores-on-your-machine> 
 make install
 ```
 

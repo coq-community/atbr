@@ -15,14 +15,11 @@ pkgs.stdenv.mkDerivation {
 
   name = "atbr";
 
-  buildInputs = with coq.ocamlPackages; [ ocaml findlib ]
-    ++ pkgs.lib.optionals shell [ merlin ocp-indent ocp-index ];
-
   propagatedBuildInputs = [
     coq
   ];
 
   src = if shell then null else ./.;
 
-  installFlags = "COQLIB=$(out)/lib/coq/${coq.coq-version}/";
+  installFlags = "COQMF_COQLIB=$(out)/lib/coq/${coq.coq-version}/";
 }

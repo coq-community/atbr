@@ -3,7 +3,7 @@ fullname: ATBR
 shortname: atbr
 organization: coq-community
 community: true
-travis: true
+action: true
 coqdoc: true
 doi: 10.2168/LMCS-8(1:16)2012
 
