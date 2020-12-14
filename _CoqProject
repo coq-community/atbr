@@ -3,7 +3,7 @@
 
 -arg -w -arg +default
 # FIXME
--arg -w -arg -deprecated-hint-without-locality,-omega-is-deprecated
+-arg -w -arg -deprecated-hint-without-locality
 -arg -w -arg -variable-collision
 -arg -w -arg -projection-no-head-constant
 -arg -w -arg -undo-batch-mode

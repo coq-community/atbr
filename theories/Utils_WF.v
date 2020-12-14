@@ -129,7 +129,7 @@ Section powerfix.
   Fixpoint power n := match n with O => 1 | S n => 2*power n end.
 
   Lemma power_positive: forall n, 0 < power n.
-  Proof. induction n; simpl; omega. Qed.
+  Proof. induction n; simpl; lia. Qed.
 
   (** Characterisation of [powerfix] with [linearfix] *)
   Section linear_carac.
@@ -176,7 +176,7 @@ Section powerfix.
        reflexivity.
        rewrite IHn. rewrite IHn.
        pose proof (power_positive n). 
-       replace (pred (power n + (power n + 0))) with (S (pred (power n) + pred (power n))) by omega.
+       replace (pred (power n + (power n + 0))) with (S (pred (power n) + pred (power n))) by lia.
        rewrite linearfix_plus.
        reflexivity.
     Qed.
@@ -187,7 +187,7 @@ Section powerfix.
     Proof.
       intros. unfold powerfix. setoid_rewrite powerfix'_linearfix.
       generalize (power_positive n). destruct (power n). 
-       intro. omega_false.
+       intro. lia_false.
        intro. reflexivity.
     Qed.
 

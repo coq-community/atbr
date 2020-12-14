@@ -76,7 +76,7 @@ Proof.
   apply StateSetProps.Props.empty_is_empty_1.
   rewrite StateSetProps.Props.elements_Empty.
   remember (StateSet.elements p) as l. destruct l as [|i l]. trivial.
-  specialize (H i). apply apply in H. exfalso. clear - H. num_omega.
+  specialize (H i). apply apply in H. exfalso. clear - H. num_lia.
   rewrite StateSetProps.Facts.elements_iff. rewrite <- Heql. auto. 
 Qed.
 
@@ -114,7 +114,7 @@ Proof.
   replace (StateSetSet.cardinal t0) with (StateSetSet.cardinal t0').
   assert (IH1 := IHs t1). apply apply in IH1. 
   assert (IH0 := IHs t0'). apply apply in IH0. 
-  omega.
+  lia.
 
    subst t0' t0. clear t1 IH1 IH0. intros p Hp. 
    destruct (statesetset_map_in Hp) as [q Hq Hq']. revert Hq.
@@ -126,7 +126,7 @@ Proof.
     exfalso. revert Hx. clear. StateSetProps.setdec. 
    rewrite <- StateSetSetProps.mem_iff in Hq. 
    rewrite <- StateSetProps.mem_iff in Hq''. 
-   specialize (H q Hq x). apply apply in H. clear - H n. num_omega. StateSetProps.setdec.
+   specialize (H q Hq x). apply apply in H. clear - H n. num_lia. StateSetProps.setdec.
 
    subst t1. clear t0 t0' IH1. intro p. 
    rewrite StateSetSetProps.mem_iff.
@@ -134,7 +134,7 @@ Proof.
    case_eq (StateSetSet.mem p t). 2:(intros; discriminate). simpl. intros Hp Hp'. 
    intros x Hx. 
    destruct (eq_num_dec x s). subst. apply StateSet.mem_1 in Hx. rewrite Hx in Hp'. discriminate.
-   apply StateSetSet.mem_2 in Hp. pose (H' := H p Hp x Hx). num_omega.
+   apply StateSetSet.mem_2 in Hp. pose (H' := H p Hp x Hx). num_lia.
 
   subst t0' t0. clear t1.
   apply statesetset_map_cardinal. 
@@ -239,14 +239,14 @@ Lemma in_classes: forall t size x,
   StateSetSet.In x (classes size t) <-> exists2 y, y<size & StateSet.Equal x (DS.class_of t (state_of_nat y)).
 Proof.
   induction size; intros x; simpl; unfold add_classes; StateSetSetProps.set_iff.
-   intuition. destruct H. omega.
+   intuition. destruct H. lia.
    rewrite IHsize. clear IHsize.
    completer idtac.
-    symmetry in H. eauto with omega.
-    destruct H. eauto with omega.
+    symmetry in H. eauto with lia.
+    destruct H. eauto with lia.
     destruct H as [y Hy H]. destruct (eq_nat_dec y size). subst. 
      symmetry in H. auto.
-     right. exists y. omega. assumption. 
+     right. exists y. lia. assumption. 
 Qed.
 
 Lemma in_classes_empty_below: forall size x, 
@@ -255,7 +255,7 @@ Proof.
   intros size x H z. 
   rewrite in_classes in H. destruct H as [y Hy H].
   rewrite H. rewrite DSUtils.class_of_empty. StateSetProps.set_iff. 
-  intro. psubst. num_omega.
+  intro. psubst. num_lia.
 Qed.
 
 Lemma add_classes_empty: forall x a, 
@@ -278,9 +278,9 @@ Proof.
     clear. intros [H|H].
      eapply proj1 in H. apply apply in H. 2: rewrite StateSetProps.singleton_iff; trivial.
      revert H. StateSetProps.set_iff. intro. psubst. 
-     revert H. generalize (statesetelt_of_nat s). intro. num_omega.
+     revert H. generalize (statesetelt_of_nat s). intro. num_lia.
      apply in_classes_empty_below in H. specialize (H (Pos.succ (state_of_nat s))).
-     apply apply in H. num_omega. auto with set.
+     apply apply in H. num_lia. auto with set.
 Qed.
 
 Lemma classes_union_strict: forall `{DS.WF} size (x y: state), 
@@ -318,7 +318,7 @@ Lemma add_cardinal: forall s s' x,
   StateSetSet.cardinal (StateSetSet.add x s) < StateSetSet.cardinal s'.
 Proof.
   intros. destruct (StateSetSetProps.mem_spec x s) as [Hx|Hx]. 
-   rewrite StateSetSetProps.Props.add_cardinal_1; auto with omega.
+   rewrite StateSetSetProps.Props.add_cardinal_1; auto with lia.
    rewrite StateSetSetProps.Props.add_cardinal_2; auto.
 Qed.
 

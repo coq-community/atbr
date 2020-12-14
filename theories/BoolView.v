@@ -92,8 +92,8 @@ Instance le_nat_view : Type_View le_lt_bool := { type_view := le_nat_spec }.
 
 Ltac nat_analyse := 
   repeat (
-    try (type_view eq_nat_bool; try subst; try omega_false);
-    try (type_view le_lt_bool; try subst; try omega_false)
+    try (type_view eq_nat_bool; try subst; try lia_false);
+    try (type_view le_lt_bool; try subst; try lia_false)
   ).
 
 
@@ -144,7 +144,7 @@ Proof. intros. nat_analyse; intuition discriminate. Qed.
 Lemma le_lt_bool_true : forall x y, le_lt_bool x y = true <-> x <= y. 
 Proof. intros. nat_analyse; intuition. Qed.
 Lemma le_lt_bool_false : forall x y, le_lt_bool x y = false <-> y < x. 
-Proof. intros. nat_analyse; intuition. Qed.
+Proof. intros. nat_analyse; intuition. lia. Qed.
 
 Hint Rewrite eq_nat_bool_true eq_nat_bool_false le_lt_bool_true le_lt_bool_false : nat_prop.
 Ltac nat_prop := autorewrite with nat_prop in *.

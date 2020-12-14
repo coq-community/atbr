@@ -255,7 +255,7 @@ Proof.
    intros i Hi. destruct (eq_num_dec i size).
     subst. auto. 
     apply IHin. destruct Hi as [Hi|Hi]; auto.
-    left. clear -Hi n. num_omega.
+    left. clear -Hi n. num_lia.
 Qed.
 
 
@@ -316,27 +316,27 @@ Proof.
    apply algebraic_rt_closure; mx_intros i j Hi Hj; simpl; fold_regex; fold_leq. 
     nat_analyse; fold_regex; auto with algebra.
     subst. type_view StateSet.mem; auto with algebra. 
-    elim n. rewrite <- rt_closure_spec by num_omega. constructor 1.
+    elim n. rewrite <- rt_closure_spec by num_lia. constructor 1.
 
     apply sum_leq. intros k _ Hk.
     type_view StateSet.mem. 2: simpl; fold_regex; semiring_reflexivity.
     type_view StateSet.mem. 2: simpl; fold_regex; semiring_reflexivity.
     type_view StateSet.mem. simpl; fold_regex; semiring_reflexivity.
     elim n.
-     rewrite <- rt_closure_spec by num_omega. 
+     rewrite <- rt_closure_spec by num_lia. 
      apply trans_rt1n. constructor 3 with (sn k); 
-      apply rt1n_trans; apply <- rt_closure_spec; eauto; unfold below; num_omega.
+      apply rt1n_trans; apply <- rt_closure_spec; eauto; unfold below; num_lia.
      
     type_view StateSet.mem. 2: simpl; fold_regex; semiring_reflexivity.
     type_view StateSet.mem. simpl; fold_regex; semiring_reflexivity.
     elim n.
-     rewrite <- rt_closure_spec by num_omega.
+     rewrite <- rt_closure_spec by num_lia.
      constructor 2 with (sn j). apply StateSet.mem_1 in i0. assumption. constructor 1.
 
    mx_intros i j Hi Hj. simpl. fold_regex; fold_leq.
    set (m := mx_bool Datatypes.tt (ns size) (ns size) (fun i j => StateSet.mem (sn j) (f (sn i)))).
    type_view StateSet.mem; auto with algebra. rename i0 into Hij.
-   rewrite <- rt_closure_spec in Hij by num_omega.
+   rewrite <- rt_closure_spec in Hij by num_lia.
    revert Hi Hj. rewrite <- (id_nat i), <- (id_nat j). revert Hij.  
    generalize (sn j) as j'. generalize (sn i) as i'. clear - Hbounded.
    intros i j ij. induction ij; intros Hi Hj.
@@ -449,7 +449,7 @@ Proof.
 
   (* v' = v *)
   mx_intros i j Hi Hj. simpl. fold_regex. apply xif_compat; trivial.
-  bool_simpl. rewrite bool_prop_iff. num_prop. nat_prop. num_omega. 
+  bool_simpl. rewrite bool_prop_iff. num_prop. nat_prop. num_lia. 
 Qed. 
 
 

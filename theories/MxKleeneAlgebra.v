@@ -126,7 +126,7 @@ Section PreDefs.
     do 2 intuition.
     apply mx_blocks_incr; 
       apply plus_destruct_leq; simpl Peano.plus in *; trivial;
-        repeat intro; omega_false.
+        repeat intro; lia_false.
   Qed. 
 
   Definition prop_star_destruct_left n f := 
@@ -227,7 +227,7 @@ Section PreDefs.
     do 2 intuition.
     apply mx_blocks_incr; 
       apply plus_destruct_leq; simpl Peano.plus in *; trivial;
-        repeat intro; omega_false.
+        repeat intro; lia_false.
   Qed. 
 
   Definition prop_star_destruct_right n f := 

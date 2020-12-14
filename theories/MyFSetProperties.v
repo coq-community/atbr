@@ -110,7 +110,7 @@ Module MySetProps (X : FSetInterface.S).
     Qed.
     Next Obligation.
       assert (In x s). apply min_elt_1. auto. 
-      assert (forall x y, S x <= y -> x < y) by (intros; omega). apply H0. clear H0.       
+      assert (forall x y, S x <= y -> x < y) by (intros; lia). apply H0. clear H0.       
       rewrite EqProps.remove_cardinal_1. auto. 
       rewrite <-mem_iff. auto. 
     Qed.

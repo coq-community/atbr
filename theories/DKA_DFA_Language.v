@@ -98,7 +98,7 @@ Lemma lang_sum: forall (f: nat -> language) w n i, sum i n f w <-> exists2 j, j<
 Proof.
   induction n. 
   - compute. firstorder.
-    omega.
+    lia.
   - intros j. simpl. unfold lang_union. rewrite IHn. clear IHn. intuition. 
     exists O; auto with arith. rewrite plus_comm. assumption.
     destruct H0 as [k ? ?]. exists (Datatypes.S k); auto with arith. rewrite <- plus_n_Sm. assumption.
@@ -212,7 +212,7 @@ Proof.
   setoid_rewrite xif_xif_and. 
   rewrite sum_inversion.
   rewrite (sum_collapse (G:=@lang_Graph label) (n:=DFA.initial A)).
-   2: apply DFA.bounded_initial in HA; num_omega.
+   2: apply DFA.bounded_initial in HA; num_lia.
    2: simpl; intros; fold_langAlg label. 
    2: apply sum_zero; intros; apply xif_false.
    2: bool_connectors; nat_prop; intuition. 
@@ -224,7 +224,7 @@ Proof.
    match goal with |- context[box ?n ?m ?f] => set (M:=box n m f) end.
    apply leq_antisym.
     apply sum_leq. simpl. fold_langAlg label. intros n _ Hn.
-    rewrite (@mx_star_charac _ M s n); auto. 2: num_omega. simpl.
+    rewrite (@mx_star_charac _ M s n); auto. 2: num_lia. simpl.
     bool_simpl. StateSetProps.mem_analyse; simpl. 2: fold_langAlg label; auto with algebra.
     rewrite lang_Union_spec. intro m. revert s Hs.
     induction m; intros s Hs.
@@ -244,8 +244,8 @@ Proof.
       setoid_rewrite lang_leq in IHm. split. 
        eapply IHm; auto. apply (DFA.bounded_delta HA).
        intros b [<-|Hb]. num_simpl. assumption. eapply (IHm (DFA.delta A a s)); eauto. apply (DFA.bounded_delta HA). 
-      specialize (DFA.bounded_delta HA a s). num_omega. 
-      intros. simpl in H. num_analyse. elim H. rewrite <- e. num_omega.
+      specialize (DFA.bounded_delta HA a s). num_lia. 
+      intros. simpl in H. num_analyse. elim H. rewrite <- e. num_lia.
       reflexivity.
 
     rewrite lang_leq. 
@@ -253,20 +253,20 @@ Proof.
        exists2 j, StateSet.In j (DFA.finaux A) & !((M:LMX _ _) #) s (nat_of_state j) w).
      intro C. intros w [Hw Hw']. destruct (C _ Hw Hw') as [j Hj Hj']. 
      rewrite lang_sum. exists (nat_of_state j).
-      apply HA in Hj. num_omega. simpl. bool_simpl. rewrite (StateSet.mem_1 Hj). assumption.
+      apply HA in Hj. num_lia. simpl. bool_simpl. rewrite (StateSet.mem_1 Hj). assumption.
      intro w. revert s Hs. induction w; simpl; intros s Hs Hw Hw'.
-      assert (Hs': (s < DFA.size A)%nat). num_omega. 
+      assert (Hs': (s < DFA.size A)%nat). num_lia. 
       exists s; auto. 
       rewrite (@mx_star_charac _ M s s Hs' Hs' nil). exists O. simpl. bool_simpl. reflexivity.
       
       apply IHw in Hw; try apply (DFA.bounded_delta HA). clear IHw. destruct Hw as [j Hj' Hj].
       exists j; auto. 
       rewrite (fun Hs Hj => @mx_star_charac _ M s (nat_of_state j) Hs Hj (a::w)).
-       2: num_omega. 2: apply HA in Hj'; num_omega.
+       2: num_lia. 2: apply HA in Hj'; num_lia.
       rewrite (fun Hs Hj => @mx_star_charac _ M (DFA.delta A a s) (nat_of_state j) Hs Hj w) in Hj.
-       2: specialize (DFA.bounded_delta HA a s); num_omega. 2: apply HA in Hj'; num_omega.
+       2: specialize (DFA.bounded_delta HA a s); num_lia. 2: apply HA in Hj'; num_lia.
       destruct Hj as [n Hn]. exists (Datatypes.S n). simpl. fold_langAlg label.
-      rewrite lang_sum. exists (DFA.delta A a s). specialize (DFA.bounded_delta HA a s). num_omega.
+      rewrite lang_sum. exists (DFA.delta A a s). specialize (DFA.bounded_delta HA a s). num_lia.
       simpl Peano.plus. exists (a::nil).
       rewrite 2id_num.
       rewrite lang_sum. simpl. exists a.

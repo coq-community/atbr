@@ -157,7 +157,7 @@ Module Algebraic.
   Lemma belong_incr: forall A s, belong s A -> belong s (incr A).
   Proof. intros. destruct A. simpl in *. auto with arith. Qed.
   Lemma belong_incr': forall A, belong (size A) (incr A).
-  Proof. intros. simpl. omega. Qed.
+  Proof. intros. simpl. lia. Qed.
   Lemma belong_add: forall i j b A s, belong s A -> belong s (add i j b A).
   Proof. intros. destruct A. assumption. Qed.
   Lemma belong_add_one: forall i j A s, belong s A -> belong s (add_one i j A).
@@ -427,9 +427,9 @@ Module Correctness.
   Transparent zero one plus dot star.
 
   Lemma belong_incr: forall A s, belong s A -> belong s (incr A).
-  Proof. intros. destruct A; simpl in *. num_omega. Qed.
+  Proof. intros. destruct A; simpl in *. num_lia. Qed.
   Lemma belong_incr': forall A, belong (size A) (incr A).
-  Proof. intros. destruct A. simpl. num_omega. Qed.
+  Proof. intros. destruct A. simpl. num_lia. Qed.
   Lemma belong_add_one: forall i j A s, belong s A -> belong s (add_one i j A).
   Proof. intros. destruct A. assumption. Qed.
   Lemma belong_add_var: forall i j n A s, belong s A -> belong s (add_var i j n A).
@@ -552,7 +552,7 @@ Module Correctness.
     
     case (epsilonbrel (mk sA epsA deltaA mlA) (state_of_nat s) (state_of_nat t)); simpl; 
       nat_analyse; simpl; fold_regex; auto with algebra;
-      num_analyse; simpl; fold_regex; auto with algebra; num_omega_false.
+      num_analyse; simpl; fold_regex; auto with algebra; num_lia_false.
     Transparent add_one.
   Qed.
 
@@ -576,7 +576,7 @@ Module Correctness.
      reflexivity.
      rewrite IHle. rewrite labelling_S.
      case_eq (deltabrel A i (num_of_nat m) j); intro Hij.
-      apply HA in Hij. num_omega_false. 
+      apply HA in Hij. num_lia_false. 
       unfold xif. semiring_reflexivity.
   Qed.
 
@@ -595,7 +595,7 @@ Module Correctness.
      rewrite 2 labelling_S. rewrite IHn. clear IHn.
      rewrite deltabrel_add_var. bool_simpl.
      unfold labelling; simpl. 
-     num_analyse; try num_omega_false; subst; simpl; bool_simpl; simpl; fold_regex; try semiring_reflexivity.
+     num_analyse; try num_lia_false; subst; simpl; bool_simpl; simpl; fold_regex; try semiring_reflexivity.
      case (deltabrel A i (num_of_nat n) j); simpl; fold_regex; semiring_reflexivity.
   Qed.
 
@@ -629,15 +629,15 @@ Opaque equal.
     Algebraic.incr (preNFA_to_preMAUT A) [=0=] preNFA_to_preMAUT (incr A).
   Proof.
     intros [s ? ? ?] HA. unfold incr, preNFA_to_preMAUT. simpl.  
-    replace (nat_of_num(S s)) with (nat_of_state  s +1)%nat by (clear;num_omega).
+    replace (nat_of_num(S s)) with (nat_of_state  s +1)%nat by (clear;num_lia).
     constructor. mx_intros i j Hi Hj. simpl. 
     destruct_blocks; trivial; fold_regex;
       (case_eq (epsilonbrel (mk (S s) epsilonmap0 deltamap0 max_label0) (state_of_nat i) (state_of_nat j)); 
-        intro Hij; [apply HA in Hij; cbn in *; exfalso; num_omega | 
+        intro Hij; [apply HA in Hij; cbn in *; exfalso; num_lia | 
           symmetry; rewrite labelling_empty; 
             [ auto with algebra | 
               intros a; apply not_true_eq_false; intro F; 
-                apply HA in F; simpl in *; exfalso; num_omega ]]).
+                apply HA in F; simpl in *; exfalso; num_lia ]]).
   Qed.
 Transparent equal.
 
@@ -730,19 +730,19 @@ Transparent equal.
   Proof.
     intros A s H HA Hs.
     apply epsilon_rt_incr, rt_t in H as [->|H].
-     num_omega.
+     num_lia.
      apply trans_tn1 in H. inversion_clear H.
-     apply HA in H0. num_omega.
-     apply HA in H0. num_omega.
+     apply HA in H0. num_lia.
+     apply HA in H0. num_lia.
   Qed.
   Lemma not_epsilon_rt_incr_right: forall A s, epsilon_rt (incr A) (size A) s -> bounded A -> belong s A -> False.
   Proof.
     intros A s H HA Hs.
     apply epsilon_rt_incr, rt_t in H as [<-|H].
-     num_omega.
+     num_lia.
      apply trans_t1n in H. inversion_clear H.
-     apply HA in H0. num_omega.
-     apply HA in H0. num_omega.
+     apply HA in H0. num_lia.
+     apply HA in H0. num_lia.
   Qed.
   Ltac not_epsilon := 
     match goal with 
@@ -966,7 +966,7 @@ Lemma inf_leq: forall n m, (forall k, k<n -> k<m) -> n <= m.
 Proof. intros [|n] m H. trivial with arith. elim (H n); auto. Qed.
 
 Lemma le_antisym: forall n m: num, n <= m -> m <= n -> n = m.
-Proof. intros. num_omega. Qed. 
+Proof. intros. num_lia. Qed. 
 
 Lemma max_label_X_to_eNFA a: eNFA.max_label (X_to_eNFA a) = max_label (build a 0 1 empty).
 Proof. unfold X_to_eNFA. destruct (build a 0 1 empty). reflexivity. Qed.
@@ -984,5 +984,5 @@ Proof.
    rewrite H in Hd. eapply collect_max_label in Hd as [Hd|?].
     eapply le_lt_trans. eassumption. unfold statesetelt_of_nat in Hd. rewrite id_nat in Hd. eassumption.
     NumSetProps.setdec.
-    simpl in *. compute in H0. omega_false.
+    simpl in *. compute in H0. lia_false.
 Qed.
