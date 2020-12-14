@@ -23,16 +23,16 @@ Lemma plus_neutral_right `{SemiLattice} A B: forall (x: X A B), x+0 == x.
 Proof. intros. rewrite plus_com; apply plus_neutral_left. Qed.
 
 (** Hints  *)
-Hint Extern 0 (leq _ _ _ _) => apply leq_refl : core.
+Global Hint Extern 0 (leq _ _ _ _) => apply leq_refl : core.
 
-Hint Extern 0 (equal _ _ _ _) => first [
+Global Hint Extern 0 (equal _ _ _ _) => first [
     apply plus_assoc
   | apply plus_com
   | apply plus_idem
   | apply plus_neutral_left
   | apply plus_neutral_right
 ]: algebra.
-Hint Extern 2 (equal _ _ _ _) => first [
+Global Hint Extern 2 (equal _ _ _ _) => first [
     apply plus_compat; instantiate
 ]: compat algebra.
 
@@ -462,20 +462,20 @@ endtests*)
 
 (** Hints  *)
 
-Hint Extern 1 (equal _ _ _ _) => first [ 
+Global Hint Extern 1 (equal _ _ _ _) => first [ 
     apply sum_compat
 ]: compat algebra.
 
-Hint Extern 0 (leq _ _ _ _) => first [ 
+Global Hint Extern 0 (leq _ _ _ _) => first [ 
   apply plus_destruct_leq
   | apply plus_make_left
   | apply plus_make_right
   | apply zero_inf
 ]: algebra.
-Hint Extern 1 (leq _ _ _ _) => first [ 
+Global Hint Extern 1 (leq _ _ _ _) => first [ 
     apply sum_incr
 ]: compat algebra.
-Hint Extern 2 (leq _ _ _ _) => first [ 
+Global Hint Extern 2 (leq _ _ _ _) => first [ 
     apply plus_incr
 ]: compat algebra.
 

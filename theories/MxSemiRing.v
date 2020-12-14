@@ -174,8 +174,8 @@ Infix "*'" := dot_scal_right (at level 40): A_scope.
 
 
 
-Hint Extern 2 (mx_equal_ _ _ _ _ _) => apply dot_scal_left_compat: compat algebra.
-Hint Extern 2 (mx_equal_ _ _ _ _ _) => apply dot_scal_right_compat: compat algebra.
+Global Hint Extern 2 (mx_equal_ _ _ _ _ _) => apply dot_scal_left_compat: compat algebra.
+Global Hint Extern 2 (mx_equal_ _ _ _ _ _) => apply dot_scal_right_compat: compat algebra.
 
 Section Props2.
 

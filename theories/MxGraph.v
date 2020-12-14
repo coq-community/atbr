@@ -296,16 +296,16 @@ Section Props.
 
 End Props.
 
-Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub00_compat: compat algebra.
-Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub01_compat: compat algebra.
-Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub10_compat: compat algebra.
-Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub11_compat: compat algebra.
-Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_transpose_compat: compat algebra.
-Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_force_compat: compat algebra.
-Hint Extern 4 (mx_equal_ _ _ _ _ _) => apply mx_blocks_compat: compat algebra.
-Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_of_scal_compat: compat algebra.
-Hint Extern 1 (equal _ _ _ _) => apply mx_to_scal_compat: compat algebra.
-Hint Extern 5 (equal _ _ _ _) => apply mx_equal_compat : compat algebra.
+Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub00_compat: compat algebra.
+Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub01_compat: compat algebra.
+Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub10_compat: compat algebra.
+Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub11_compat: compat algebra.
+Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_transpose_compat: compat algebra.
+Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_force_compat: compat algebra.
+Global Hint Extern 4 (mx_equal_ _ _ _ _ _) => apply mx_blocks_compat: compat algebra.
+Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_of_scal_compat: compat algebra.
+Global Hint Extern 1 (equal _ _ _ _) => apply mx_to_scal_compat: compat algebra.
+Global Hint Extern 5 (equal _ _ _ _) => apply mx_equal_compat : compat algebra.
 
 (* Hint Resolve @equal_compat: compat algebra.  *)
   

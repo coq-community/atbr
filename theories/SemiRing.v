@@ -27,7 +27,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Set Asymmetric Patterns.
 
-Hint Extern 0 (equal _ _ _ _) => first [ 
+Global Hint Extern 0 (equal _ _ _ _) => first [ 
     apply dot_ann_left
   | apply dot_ann_right
   | apply dot_distr_left
@@ -890,7 +890,7 @@ Lemma sum_distr_left `{ISR: IdemSemiRing}: forall A B C (x: X B A) (f: nat -> X 
 Proof. exact (@sum_distr_right _ _ _ (@Dual.IdemSemiRing _ _ _ ISR)). Qed.
 
 
-Hint Extern 2 (leq _ _ _ _) => first [ 
+Global Hint Extern 2 (leq _ _ _ _) => first [ 
     apply dot_incr
 ]: compat algebra.
 

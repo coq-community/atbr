@@ -31,7 +31,7 @@ Module MyMapProps (X : FMapInterface.S).
      destruct H as [w ?]. exists w. auto with map. 
   Qed. 
 
-  Hint Resolve mapsto_in in_add_1 in_add_2 : map.
+  Global Hint Resolve mapsto_in in_add_1 in_add_2 : map.
 
   Inductive find_spec_ind A k s : option A -> Prop :=
   | find_spec_1 : forall x, MapsTo k x s -> find_spec_ind A k s (Some x)

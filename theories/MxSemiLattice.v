@@ -174,5 +174,5 @@ Section Props.
 
 End Props.
 
-Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_point_compat: compat algebra.
+Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_point_compat: compat algebra.
 

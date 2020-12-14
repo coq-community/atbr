@@ -18,12 +18,12 @@ Require Import BoolView.
 Set Implicit Arguments.
 Unset Strict Implicit.
 
-Hint Extern 0 (equal _ _ _ _) => first [ 
+Global Hint Extern 0 (equal _ _ _ _) => first [ 
     apply dot_assoc
   | apply dot_neutral_left
   | apply dot_neutral_right
 ]: algebra.
-Hint Extern 2 (equal _ _ _ _) => first [ 
+Global Hint Extern 2 (equal _ _ _ _) => first [ 
     apply dot_compat; instantiate
 ]: compat algebra.
 

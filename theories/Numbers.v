@@ -499,7 +499,7 @@ Module Positive <: NUM.
             end); subst.
 
   (* and this hints to automatically prove some trivial facts, by reflexivity *)
-  Hint Extern 0 (Pos_as_OTA.compare _ _ = Eq) => apply Pos_as_OT.eq_refl : core.
+Global   Hint Extern 0 (Pos_as_OTA.compare _ _ = Eq) => apply Pos_as_OT.eq_refl : core.
 
   Lemma pcompare_prop: forall x y, Pos_as_OTA.compare x y = Eq <-> x = y. 
   Proof. intros. intuition; psubst; trivial. Qed. 
