@@ -23,16 +23,16 @@ Lemma plus_neutral_right `{SemiLattice} A B: forall (x: X A B), x+0 == x.
 Proof. intros. rewrite plus_com; apply plus_neutral_left. Qed.
 
 (** Hints  *)
-Hint Extern 0 (leq _ _ _ _) => apply leq_refl : core.
+Global Hint Extern 0 (leq _ _ _ _) => apply leq_refl : core.
 
-Hint Extern 0 (equal _ _ _ _) => first [
+Global Hint Extern 0 (equal _ _ _ _) => first [
     apply plus_assoc
   | apply plus_com
   | apply plus_idem
   | apply plus_neutral_left
   | apply plus_neutral_right
 ]: algebra.
-Hint Extern 2 (equal _ _ _ _) => first [
+Global Hint Extern 2 (equal _ _ _ _) => first [
     apply plus_compat; instantiate
 ]: compat algebra.
 
@@ -278,7 +278,7 @@ Section Props1.
     induction k'; simpl_sum_r.
      auto with algebra.
      rewrite IHk', plus_assoc.
-     auto with compat omega.
+     auto with compat lia.
   Qed.
   
   Lemma sum_cut_fun i k (f g: nat -> X A B):
@@ -295,17 +295,17 @@ Section Props1.
   Lemma sum_cut_nth n (f: nat -> X A B) i k:
     n<k -> sum i k f == sum i n f + f (i+n)%nat + sum (i+S n) (k-n-1) f.
   Proof.
-    intros; pattern k at 1; replace k with (S(k-n-1)+n)%nat by omega. 
+    intros; pattern k at 1; replace k with (S(k-n-1)+n)%nat by lia. 
     rewrite sum_cut.
     rewrite sum_enter_left, plus_assoc.
-    auto with compat omega.
+    auto with compat lia.
   Qed.
   Arguments sum_cut_nth : clear implicits.
   
   Lemma sum_shift d (f: nat -> X A B) i k:
     sum (i+d) k f == sum i k (fun u => f (u+d)%nat).
   Proof.
-    induction k; simpl_sum_r; auto with compat omega.
+    induction k; simpl_sum_r; auto with compat lia.
   Qed.
     
   Theorem sum_inversion (f: nat -> nat -> X A B) i i' k k':
@@ -322,7 +322,7 @@ Section Props1.
     (exists n, i<=n /\ n<i+k /\ x <== f n) -> x <== sum i k f.
   Proof. 
     intros [n [? [? E]]].
-    rewrite E, (sum_cut_nth (n-i))  by omega. 
+    rewrite E, (sum_cut_nth (n-i))  by lia. 
     replace (i+(n-i))%nat with n by auto with arith. 
     rewrite <- plus_make_left. apply plus_make_right.
   Qed.
@@ -337,30 +337,30 @@ Section Props1.
      auto using plus_destruct_leq.
      auto with arith.
      auto with arith.
-     intros; apply H; omega.  
+     intros; apply H; lia.  
   Qed.
     
   Lemma sum_plus : forall (f : nat -> X A B) i k a, 0 < k -> sum i k f + a == sum i k (fun n => f n + a).
   Proof.
     induction k; intros.
-      omega_false.
+      lia_false.
       simpl_sum_r.
       destruct (eq_nat_dec 0 k).
         subst. simpl_sum_r. auto with algebra.
         setoid_rewrite <- IHk. 
         setoid_rewrite switch at 2. rewrite <- !plus_assoc, plus_idem. reflexivity.
-        omega.
+        lia.
   Qed.
     
   Lemma sum_constant : forall i k (a : X A B),  0 < k -> sum i k (fun _ => a) == a.
   Proof. 
     induction k; intros. 
-      omega_false.
+      lia_false.
       simpl_sum_r.   
       destruct (eq_nat_dec 0 k).
         subst. simpl_sum_r. auto with algebra.
         setoid_rewrite IHk. trivial with algebra.
-        omega.
+        lia.
   Qed.
 
   Lemma sum_collapse n (f: nat -> X A B) i k:
@@ -369,7 +369,7 @@ Section Props1.
     sum i k f == f (i+n)%nat.
   Proof.
     intros Hn H.
-    rewrite (sum_cut_nth n), 2 sum_zero by  ( auto || intros; apply H ; omega).
+    rewrite (sum_cut_nth n), 2 sum_zero by  ( auto || intros; apply H ; lia).
     rewrite plus_neutral_left. apply plus_neutral_right.
   Qed.    
 
@@ -462,20 +462,20 @@ endtests*)
 
 (** Hints  *)
 
-Hint Extern 1 (equal _ _ _ _) => first [ 
+Global Hint Extern 1 (equal _ _ _ _) => first [ 
     apply sum_compat
 ]: compat algebra.
 
-Hint Extern 0 (leq _ _ _ _) => first [ 
+Global Hint Extern 0 (leq _ _ _ _) => first [ 
   apply plus_destruct_leq
   | apply plus_make_left
   | apply plus_make_right
   | apply zero_inf
 ]: algebra.
-Hint Extern 1 (leq _ _ _ _) => first [ 
+Global Hint Extern 1 (leq _ _ _ _) => first [ 
     apply sum_incr
 ]: compat algebra.
-Hint Extern 2 (leq _ _ _ _) => first [ 
+Global Hint Extern 2 (leq _ _ _ _) => first [ 
     apply plus_incr
 ]: compat algebra.
 

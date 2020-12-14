@@ -14,9 +14,9 @@
     This interface is then instanciated with positive, and we are able
     to use positive maps in our development.
 
-    In [NUMUTILS] we define a tactic [num_omega] (and its couterparts
-    [num_omega_false]), that reflects equalities and inequalities from
-    [num] into [nat] and then calls [omega]. This tactic is implemented
+    In [NUMUTILS] we define a tactic [num_lia] (and its couterparts
+    [num_lia_false]), that reflects equalities and inequalities from
+    [num] into [nat] and then calls [lia]. This tactic is implemented
     with autorewrite libraires. 
     
     In [NUMUTILS], we also define tactics [num_analyse] and [num_prop]
@@ -75,7 +75,7 @@ Module Type NUM.
   Axiom le_spec : forall n m, reflect (le n m) (leb n m).
   Axiom lt_spec : forall n m, reflect (lt n m) (ltb n m).
   Axiom eq_spec : forall n m, reflect (n = m)  (eqb n m).
-  Axiom compare_spec : forall n m, compare_spec eq lt n m (compare n m).
+  Axiom compare_spec : forall n m, BoolView.compare_spec eq lt n m (compare n m).
 
   (* specification of operations and predicates, w.r.t. nat *)
   Axiom S_nat_spec : forall n, nat_of_num (S n) = Datatypes.S (nat_of_num n).
@@ -209,14 +209,14 @@ Module NumUtils (N : NUM).
   Lemma leb_false : forall x y, leb x y = false <-> lt y x.
   Proof.
     intros. rewrite eq_not_negb. rewrite leb_true. 
-    rewrite le_nat_spec, lt_nat_spec. omega.
+    rewrite le_nat_spec, lt_nat_spec. lia.
   Qed.
   Lemma ltb_true : forall x y, ltb x y = true <-> lt x y. 
   Proof. intros. case lt_spec; intuition discriminate. Qed.
   Lemma ltb_false : forall x y, ltb x y = false <-> le y x.
   Proof.
     intros. rewrite eq_not_negb. rewrite ltb_true. 
-    rewrite le_nat_spec, lt_nat_spec. omega.
+    rewrite le_nat_spec, lt_nat_spec. lia.
   Qed.
   Lemma eqb_true : forall x y, eqb x y = true <-> x = y. 
   Proof. intros. case eq_spec; intuition discriminate. Qed.
@@ -244,7 +244,7 @@ Module NumUtils (N : NUM).
   Hint Rewrite  eqb_refl leb_refl id_nat id_num: bool_simpl.
 
 
-  (** * num_omega : injects every prop about nums into equivalent props about nats, then call omega*)
+  (** * num_lia : injects every prop about nums into equivalent props about nats, then call lia*)
   Lemma num_of_nat_comm : forall x y, x = num_of_nat y <-> nat_of_num x = y.
   Proof. 
     intros x y. split; [intros -> | intros <-]. 
@@ -259,19 +259,19 @@ Module NumUtils (N : NUM).
     rewrite id_num. reflexivity.
   Qed.
 
-  Hint Rewrite eq_nat_spec le_nat_spec lt_nat_spec S_nat_spec max_spec : num_omega.
-  Hint Rewrite nat_of_num_comm num_of_nat_comm : num_omega .
-  Hint Rewrite id_nat id_num : num_omega.
+  Hint Rewrite eq_nat_spec le_nat_spec lt_nat_spec S_nat_spec max_spec : num_lia.
+  Hint Rewrite nat_of_num_comm num_of_nat_comm : num_lia .
+  Hint Rewrite id_nat id_num : num_lia.
 
-  Ltac num_simpl := autorewrite with num_omega in *.
-  Ltac num_omega := num_simpl; intuition (subst; omega).
-  Ltac num_omega_false := exfalso; num_omega.
+  Ltac num_simpl := autorewrite with num_lia in *.
+  Ltac num_lia := num_simpl; intuition (subst; lia).
+  Ltac num_lia_false := exfalso; num_lia.
 
   Lemma eqb_eq_nat_bool: forall i j, 
     eqb i j = eq_nat_bool (nat_of_num i) (nat_of_num j). 
   Proof.
     intros. num_analyse. subst. bool_simpl. reflexivity.
-    symmetry. nat_prop. num_omega.
+    symmetry. nat_prop. num_lia.
   Qed.
 
   Lemma numseteqb_eq_nat_bool: forall i j, 
@@ -284,7 +284,7 @@ Module NumUtils (N : NUM).
   Hint Rewrite numseteqb_eq_nat_bool : bool_simpl.
 
   Lemma le_antisym: forall n m: num, n <= m -> m <= n -> n = m.
-  Proof. intros. num_omega. Qed. 
+  Proof. intros. num_lia. Qed. 
 
 End NumUtils.
 
@@ -348,7 +348,7 @@ Module Positive <: NUM.
     intros n.
     unfold nat_of_num. 
     assert (Hn : 0 < nat_of_P (num_of_nat n) ). apply lt_O_nat_of_P. 
-    assert (forall s n, 0 <s -> s = Datatypes.S n -> pred s = n). intros. omega.
+    assert (forall s n, 0 <s -> s = Datatypes.S n -> pred s = n). intros. lia.
     apply H. auto.  
     apply nat_of_P_o_P_of_succ_nat_eq_succ.
   Qed.
@@ -372,7 +372,7 @@ Module Positive <: NUM.
     intro H'. apply ZC1 in H. assert (H'' := Pos.lt_trans _ _ _ H H'). refine (Pos.lt_irrefl _ H''). 
   Qed.
   Definition eq_spec := eq_pos_spec.
-  Lemma compare_spec : forall n m, compare_spec eq lt n m (compare n m). 
+  Lemma compare_spec : forall n m, BoolView.compare_spec eq lt n m (compare n m). 
   Proof. 
    intros.
    case_eq (compare n m); intro H;  constructor.
@@ -389,7 +389,7 @@ Module Positive <: NUM.
     intros n.
     unfold nat_of_num. rewrite nat_of_P_succ_morphism. simpl.
     assert (H := lt_O_nat_of_P n).
-    omega.
+    lia.
   Qed.
   Lemma le_nat_spec : forall n m, le n m <-> (nat_of_num n <= nat_of_num m)%nat. 
   Proof.
@@ -402,12 +402,12 @@ Module Positive <: NUM.
       apply H.
       apply nat_of_P_gt_Gt_compare_complement_morphism. auto. 
       unfold nat_of_num .
-      omega.
+      lia.
 
       intro H'.   
       apply nat_of_P_gt_Gt_compare_morphism in H'.
       unfold nat_of_num in H.
-      omega.
+      lia.
   Qed.
 
 
@@ -421,11 +421,11 @@ Module Positive <: NUM.
     assert (nat_of_P x < nat_of_P y).
     apply    nat_of_P_lt_Lt_compare_morphism. apply H.
     unfold nat_of_num.
-    omega.
+    lia.
     
     apply nat_of_P_lt_Lt_compare_complement_morphism.
     unfold nat_of_num in H.
-    omega.
+    lia.
   Qed.
 
   Lemma max_spec : forall n m, nat_of_num (max n m) = Max.max (nat_of_num n) (nat_of_num m).
@@ -468,9 +468,9 @@ Module Positive <: NUM.
   Lemma match_pi1: forall n, pimatch (pi1 n) = inr n. Proof. reflexivity. Qed.
     
   Lemma lt_pi0: forall n m, lt n m -> lt (pi0 n) (pi0 m).
-  Proof. intros n m. setoid_rewrite lt_nat_spec. unfold pi0, nat_of_num. rewrite 2 nat_of_P_xO. omega. Qed.
+  Proof. intros n m. setoid_rewrite lt_nat_spec. unfold pi0, nat_of_num. rewrite 2 nat_of_P_xO. lia. Qed.
   Lemma lt_pi1: forall n m, lt n m -> lt (pi1 n) (pi1 m).
-  Proof. intros n m. setoid_rewrite lt_nat_spec. unfold pi1, nat_of_num. rewrite 2 nat_of_P_xI. omega. Qed.
+  Proof. intros n m. setoid_rewrite lt_nat_spec. unfold pi1, nat_of_num. rewrite 2 nat_of_P_xI. lia. Qed.
 
   Module NumOTA := Pos_as_OTA.
 (*   Module NumSet' := FSetList.Make Pos_as_OT. Module NumSet := FSetHide NumSet'.  *)
@@ -499,7 +499,7 @@ Module Positive <: NUM.
             end); subst.
 
   (* and this hints to automatically prove some trivial facts, by reflexivity *)
-  Hint Extern 0 (Pos_as_OTA.compare _ _ = Eq) => apply Pos_as_OT.eq_refl : core.
+Global   Hint Extern 0 (Pos_as_OTA.compare _ _ = Eq) => apply Pos_as_OT.eq_refl : core.
 
   Lemma pcompare_prop: forall x y, Pos_as_OTA.compare x y = Eq <-> x = y. 
   Proof. intros. intuition; psubst; trivial. Qed. 

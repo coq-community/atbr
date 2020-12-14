@@ -174,8 +174,8 @@ Infix "*'" := dot_scal_right (at level 40): A_scope.
 
 
 
-Hint Extern 2 (mx_equal_ _ _ _ _ _) => apply dot_scal_left_compat: compat algebra.
-Hint Extern 2 (mx_equal_ _ _ _ _ _) => apply dot_scal_right_compat: compat algebra.
+Global Hint Extern 2 (mx_equal_ _ _ _ _ _) => apply dot_scal_left_compat: compat algebra.
+Global Hint Extern 2 (mx_equal_ _ _ _ _ _) => apply dot_scal_right_compat: compat algebra.
 
 Section Props2.
 
@@ -205,7 +205,7 @@ Section Props2.
     rewrite (plus_comm m), sum_cut. 
     apply plus_compat.
     apply sum_compat; intros. 
-    destruct_blocks. reflexivity. omega_false.
+    destruct_blocks. reflexivity. lia_false.
     rewrite (plus_comm m), sum_shift. 
     apply sum_compat; intros.
     destruct_blocks. reflexivity.
@@ -213,7 +213,7 @@ Section Props2.
     rewrite (plus_comm m), sum_cut. 
     apply plus_compat.
     apply sum_compat; intros. 
-    destruct_blocks. reflexivity. omega_false.
+    destruct_blocks. reflexivity. lia_false.
     rewrite (plus_comm m), sum_shift. 
     apply sum_compat; intros.
     destruct_blocks. reflexivity.
@@ -221,7 +221,7 @@ Section Props2.
     rewrite (plus_comm m), sum_cut. 
     apply plus_compat.
     apply sum_compat; intros. 
-    destruct_blocks. reflexivity. omega_false.
+    destruct_blocks. reflexivity. lia_false.
     rewrite (plus_comm m), sum_shift. 
     apply sum_compat; intros.
     destruct_blocks. reflexivity.
@@ -229,7 +229,7 @@ Section Props2.
     rewrite (plus_comm m), sum_cut. 
     apply plus_compat.
     apply sum_compat; intros. 
-    destruct_blocks. reflexivity. omega_false.
+    destruct_blocks. reflexivity. lia_false.
     rewrite (plus_comm m), sum_shift. 
     apply sum_compat; intros.
     destruct_blocks. reflexivity.

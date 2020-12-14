@@ -77,7 +77,7 @@ Qed.
 
 Section comb.
 
-  Local Hint Resolve @DS.union_WF @DS.empty_WF: typeclass_instances.
+  Local Hint Resolve DS.union_WF DS.empty_WF: typeclass_instances.
 
   Inductive combine_no_length X Y : list X -> list Y -> Type :=
   |cnl_nil : combine_no_length nil nil
@@ -164,7 +164,7 @@ Section correctness.
 
   Definition prog (t t' : DS.T) := forall R, diag {{t}} {{t +++ R}} -> diag {{t'}} {{t' +++ R}}.
 
-  Local Hint Resolve @DS.union_WF @DS.empty_WF: typeclass_instances.
+  Local Hint Resolve DS.union_WF DS.empty_WF: typeclass_instances.
   Existing Instance complete_WF.
   
   Instance preorder_prog : PreOrder prog.
@@ -313,10 +313,10 @@ Section correctness.
   Proof.
     intros tar Hwf ml; revert tar Hwf.
     induction ml; intros.
-     omega_false.
+     lia_false.
      simpl.
       destruct (eq_nat_dec a ml). subst. apply complete_incr. apply in_union.
-      apply IHml; ti_auto. omega.
+      apply IHml; ti_auto. lia.
   Qed.
 
 
@@ -361,7 +361,7 @@ Section correctness.
     invariant t -> below x size -> below y size -> loop A n w t x y = inl t' ->  
     correct_ind t t' x y /\ invariant t'.
   Proof.
-    induction n. intros. omega_false.
+    induction n. intros. lia_false.
     intros w tarjan tar' x y Hsize Hstat Hx Hy. simpl loop.
     rewrite DS.test_and_unify_eq.
     case_eq (DS.equiv tarjan x y). intros [|] u Hn; simpl. 
@@ -399,7 +399,7 @@ Section correctness.
     clear IHn. intro Hr.
     destruct (IH _ Hr) as [IH1 IH2]; clear Hr IH. 
      apply in_union. 
-     apply (measure_union_strict (size:=size)) in Hn; auto; num_omega. 
+     apply (measure_union_strict (size:=size)) in Hn; auto; num_lia. 
      apply invariant_prog; assumption.
     split; auto. constructor. 
      intros l Hl. simpl; simpl in Hl. 
@@ -407,7 +407,7 @@ Section correctness.
 
      transitivity (DS.union tarjan x y). apply DSUtils.le_union. apply IH1.
      apply le_trans with (measure (DS.union tarjan x y)). 
-     apply IH1. apply (measure_union_strict (size:=size)) in Hn; auto using lt_le_weak; num_omega.
+     apply IH1. apply (measure_union_strict (size:=size)) in Hn; auto using lt_le_weak; num_lia.
      apply IH1. apply in_union.
   Qed.
 
@@ -506,8 +506,8 @@ Section correctness.
       apply xif_compat; auto.
       rewrite 2 id_num. apply <- bool_prop_iff. rewrite 2 T_true. 
       destruct tarjan_correct as [[ _ _ _ H] _]. rewrite H. tauto.  
-      num_omega.
-      num_omega.
+      num_lia.
+      num_lia.
        
       (* y * m <== m * y *)
       mx_intros i k Hi Hk. simpl; fold_regex.
@@ -517,12 +517,12 @@ Section correctness.
        setoid_rewrite sum_distr_left. rewrite sum_inversion. (* BUG setoid_rewrite/rewrite: très long... *)
        apply sum_incr; intros a Ha. simpl; fold_regex. fold_leq.
        xif_destruct; unfold xif at 1; trivial with algebra.
-       leq_sum (delta a i). pose proof (bounded_delta Hbounds a i). num_omega.
+       leq_sum (delta a i). pose proof (bounded_delta Hbounds a i). num_lia.
        bool_simpl. num_prop. rewrite H0.
        rewrite (simulation H); trivial. 
         unfold xif. semiring_reflexivity.
-        num_omega. 
-        num_omega. 
+        num_lia. 
+        num_lia. 
             
       (* y * v == v *)
       mx_intros i j Hi Hj. clear - Hi Hbounds i' Hi' Hj' _H. simpl; fold_regex.
@@ -598,7 +598,7 @@ Section completeness.
         case loop. 
          intros tar' _ H. apply IHa in H; auto with arith. 
          intros p H H'. dependent destruction H'. apply H; auto.
-          intros c [->|Hc]; auto with arith. num_omega. 
+          intros c [->|Hc]; auto with arith. num_lia. 
 
        clear IHn. intro H'; injection H'; intros; subst; clear H'.
        StateSetProps.mem_analyse; StateSetProps.mem_analyse; 

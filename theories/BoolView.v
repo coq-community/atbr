@@ -92,8 +92,8 @@ Instance le_nat_view : Type_View le_lt_bool := { type_view := le_nat_spec }.
 
 Ltac nat_analyse := 
   repeat (
-    try (type_view eq_nat_bool; try subst; try omega_false);
-    try (type_view le_lt_bool; try subst; try omega_false)
+    try (type_view eq_nat_bool; try subst; try lia_false);
+    try (type_view le_lt_bool; try subst; try lia_false)
   ).
 
 
@@ -124,6 +124,7 @@ Definition eq_bool_bool := Bool.eqb.
 Lemma eq_bool_spec : forall a b, reflect (a=b) (eq_bool_bool a b).
 Proof.
   intros [|] [|]; simpl; constructor; firstorder.
+  congruence.
 Qed.
 
 Instance eq_bool_view : Type_View eq_bool_bool := { type_view := eq_bool_spec }.
@@ -143,7 +144,7 @@ Proof. intros. nat_analyse; intuition discriminate. Qed.
 Lemma le_lt_bool_true : forall x y, le_lt_bool x y = true <-> x <= y. 
 Proof. intros. nat_analyse; intuition. Qed.
 Lemma le_lt_bool_false : forall x y, le_lt_bool x y = false <-> y < x. 
-Proof. intros. nat_analyse; intuition. Qed.
+Proof. intros. nat_analyse; intuition. lia. Qed.
 
 Hint Rewrite eq_nat_bool_true eq_nat_bool_false le_lt_bool_true le_lt_bool_false : nat_prop.
 Ltac nat_prop := autorewrite with nat_prop in *.
@@ -208,7 +209,7 @@ Proof. intros [|]; firstorder. Qed.
 Lemma negb_false  : forall b, negb b = false <-> b = true. 
 Proof. intros [|]; firstorder. Qed.
 Lemma eq_not_negb  : forall b c, b = c <-> ~ (b = negb c). 
-Proof. intros [|] [|]; firstorder. Qed.
+Proof. intros [|] [|]; firstorder; simpl; try congruence. Qed.
 
 Hint Rewrite andb_false_iff andb_true_iff orb_false_iff orb_true_iff negb_true negb_false : bool_connectors.
 

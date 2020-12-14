@@ -459,9 +459,9 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
       destruct (eq_num_dec i a). subst. 
       exists (S O). apply (DS _ _ b). map_iff. auto. apply DO.
       eauto.
-      omega.
+      lia.
       
-      destruct (IHD). exists (S x). eapply DS. 2 : eauto. map_iff. auto. omega.
+      destruct (IHD). exists (S x). eapply DS. 2 : eauto. map_iff. auto. lia.
     Qed.
     
     
@@ -469,7 +469,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
       bounded (t [a>- b]) n.
     Proof.
       unfold bounded. intros. 
-      destruct (H x). destruct (D_update_ex _ _ H0). exists x1. auto. omega.
+      destruct (H x). destruct (D_update_ex _ _ H0). exists x1. auto. lia.
     Qed.
   End update.
   
@@ -486,21 +486,21 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
       exists 1. apply (DS _ _  b).
       map_iff. auto. apply DO.
       map_iff; intros [H' | H']; subst. tauto_false. revert H'. eapply repr_inv_In. eauto.
-      omega. 
+      lia. 
       exists O. apply DO. map_iff.
       intros [H' | H']; subst; tauto_false. 
-      omega.
+      lia.
       destruct (eq_num_dec i a). subst.
       exists 1. apply (DS _ _  b).  map_iff. auto. apply DO. map_iff. 
       intros [H' | H']. subst. tauto_false. 
-      revert H'. eapply repr_inv_In. eauto. omega.   
-      destruct IHD. exists (S x). eapply DS.  2 : eauto. map_iff. auto. omega. 
+      revert H'. eapply repr_inv_In. eauto. lia.   
+      destruct IHD. exists (S x). eapply DS.  2 : eauto. map_iff. auto. lia. 
     Qed.  
     
     Lemma boundage_link : forall n, bounded t n ->  bounded (t [a>- b]) (S n).
     Proof.
       unfold bounded. intros. 
-      destruct (H x). destruct (D_link_ex _ _ H0). exists x1. auto. omega.
+      destruct (H x). destruct (D_link_ex _ _ H0). exists x1. auto. lia.
     Qed.
     
     Lemma repr_update_fwd :
@@ -617,13 +617,13 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
       ).
     Proof.
       induction n; intros s t0 x y t' px Hxt Hx Hpx Hwf. 
-      omega_false.
+      lia_false.
       simpl in Hxt.
       find_analyse.
       case_eq (find_aux n x0 t0). intros p' t'' H'. rewrite H' in *. injection Hxt. intros. subst. clear Hxt. 
       
       destruct (D_succ _ _ _ _ H Hx).  subst . 
-      destruct (IHn s _ _ _ _ _ H' H0) as [Hy [[Hxy | Hxy] [Heq Hwf']] ] . omega. auto.
+      destruct (IHn s _ _ _ _ _ H' H0) as [Hy [[Hxy | Hxy] [Heq Hwf']] ] . lia. auto.
       subst. 
       assert (x <> y).
       eapply D_inv_n. 2:eauto. rewrite FEquiv_D; eauto. 

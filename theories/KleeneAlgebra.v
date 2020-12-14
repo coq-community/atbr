@@ -145,13 +145,13 @@ Section Props1.
 End Props1.
 
 (** hints *)
-Hint Extern 1 (equal _ _ _ _) => apply star_compat; instantiate: compat algebra.
-Hint Extern 0 (equal _ _ _ _) => apply star_make_left: algebra.
-Hint Extern 0 (equal _ _ _ _) => apply star_make_right: algebra.
-Hint Extern 0 (equal _ _ _ _) => apply star_one: algebra.
-Hint Extern 0 (equal _ _ _ _) => apply star_zero: algebra.
-Hint Extern 0 (leq _ _ _ _) => apply a_leq_star_a: algebra.
-Hint Extern 0 (leq _ _ _ _) => apply one_leq_star_a: algebra.
+Global Hint Extern 1 (equal _ _ _ _) => apply star_compat; instantiate: compat algebra.
+Global Hint Extern 0 (equal _ _ _ _) => apply star_make_left: algebra.
+Global Hint Extern 0 (equal _ _ _ _) => apply star_make_right: algebra.
+Global Hint Extern 0 (equal _ _ _ _) => apply star_one: algebra.
+Global Hint Extern 0 (equal _ _ _ _) => apply star_zero: algebra.
+Global Hint Extern 0 (leq _ _ _ _) => apply a_leq_star_a: algebra.
+Global Hint Extern 0 (leq _ _ _ _) => apply one_leq_star_a: algebra.
 
 Hint Rewrite @star_zero @star_one using ti_auto : simpl.
 Hint Rewrite @star_mon_is_one using ti_auto : simpl.
@@ -239,9 +239,9 @@ Section Props2.
    
 End Props2.
 
-Hint Extern 1 (leq _ _ _ _) => apply star_incr: compat algebra.
-Hint Extern 0 (equal _ _ _ _) => apply star_idem: algebra.
-Hint Extern 0 (equal _ _ _ _) => apply star_trans: algebra.
+Global Hint Extern 1 (leq _ _ _ _) => apply star_incr: compat algebra.
+Global Hint Extern 0 (equal _ _ _ _) => apply star_idem: algebra.
+Global Hint Extern 0 (equal _ _ _ _) => apply star_trans: algebra.
 
 
 (** more properties, by duality  *)

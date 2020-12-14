@@ -10,7 +10,8 @@
    modules and defines some basic utilities and tactics *)
 
 Require Export Arith.
-Require Export Omega.
+Require Export Lia.
+Require Export BinNums BinPos PArith.Pnat.
 Require Export Coq.Program.Equality. 
 Require Export Setoid Morphisms. 
 
@@ -26,8 +27,8 @@ Notation "f >> g" := (comp f g) (at level 50).
    an hypothesis [H] by generating the corresponding subgoals) *)
 Definition apply X x Y (f: X -> Y) := f x.
 
-(** Tactics to resolve a goal by using a contradiction in the hypotheses, using either [omega] or [tauto] *)
-Ltac omega_false := exfalso; omega.
+(** Tactics to resolve a goal by using a contradiction in the hypotheses, using either [lia] or [tauto] *)
+Ltac lia_false := exfalso; lia.
 Ltac tauto_false := exfalso; tauto.
 
 (** This destructor sometimes works better that the standard [destruct] *)
@@ -53,17 +54,17 @@ Ltac ti_auto := eauto with typeclass_instances.
    - <simpl> is a rewriting database, to be used with the [rsimpl] tactic. It contains lemmas like [1*x == x] 
    [0# == 1] and provides a simple way to normalise the goal "in depth", using the setoid infrastructure.
    This is not really efficient, however.
-   - <omega> contains hints to use [omega] when proof search failed ; this basically allows us to avoid 
-   using [omega] in trivial cases.
+   - <lia> contains hints to use [lia] when proof search failed ; this basically allows us to avoid 
+   using [lia] in trivial cases.
 *)
 Create HintDb compat discriminated.
 Create HintDb algebra discriminated.
 
 Ltac rsimpl := simpl; autorewrite with simpl using ti_auto.
 
-Hint Extern 9 (@eq nat ?x ?y) => instantiate; abstract omega: omega.
-Hint Extern 9 (Peano.le ?x ?y) => instantiate; abstract omega: omega.
-Hint Extern 9 (Peano.lt ?x ?y) => instantiate; abstract omega: omega.
+Global Hint Extern 9 (@eq nat ?x ?y) => instantiate; abstract lia: lia.
+Global Hint Extern 9 (Peano.le ?x ?y) => instantiate; abstract lia: lia.
+Global Hint Extern 9 (Peano.lt ?x ?y) => instantiate; abstract lia: lia.
 
 (** Tactic to use when apply does not smartly unify *)
 Ltac rapply H := first 

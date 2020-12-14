@@ -67,11 +67,11 @@ Notation "! M" := (get M) (at level 0) : A_scope.
 Notation "M == [ n , m ]  N" := (@equal (mx_Graph _) n m M N) (at level 80) : A_scope.
 
 Lemma plus_minus : forall m n, S (m+n)-n = S m.
-Proof. intros. omega. Qed.
+Proof. intros. lia. Qed.
 Global Opaque minus. 
 
 Lemma lt_n_1 n: ~ (S n<1)%nat.
-Proof. omega. Qed.
+Proof. lia. Qed.
 
 (** case analysis on block matrix acesses *)
 Ltac destruct_blocks :=
@@ -139,13 +139,13 @@ Section Props.
       Definition mx_sub11 := mx_sub x y n m M.
     End Def.
     Global Instance mx_sub00_compat: Proper (mx_equal (x+n) (y+m) ==> mx_equal x y) mx_sub00.
-    Proof. repeat intro. simpl. apply H; auto with omega. Qed.
+    Proof. repeat intro. simpl. apply H; auto with lia. Qed.
     Global Instance mx_sub01_compat: Proper (mx_equal (x+n) (y+m) ==> mx_equal x m) mx_sub01.
-    Proof. repeat intro. simpl. apply H; auto with omega. Qed.
+    Proof. repeat intro. simpl. apply H; auto with lia. Qed.
     Global Instance mx_sub10_compat: Proper (mx_equal (x+n) (y+m) ==> mx_equal n y) mx_sub10.
-    Proof. repeat intro. simpl. apply H; auto with omega. Qed.
+    Proof. repeat intro. simpl. apply H; auto with lia. Qed.
     Global Instance mx_sub11_compat: Proper (mx_equal (x+n) (y+m) ==> mx_equal n m) mx_sub11.
-    Proof. repeat intro. simpl. apply H; auto with omega. Qed.
+    Proof. repeat intro. simpl. apply H; auto with lia. Qed.
   End Subs.
 
 
@@ -178,7 +178,7 @@ Section Props.
       mx_equal (x+n) (y+m))
     mx_blocks.
     Proof. 
-      repeat intro. destruct_blocks; auto with omega.
+      repeat intro. destruct_blocks; auto with lia.
     Qed.
 
     Lemma mx_decompose_blocks :
@@ -190,7 +190,7 @@ Section Props.
           (mx_sub10 M)
           (mx_sub11 M).
     Proof.
-      simpl; intros. destruct_blocks; auto with omega. 
+      simpl; intros. destruct_blocks; auto with lia. 
     Qed.
   
     Section Proj.
@@ -199,22 +199,22 @@ Section Props.
   
       Lemma mx_block_00: mx_sub00 (mx_blocks a b c d) == a.
       Proof.
-        simpl. intros. destruct_blocks; reflexivity || omega_false.
+        simpl. intros. destruct_blocks; reflexivity || lia_false.
       Qed.
     
       Lemma mx_block_01: mx_sub01 (mx_blocks a b c d) == b.
       Proof.
-        simpl. intros. destruct_blocks; omega_false || auto with compat omega.
+        simpl. intros. destruct_blocks; lia_false || auto with compat lia.
       Qed.
     
       Lemma mx_block_10: mx_sub10 (mx_blocks a b c d) == c.
       Proof.
-        simpl. intros. destruct_blocks; omega_false || auto with compat omega.
+        simpl. intros. destruct_blocks; lia_false || auto with compat lia.
       Qed.
     
       Lemma mx_block_11: mx_sub11 (mx_blocks a b c d) == d.
       Proof.
-        simpl. intros. destruct_blocks; omega_false || auto with compat omega.
+        simpl. intros. destruct_blocks; lia_false || auto with compat lia.
       Qed.
 
     End Proj.
@@ -239,7 +239,7 @@ Section Props.
   Lemma mx_blocks_degenerate_00 (a: MX 1 1) b c (d: MX 0 0):
     (mx_blocks a b c d: MX 1 1) == a.
   Proof.
-    intros [|] [|] Hi Hj; try omega_false. reflexivity. 
+    intros [|] [|] Hi Hj; try lia_false. reflexivity. 
   Qed.
 
   Lemma mx_blocks_degenerate_11 n m (a: MX 0 0) b c (d: MX n m):
@@ -296,16 +296,16 @@ Section Props.
 
 End Props.
 
-Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub00_compat: compat algebra.
-Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub01_compat: compat algebra.
-Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub10_compat: compat algebra.
-Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub11_compat: compat algebra.
-Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_transpose_compat: compat algebra.
-Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_force_compat: compat algebra.
-Hint Extern 4 (mx_equal_ _ _ _ _ _) => apply mx_blocks_compat: compat algebra.
-Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_of_scal_compat: compat algebra.
-Hint Extern 1 (equal _ _ _ _) => apply mx_to_scal_compat: compat algebra.
-Hint Extern 5 (equal _ _ _ _) => apply mx_equal_compat : compat algebra.
+Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub00_compat: compat algebra.
+Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub01_compat: compat algebra.
+Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub10_compat: compat algebra.
+Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub11_compat: compat algebra.
+Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_transpose_compat: compat algebra.
+Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_force_compat: compat algebra.
+Global Hint Extern 4 (mx_equal_ _ _ _ _ _) => apply mx_blocks_compat: compat algebra.
+Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_of_scal_compat: compat algebra.
+Global Hint Extern 1 (equal _ _ _ _) => apply mx_to_scal_compat: compat algebra.
+Global Hint Extern 5 (equal _ _ _ _) => apply mx_equal_compat : compat algebra.
 
 (* Hint Resolve @equal_compat: compat algebra.  *)
   

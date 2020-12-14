@@ -110,7 +110,7 @@ Module MySetProps (X : FSetInterface.S).
     Qed.
     Next Obligation.
       assert (In x s). apply min_elt_1. auto. 
-      assert (forall x y, S x <= y -> x < y) by (intros; omega). apply H0. clear H0.       
+      assert (forall x y, S x <= y -> x < y) by (intros; lia). apply H0. clear H0.       
       rewrite EqProps.remove_cardinal_1. auto. 
       rewrite <-mem_iff. auto. 
     Qed.
@@ -297,12 +297,13 @@ Module MySetProps (X : FSetInterface.S).
         rewrite <- (Hcompat _ _ H0) in H1. auto. 
         firstorder. 
         firstorder. 
-        firstorder. 
+        eauto using E.eq_refl.
     Qed.
 
     Lemma exists_empty :  exists_ f empty = false.
     Proof.
       assert (forall b, b = false <-> ~b=true). clear. intros [|]; firstorder.
+      congruence.
       rewrite H.  clear H. intro. 
       rewrite <- exists_iff in H. destruct H. setdec.
       apply Hcompat.

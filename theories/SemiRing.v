@@ -27,7 +27,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Set Asymmetric Patterns.
 
-Hint Extern 0 (equal _ _ _ _) => first [ 
+Global Hint Extern 0 (equal _ _ _ _) => first [ 
     apply dot_ann_left
   | apply dot_ann_right
   | apply dot_distr_left
@@ -322,18 +322,18 @@ endtests*)
   
       (* norm_aux *)
       destruct x; simpl in *.
-      rewrite dot_neutral_right; apply IHnorm_aux'; omega.
+      rewrite dot_neutral_right; apply IHnorm_aux'; lia.
       rewrite dot_ann_right, dot_ann_left, plus_com; apply plus_neutral_left.
-      rewrite <- IHnorm_aux, ! dot_assoc; trivial; simpl; omega.
-      rewrite <- 2 IHnorm_aux, dot_distr_right, dot_distr_left; trivial; omega.
-      rewrite <- IHnorm_aux'. rewrite VLst_add. reflexivity. omega.
+      rewrite <- IHnorm_aux, ! dot_assoc; trivial; simpl; lia.
+      rewrite <- 2 IHnorm_aux, dot_distr_right, dot_distr_left; trivial; lia.
+      rewrite <- IHnorm_aux'. rewrite VLst_add. reflexivity. lia.
   
       (* norm_aux' *)
       destruct y; simpl in *.
       rewrite dot_neutral_right. symmetry. apply VLSet_add. 
       rewrite dot_ann_right, plus_com; apply plus_neutral_left.
-      rewrite <- IHnorm_aux, dot_assoc; trivial; omega.
-      rewrite <- 2 IHnorm_aux', dot_distr_right; trivial; omega. 
+      rewrite <- IHnorm_aux, dot_assoc; trivial; lia.
+      rewrite <- 2 IHnorm_aux', dot_distr_right; trivial; lia. 
       rewrite VLSet_add. rewrite VLst_add. reflexivity.
     Qed.
   
@@ -890,7 +890,7 @@ Lemma sum_distr_left `{ISR: IdemSemiRing}: forall A B C (x: X B A) (f: nat -> X 
 Proof. exact (@sum_distr_right _ _ _ (@Dual.IdemSemiRing _ _ _ ISR)). Qed.
 
 
-Hint Extern 2 (leq _ _ _ _) => first [ 
+Global Hint Extern 2 (leq _ _ _ _) => first [ 
     apply dot_incr
 ]: compat algebra.
 

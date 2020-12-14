@@ -89,7 +89,7 @@ Lemma sum_collapse': forall k f b (j: state), (j<k)%nat ->
 Proof.
   intros. rewrite (sum_collapse (n:=j)); auto.
    cbn. rewrite id_num. bool_simpl. reflexivity.
-   intros. num_analyse. num_omega. reflexivity.
+   intros. num_analyse. num_lia. reflexivity.
 Qed.
 
 Lemma and_neutral_left: forall (A B: Prop), A -> (A/\B <-> B). Proof. tauto. Qed.
@@ -110,10 +110,10 @@ Proof.
 
    mx_intros i j Hi Hj. Transparent dot. simpl. fold_regex. Opaque dot. 
    apply bounded_initial in HA. 
-   setoid_rewrite xif_dot. rewrite (sum_collapse (n:=initial A)). 2: num_omega. 
+   setoid_rewrite xif_dot. rewrite (sum_collapse (n:=initial A)). 2: num_lia. 
     bool_simpl. simpl. rewrite dot_neutral_left. apply xif_compat; auto. 
     rewrite id_num. rewrite bool_prop_iff. bool_connectors. num_prop. nat_prop.
-    intuition; num_omega.
+    intuition; num_lia.
     simpl. intros x Hx. nat_analyse; simpl; auto with algebra.
 
    mx_intros i j Hi Hj. Transparent dot. simpl. fold_regex. Opaque dot. 
@@ -125,15 +125,15 @@ Proof.
     setoid_rewrite dot_xif_zero. setoid_rewrite dot_neutral_right. setoid_rewrite xif_xif_and.
     rewrite sum_collapse'. setoid_rewrite <- andb_assoc. rewrite sum_collapse'.  
       apply xif_compat; auto. rewrite 2id_num. rewrite match_pi0. 
-      rewrite bool_prop_iff. bool_connectors. num_prop. intuition. num_omega. apply (bounded_delta HA).
-      unfold s. rewrite <- lt_nat_spec. apply below_max_pi0. num_omega.
+      rewrite bool_prop_iff. bool_connectors. num_prop. intuition. num_lia. apply (bounded_delta HA).
+      unfold s. rewrite <- lt_nat_spec. apply below_max_pi0. num_lia.
       apply -> lt_nat_spec. apply (bounded_delta HA).
 
    mx_intros i j Hi Hj. Transparent dot. simpl. fold_regex. Opaque dot. 
     setoid_rewrite dot_xif_zero. setoid_rewrite dot_neutral_left.
     setoid_rewrite <- andb_assoc. rewrite sum_collapse'. apply xif_compat; auto.
     rewrite id_num. rewrite bool_prop_iff. bool_connectors. num_prop. StateSetProps.mem_prop.
-    rewrite and_neutral_left by num_omega.
+    rewrite and_neutral_left by num_lia.
     (* BUG d'induction *)
     (* induction (finaux A) using StateSetProps.set_induction_above. *)
     generalize (finaux A). rapply StateSetProps.set_induction_above.
@@ -149,7 +149,7 @@ Proof.
      rewrite StateSetProps.fold_add_above; ti_auto.
      StateSetProps.set_iff. rewrite <- IHx. intuition (try subst; auto using pi0_inj). 
      repeat intro. psubst. rewrite H3. reflexivity.
-    apply -> lt_nat_spec. apply below_max_pi0. num_omega. 
+    apply -> lt_nat_spec. apply below_max_pi0. num_lia. 
     Opaque NumSet.add.
   Qed.
 
@@ -165,10 +165,10 @@ Proof.
   
    mx_intros i j Hi Hj. Transparent dot. simpl. fold_regex. Opaque dot. 
    apply bounded_initial in HB. 
-   setoid_rewrite xif_dot. rewrite (sum_collapse (n:=initial B)). 2: num_omega. 
+   setoid_rewrite xif_dot. rewrite (sum_collapse (n:=initial B)). 2: num_lia. 
     bool_simpl. simpl. rewrite dot_neutral_left. apply xif_compat; auto. 
     rewrite id_num. rewrite bool_prop_iff. bool_connectors. num_prop. nat_prop.
-    intuition; num_omega.
+    intuition; num_lia.
     simpl. intros x Hx. nat_analyse; simpl; auto with algebra.
 
    mx_intros i j Hi Hj. Transparent dot. simpl. fold_regex. Opaque dot. 
@@ -180,15 +180,15 @@ Proof.
     setoid_rewrite dot_xif_zero. setoid_rewrite dot_neutral_right. setoid_rewrite xif_xif_and.
     rewrite sum_collapse'. setoid_rewrite <- andb_assoc. rewrite sum_collapse'.  
       apply xif_compat; auto. rewrite 2id_num. rewrite match_pi1. 
-      rewrite bool_prop_iff. bool_connectors. num_prop. intuition. num_omega. apply (bounded_delta HB).
-      unfold s. rewrite <- lt_nat_spec. apply below_max_pi1. num_omega.
+      rewrite bool_prop_iff. bool_connectors. num_prop. intuition. num_lia. apply (bounded_delta HB).
+      unfold s. rewrite <- lt_nat_spec. apply below_max_pi1. num_lia.
       apply -> lt_nat_spec. apply (bounded_delta HB).
 
    mx_intros i j Hi Hj. Transparent dot. simpl. fold_regex. Opaque dot. 
     setoid_rewrite dot_xif_zero. setoid_rewrite dot_neutral_left.
     setoid_rewrite <- andb_assoc. rewrite sum_collapse'. apply xif_compat; auto.
     rewrite id_num. rewrite bool_prop_iff. bool_connectors. num_prop. StateSetProps.mem_prop.
-    rewrite and_neutral_left by num_omega.
+    rewrite and_neutral_left by num_lia.
     apply StateSetProps.Props.fold_rec_nodep. 
      (* BUG d'induction *)
      (* induction (finaux B) using StateSetProps.set_induction_above. *)
@@ -202,7 +202,7 @@ Proof.
      repeat intro. StateSetProps.set_iff. tauto.
      intro. rewrite H1. StateSetProps.set_iff. tauto.
     intros x a _. StateSetProps.set_iff. intuition psubst. discriminate.
-    apply -> lt_nat_spec. apply below_max_pi1. num_omega.
+    apply -> lt_nat_spec. apply below_max_pi1. num_lia.
     Opaque NumSet.add.
 Qed.
 

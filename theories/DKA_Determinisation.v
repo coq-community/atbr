@@ -144,13 +144,14 @@ Section S.
   Proof.
     unfold build_store.
     pose (Heq:=powerfix_linearfix (A:=Store) (B:=stateset -> num -> Store) (R:=pointwise_relation _ (pointwise_relation _ (@eq _)))).
-    unfold pointwise_relation at -1 -2 -3 in Heq.
     rewrite Heq. 
     generalize (state_of_nat 0) initiaux initial_store. generalize (power size) as n. 
     induction n; intros s p np; simpl.
      reflexivity.
      apply fold_num_compat, step_compat. repeat intro. apply IHn.
-     intros f g H s ? <- p np. apply fold_num_compat, step_compat, H.  
+     intros f g H s ? <- p np. apply fold_num_compat, step_compat.  
+     unfold pointwise_relation; simpl.
+     apply H.
   Qed.
 
 
@@ -231,7 +232,7 @@ Section S.
     forall P, defined s (fun n a => P n a \/ n=np) -> defined (steps i s p np) P.
   Proof. 
     induction i; intros s p np Hsize H Hp; simpl.
-     omega_false.
+     lia_false.
      cut (forall a: num, extends s (fold_labels (step' (steps i) p np) a s) /\
        forall P, defined s (fun n b => P n b \/ n = np /\ b < a) ->
          defined (fold_labels (step' (steps i) p np) a s) P).
@@ -241,7 +242,7 @@ Section S.
      intro a. revert s Hsize H Hp. induction a using num_peano_rec; intros [[t d] n] Hsize H Hp.
       rewrite fold_num_O. split.
        apply reflexive_extends. assumption.
-       intros P HP m b Hm Hb. specialize (HP m b Hm Hb). intuition auto. num_omega_false.
+       intros P HP m b Hm Hb. specialize (HP m b Hm Hb). intuition auto. num_lia_false.
       rewrite fold_num_S. simpl. StateSetMapProps.find_analyse.
        (* existing state *)
        assert (H': invariant (t, StateLabelMap.add (np, a) x d, n)).
@@ -255,7 +256,7 @@ Section S.
         constructor; auto with map. reflexivity.
         intros P HP. eapply IHa; simpl; auto with map. 
         intros m' b Hm Hb. specialize (HP _ b Hm Hb). simpl in *.
-        intuition subst; auto with map. destruct (eq_spec a b). subst. auto with map. num_omega. 
+        intuition subst; auto with map. destruct (eq_spec a b). subst. auto with map. num_lia. 
 
        (* new state *)
        set (s' := (StateSetMap.add (delta_set a p) n t, StateLabelMap.add (np: NumOTA.t, a) n d, S n)).
@@ -263,20 +264,20 @@ Section S.
          constructor; simpl.
           intros q nq. StateSetMapProps.map_iff. intuition subst.
            intros x Hx. rewrite <- H1 in Hx. eapply bounded_delta_set, Hx.  
-           num_omega.
+           num_lia.
            apply (i_table_wf H H3).
-           specialize (i_table_wf H H3). simpl. num_omega.
+           specialize (i_table_wf H H3). simpl. num_lia.
           intros q q' nq. StateSetMapProps.map_iff. intuition subst. 
            StateSetProps.setdec.
-           exfalso. specialize (i_table_wf H H5). simpl. num_omega.
-           exfalso. specialize (i_table_wf H H4). simpl. num_omega.
+           exfalso. specialize (i_table_wf H H5). simpl. num_lia.
+           exfalso. specialize (i_table_wf H H4). simpl. num_lia.
            apply (i_table_inj H H4 H5).
           intros m Hm. destruct (eq_num_dec m n). subst.
            eauto with map.
-           destruct (@i_table_surj _ H m) as [q ?]. simpl. num_omega. exists q.
+           destruct (@i_table_surj _ H m) as [q ?]. simpl. num_lia. exists q.
             apply StateSetMap.add_2; trivial. intro F. rewrite <- F in H1. elim H0. exists m; assumption.
           erewrite StateSetMapProps.cardinal_2; eauto. 
-           apply i_table_size in H. simpl in H. rewrite H. num_omega.
+           apply i_table_size in H. simpl in H. rewrite H. num_lia.
            intro; reflexivity.
           intros nq b nq'. StateLabelMapProps.map_iff. intuition subst.
            apply StateLabel.P.reflect in H1. injection H1; intros; subst; clear H1.
@@ -289,11 +290,11 @@ Section S.
        specialize (IHi s' (delta_set a p) n). 
        simpl in IHi. destruct IHi as [IHi1 IHi2]; auto with map.
         clear - Hsize H Hp H0 H'. subst s'. simpl in *.
-        apply store_size_bound in H'. simpl in *. pose proof (power_positive size). num_omega.
+        apply store_size_bound in H'. simpl in *. pose proof (power_positive size). num_lia.
 
        specialize (IHa (steps i s' (delta_set a p) n)). 
        simpl in IHa. destruct IHa as [IHa1 IHa2].
-        clear IHi2. subst s'. apply e_next in IHi1. simpl in *. num_omega.
+        clear IHi2. subst s'. apply e_next in IHi1. simpl in *. num_lia.
         apply IHi1.
         apply IHi1. simpl.
          apply StateSetMap.add_2; trivial. intro F. rewrite F in H0. elim H0. exists np. assumption.
@@ -304,14 +305,14 @@ Section S.
         constructor; simpl; auto.  
          intros q nq Hq. 
           apply StateSetMap.add_2; trivial. intro F. rewrite <- F in Hq. elim H0. exists nq. assumption.
-         num_omega.
+         num_lia.
 
         intros P HP. apply IHa2. apply IHi2. unfold s' in *. clear - Hp HP. 
         intros m b Hm Hb. simpl in *.
         destruct (eq_num_dec m n). subst. auto.
-        destruct (HP m b) as [[y ?]|[ ?|[? ?]]]; subst; simpl in *; auto with map. num_omega. 
+        destruct (HP m b) as [[y ?]|[ ?|[? ?]]]; subst; simpl in *; auto with map. num_lia. 
          clear - H. eauto with map.
-         destruct (eq_spec a b). subst. auto with map. num_omega. 
+         destruct (eq_spec a b). subst. auto with map. num_lia. 
   Qed. 
 
   (** the initial store satisfies the invariant *)
@@ -322,7 +323,7 @@ Section S.
       intros x Hx. rewrite <- H in Hx. apply (NFA.bounded_initiaux HA Hx).
      StateSetMapProps.find_tac; StateSetProps.setdec.
      exists initiaux. replace i with (state_of_nat O). auto with map. 
-      change 2%positive with (state_of_nat 1) in H. num_omega.
+      change 2%positive with (state_of_nat 1) in H. num_lia.
      reflexivity.
      revert H. StateLabelMapProps.map_iff. tauto. 
   Qed.
@@ -334,12 +335,12 @@ Section S.
   Proof.
     rewrite build_store_spec.
     destruct (@steps_correct (power size) initial_store initiaux 0) as [H H'].
-     simpl. pose proof (power_positive size). change 2%positive with (state_of_nat 1). num_omega. 
+     simpl. pose proof (power_positive size). change 2%positive with (state_of_nat 1). num_lia. 
      apply invariant_initial_store.
      simpl. auto with map.
     split. apply H.
     intros n a Hn Ha. destruct (fun H => H' (fun _ _ => False) H n a Hn Ha); try tauto.
-    intros m b Hm _. simpl in Hm. right. right. change 2%positive with (state_of_nat 1) in Hm. num_omega. 
+    intros m b Hm _. simpl in Hm. right. right. change 2%positive with (state_of_nat 1) in Hm. num_lia. 
   Qed.
 
   (** in particular, the constructed store satisfies the invariant *)
@@ -482,7 +483,7 @@ Section S.
   Lemma positive_size: 0 < size'.
   Proof.
     assert (H:=build_store_correct). eapply proj1, e_next in H. simpl in H.
-    change 2%positive with (state_of_nat 1) in H. num_omega.
+    change 2%positive with (state_of_nat 1) in H. num_lia.
   Qed.
 
   (** its transitions are bounded *)
@@ -527,7 +528,7 @@ Section S.
 
     (** u *)
     Opaque dot one zero equal. simpl. Transparent dot one zero equal.
-    rewrite mx_point_one_left by num_omega. 
+    rewrite mx_point_one_left by num_lia. 
     mx_intros i j Hi Hj. Opaque eq_nat_bool. simpl. bool_simpl. simpl. fold_regex. Transparent eq_nat_bool. 
     rewrite theta_0. reflexivity. 
 
@@ -541,16 +542,16 @@ Section S.
     setoid_rewrite dot_neutral_left.
     setoid_rewrite dot_neutral_right.
     apply leq_antisym; apply compare_sum_xif_zero; intros u Hu; bool_connectors; intros [Hu' Hu'']; simpl in *.
-     exists (nat_of_state (delta' d a i)); auto. specialize (Hdelta'_below a i). num_omega. 
+     exists (nat_of_state (delta' d a i)); auto. specialize (Hdelta'_below a i). num_lia. 
      bool_connectors. num_prop. rewrite id_num. split; trivial.
-     rewrite Htheta_delta' by num_omega.
+     rewrite Htheta_delta' by num_lia.
      StateSetProps.mem_prop. apply <- in_delta_set. exists (state_of_nat u); auto.
 
      num_prop. rewrite Hu' in Hu''. clear u Hu Hu'. simpl in Hi. 
-     rewrite Htheta_delta', <- StateSetProps.mem_iff in Hu'' by num_omega.
+     rewrite Htheta_delta', <- StateSetProps.mem_iff in Hu'' by num_lia.
      apply -> in_delta_set in Hu''. destruct Hu'' as [k [? ?]].
      exists (nat_of_state k). 
-      apply Htheta_below, proj2 in H. clear - H. num_omega.
+      apply Htheta_below, proj2 in H. clear - H. num_lia.
       rewrite id_num. bool_connectors. StateSetProps.mem_prop. rewrite id_num. auto. 
 
     (** v *)
@@ -562,7 +563,7 @@ Section S.
 
      rewrite <- StateSetProps.exists_iff in H by trivial. destruct H as [u [Hu Hu']].
      rewrite (sum_fixed_xif_zero (v:=nat_of_state u)). auto with algebra. 
-      StateSetProps.mem_prop. apply HA in Hu'. apply Htheta_below, proj2 in Hu. num_omega.
+      StateSetProps.mem_prop. apply HA in Hu'. apply Htheta_below, proj2 in Hu. num_lia.
      rewrite id_num. bool_connectors. StateSetProps.mem_prop. auto.  
 
      apply sum_zero. intros m Hm. apply xif_false. simpl.
