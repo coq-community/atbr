@@ -46,8 +46,8 @@ rather than automata: https://github.com/damien-pous/relation-algebra
 - Coq-community maintainer(s):
   - Tej Chajed ([**@tchajed**](https://github.com/tchajed))
 - License: [GNU Lesser General Public License v3.0 or later](LICENSE)
-- Compatible Coq versions: 8.15 (use the corresponding branch or release for other Coq versions)
-- Compatible OCaml versions: 4.05.0 or later
+- Compatible Coq versions: 8.16 (use the corresponding branch or release for other Coq versions)
+- Compatible OCaml versions: 4.09.0 or later
 - Additional dependencies: none
 - Coq namespace: `ATBR`
 - Related publication(s):

@@ -36,22 +36,22 @@ maintainers:
 
 opam-file-maintainer: palmskog@gmail.com
 
-opam-file-version: 8.15.dev
+opam-file-version: 8.16.dev
 
 license:
   fullname: GNU Lesser General Public License v3.0 or later
   identifier: LGPL-3.0-or-later
 
 supported_coq_versions:
-  text: 8.15 (use the corresponding branch or release for other Coq versions)
-  opam: '{>= "8.15" & < "8.16"}'
+  text: 8.16 (use the corresponding branch or release for other Coq versions)
+  opam: '{>= "8.16" & < "8.17"}'
 
 supported_ocaml_versions:
-    text: 4.05.0 or later
-    opam: '{>= "4.05.0"}'
+    text: 4.09.0 or later
+    opam: '{>= "4.09.0"}'
 
 tested_coq_opam_versions:
-- version: '8.15'
+- version: '8.16'
 
 namespace: ATBR
 

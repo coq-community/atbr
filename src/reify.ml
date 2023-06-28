@@ -343,7 +343,7 @@ let reify_goal ops =
 	in
 	  (try 
 	     Tacticals.tclTHEN (retype reified)
-	       (Tactics.convert_concl ~cast:false ~check:true reified Constr.VMcast)
+	       (Tactics.convert_concl ~cast:false ~check:true reified DEFAULTcast)
 	   with e -> Feedback.msg_warning (Printer.pr_leconstr_env env sigma reified); raise e)
 	    
     | _ -> error "unrecognised goal"
