@@ -335,10 +335,10 @@ let reify_goal ops =
 
 	(* reified goal conclusion: add the relation over the two evaluated members *)
 	let reified = 
-	  mkNamedLetIn (Context.make_annot tenv_name Sorts.Relevant) tenv (mkArrow (Lazy.force Coq.positive) typ) (
-	    mkNamedLetIn (Context.make_annot env_name Sorts.Relevant) tenv' (Reification.env_type gph) (
-	      mkNamedLetIn (Context.make_annot ln Sorts.Relevant) lv x (
-		mkNamedLetIn (Context.make_annot rn Sorts.Relevant) rv x (
+	  mkNamedLetIn sigma (Context.make_annot tenv_name Sorts.Relevant) tenv (mkArrow (Lazy.force Coq.positive) typ) (
+	    mkNamedLetIn sigma (Context.make_annot env_name Sorts.Relevant) tenv' (Reification.env_type gph) (
+	      mkNamedLetIn sigma (Context.make_annot ln Sorts.Relevant) lv x (
+		mkNamedLetIn sigma (Context.make_annot rn Sorts.Relevant) rv x (
 		  (mkApp (rel, [|Reification.typ gph env_ref src; Reification.typ gph env_ref tgt;l;r|]))))))
 	in
 	  (try 

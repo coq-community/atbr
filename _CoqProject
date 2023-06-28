@@ -7,6 +7,8 @@
 -arg -w -arg -undo-batch-mode
 -arg -w -arg -undeclared-scope
 -arg -w -arg -ambiguous-paths
+-arg -w -arg -deprecated-instance-without-locality
+-arg -w -arg -deprecated-hint-rewrite-without-locality
 
 src/reify.ml
 src/reification.mlg
