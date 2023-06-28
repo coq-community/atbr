@@ -22,3 +22,4 @@ Makefile.coq.conf
 *.cmxa
 src/reification.ml
 src/.merlin
+src/META.coq-atbr

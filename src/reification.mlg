@@ -8,7 +8,7 @@
 
 (** Generic reification, for the classes from [Classes.v] to the inductives from [Reification.v] *)
 
-DECLARE PLUGIN "reification_plugin"
+DECLARE PLUGIN "coq-atbr.plugin"
 
 {
 
