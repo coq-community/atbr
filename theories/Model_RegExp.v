@@ -564,7 +564,7 @@ Module RegExp.
         (* star_destruct_left lr *)
         eexists; eauto. eval_injection.
         apply star_destruct_left; unfold leq. 
-        destruct (proj1 IHsequal _ _ (x0*x1+x1)) as [ y1 ? Hy1 ]; auto.
+        destruct (proj1 IHsequal _ _ (x0*x4+x4)) as [ y1 ? Hy1 ]; auto.
         rewrite Hy1. eval_injection. reflexivity.
   
         (* star_destruct_left rl *)
