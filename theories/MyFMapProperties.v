@@ -43,7 +43,7 @@ Module MyMapProps (X : FMapInterface.S).
     intros [x Hx]. apply find_1 in Hx. rewrite H in Hx. discriminate.
   Qed.
   
-  Instance find_view : Type_View find := {type_view := find_spec}. 
+  #[global] Instance find_view : Type_View find := {type_view := find_spec}. 
   
   (** * Destructor for find *)
   Ltac find_analyse :=

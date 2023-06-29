@@ -87,8 +87,8 @@ Proof.
   case (IHa ( b));  intros H; subst;  constructor; auto with arith.
 Qed.
 
-Instance eq_nat_view : Type_View eq_nat_bool := { type_view := eq_nat_spec }.
-Instance le_nat_view : Type_View le_lt_bool := { type_view := le_nat_spec }.
+#[global] Instance eq_nat_view : Type_View eq_nat_bool := { type_view := eq_nat_spec }.
+#[global] Instance le_nat_view : Type_View le_lt_bool := { type_view := le_nat_spec }.
 
 Ltac nat_analyse := 
   repeat (
@@ -113,7 +113,7 @@ Proof.
   case (IHn m); intro; subst; constructor; congruence.
 Qed.
 
-Instance eq_pos_view : Type_View eq_pos_bool := { type_view := eq_pos_spec }.
+#[global] Instance eq_pos_view : Type_View eq_pos_bool := { type_view := eq_pos_spec }.
 
 Ltac pos_analyse := repeat type_view eq_pos_bool.
 
@@ -127,7 +127,7 @@ Proof.
   congruence.
 Qed.
 
-Instance eq_bool_view : Type_View eq_bool_bool := { type_view := eq_bool_spec }.
+#[global] Instance eq_bool_view : Type_View eq_bool_bool := { type_view := eq_bool_spec }.
 
 Ltac bool_analyse := repeat type_view eq_bool_bool.
 
@@ -146,7 +146,7 @@ Proof. intros. nat_analyse; intuition. Qed.
 Lemma le_lt_bool_false : forall x y, le_lt_bool x y = false <-> y < x. 
 Proof. intros. nat_analyse; intuition. lia. Qed.
 
-Hint Rewrite eq_nat_bool_true eq_nat_bool_false le_lt_bool_true le_lt_bool_false : nat_prop.
+#[global] Hint Rewrite eq_nat_bool_true eq_nat_bool_false le_lt_bool_true le_lt_bool_false : nat_prop.
 Ltac nat_prop := autorewrite with nat_prop in *.
 
 
@@ -159,7 +159,7 @@ Ltac nat_prop := autorewrite with nat_prop in *.
       The database bool_simpl should be enriched with lemmas such as [forall x, eqb x x = true], 
       which is done in Numbers.v
 *)
-Hint Rewrite 
+#[global] Hint Rewrite 
   orb_false_r                    (** b || false -> b *)
   orb_false_l                    (** false || b -> b *)
   orb_true_r                     (** b || true  -> true *)
@@ -173,8 +173,8 @@ Hint Rewrite
   negb_involutive                (** negb (negb b) -> b *)
   : bool_simpl.
 
-Hint Rewrite <- andb_lazy_alt : bool_simpl. (** a &&& b -> a && b *)
-Hint Rewrite <- orb_lazy_alt : bool_simpl.  (** a ||| b -> a || b *)
+#[global] Hint Rewrite <- andb_lazy_alt : bool_simpl. (** a &&& b -> a && b *)
+#[global] Hint Rewrite <- orb_lazy_alt : bool_simpl.  (** a ||| b -> a || b *)
  
 Ltac bool_simpl := autorewrite with bool_simpl in *.
 
@@ -183,7 +183,7 @@ Proof. intro. nat_prop. reflexivity. Qed.
 Lemma le_lt_bool_refl: forall x, le_lt_bool x x = true. 
 Proof. intro. nat_prop. auto with arith. Qed.
 
-Hint Rewrite  eq_nat_bool_refl le_lt_bool_refl: bool_simpl.
+#[global] Hint Rewrite  eq_nat_bool_refl le_lt_bool_refl: bool_simpl.
 
 
 
@@ -211,7 +211,7 @@ Proof. intros [|]; firstorder. Qed.
 Lemma eq_not_negb  : forall b c, b = c <-> ~ (b = negb c). 
 Proof. intros [|] [|]; firstorder; simpl; try congruence. Qed.
 
-Hint Rewrite andb_false_iff andb_true_iff orb_false_iff orb_true_iff negb_true negb_false : bool_connectors.
+#[global] Hint Rewrite andb_false_iff andb_true_iff orb_false_iff orb_true_iff negb_true negb_false : bool_connectors.
 
 Ltac bool_connectors := autorewrite with bool_connectors in *.
 

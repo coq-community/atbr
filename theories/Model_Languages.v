@@ -145,13 +145,13 @@ End Def.
 (** Import this module to work with languages *)
 Module Load.
 
-  Existing Instance lang_Graph.
-  Existing Instance lang_SemiLattice_Ops.
-  Existing Instance lang_Monoid_Ops.
-  Existing Instance lang_Converse_Op.
-  Existing Instance lang_SemiLattice.
-  Existing Instance lang_Star_Op.
-  Existing Instance lang_KleeneAlgebra.
+  #[global] Existing Instance lang_Graph.
+  #[global] Existing Instance lang_SemiLattice_Ops.
+  #[global] Existing Instance lang_Monoid_Ops.
+  #[global] Existing Instance lang_Converse_Op.
+  #[global] Existing Instance lang_SemiLattice.
+  #[global] Existing Instance lang_Star_Op.
+  #[global] Existing Instance lang_KleeneAlgebra.
   
   Canonical Structure lang_Graph.
   

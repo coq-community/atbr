@@ -110,13 +110,13 @@ End protect.
 (** Import this module to work in the (min,+) algebra *)
 Module Load.
 
-  Existing Instance mp_Graph.
-  Existing Instance mp_SemiLattice_Ops.
-  Existing Instance mp_Monoid_Ops.
-  Existing Instance mp_Converse_Op.
-  Existing Instance mp_SemiLattice.
-  Existing Instance mp_Star_Op.
-  Existing Instance mp_KleeneAlgebra.
+  #[global] Existing Instance mp_Graph.
+  #[global] Existing Instance mp_SemiLattice_Ops.
+  #[global] Existing Instance mp_Monoid_Ops.
+  #[global] Existing Instance mp_Converse_Op.
+  #[global] Existing Instance mp_SemiLattice.
+  #[global] Existing Instance mp_Star_Op.
+  #[global] Existing Instance mp_KleeneAlgebra.
   
   Canonical Structure mp_Graph.
   

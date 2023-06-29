@@ -33,13 +33,13 @@ Global Hint Extern 0 (equal _ _ _ _) => first [
   | apply plus_neutral_right
 ]: algebra.
 Global Hint Extern 2 (equal _ _ _ _) => first [
-    apply plus_compat; instantiate
+    apply plus_compat
 ]: compat algebra.
 
 (* Hint Resolve @leq_refl. *)
 (* Hint Resolve @plus_assoc @plus_idem @plus_com @plus_neutral_left: algebra. *)
 (* Hint Resolve @plus_compat: compat algebra. *)
-Hint Rewrite @plus_neutral_left @plus_neutral_right @plus_idem using ti_auto: simpl.  
+#[global] Hint Rewrite @plus_neutral_left @plus_neutral_right @plus_idem using ti_auto: simpl.  
 
 
 Ltac fold_leq := match goal with |- equal ?A ?B (?a + ?b) ?b => change (leq A B a b) end.

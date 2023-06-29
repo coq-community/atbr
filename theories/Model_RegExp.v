@@ -168,14 +168,14 @@ Module RegExp.
   
   Module Load.
   
-    Existing Instance re_Graph.
-    Existing Instance re_SemiLattice_Ops.
-    Existing Instance re_Monoid_Ops.
-    Existing Instance re_SemiLattice.
-    Existing Instance re_Star_Op.
-    Existing Instance re_SemiRing.
-    Existing Instance re_Monoid.
-    Existing Instance re_KleeneAlgebra.
+    #[global] Existing Instance re_Graph.
+    #[global] Existing Instance re_SemiLattice_Ops.
+    #[global] Existing Instance re_Monoid_Ops.
+    #[global] Existing Instance re_SemiLattice.
+    #[global] Existing Instance re_Star_Op.
+    #[global] Existing Instance re_SemiRing.
+    #[global] Existing Instance re_Monoid.
+    #[global] Existing Instance re_KleeneAlgebra.
     
     Canonical Structure re_Graph.
     
