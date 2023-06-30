@@ -1,7 +1,7 @@
 (coq.theory
  (name ATBR)
- (public_name coq-atbr.ATBR)
- (libraries coq-atbr.plugin)
+ (plugins coq-atbr.plugin)
+ (synopsis "Coq library and tactic for deciding Kleene algebras")
  (flags :standard
    -w -variable-collision
    -w -projection-no-head-constant
