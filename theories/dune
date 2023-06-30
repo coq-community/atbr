@@ -7,4 +7,5 @@
    -w -projection-no-head-constant
    -w -undo-batch-mode
    -w -undeclared-scope
-   -w -ambiguous-paths))
+   -w -ambiguous-paths)
+ (modules :standard \ StrictKleeneAlgebra))

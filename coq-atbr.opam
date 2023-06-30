@@ -3,7 +3,7 @@
 
 opam-version: "2.0"
 maintainer: "palmskog@gmail.com"
-version: "8.17.dev"
+version: "dev"
 
 homepage: "https://github.com/coq-community/atbr"
 dev-repo: "git+https://github.com/coq-community/atbr.git"
@@ -26,7 +26,7 @@ build: [make "-j%{jobs}%"]
 install: [make "install"]
 depends: [
   "ocaml" {>= "4.09.0"}
-  "coq" {>= "8.17" & < "8.18"}
+  "coq" {= "dev"}
 ]
 
 tags: [
