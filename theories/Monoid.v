@@ -24,12 +24,12 @@ Global Hint Extern 0 (equal _ _ _ _) => first [
   | apply dot_neutral_right
 ]: algebra.
 Global Hint Extern 2 (equal _ _ _ _) => first [ 
-    apply dot_compat; instantiate
+    apply dot_compat
 ]: compat algebra.
 
 (* Hint Resolve @dot_assoc @dot_neutral_left @dot_neutral_right: algebra. *)
 (* Hint Resolve @dot_compat: compat algebra. *)
-Hint Rewrite @dot_neutral_left @dot_neutral_right using ti_auto: simpl.  
+#[global] Hint Rewrite @dot_neutral_left @dot_neutral_right using ti_auto: simpl.  
 
 
 (** simple ad-hoc tactic for closed rewrites modulo associativity *) 
@@ -146,9 +146,8 @@ Ltac add_continuation H H' := fail "todo: generic add_continuation";
         (eapply (@add_continuation _ _ r); 
           [ | 
             intros Q q;
-            eapply equal_trans; [ | apply (dot_compat (equal_refl q) H)]; instantiate; (* rewrite <- H *)
+            eapply equal_trans; [ | apply (dot_compat (equal_refl q) H)]; (* rewrite <- H *)
 (*             MonoidQuote.simpl_term_by (q;l) Free.normalize; *)
-            instantiate;
             match goal with |- equal _ _ _ ?body => 
               set (r':=body);
               pattern Q, q in r'; cbv delta [r']; 

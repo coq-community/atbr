@@ -6,6 +6,7 @@ community: true
 action: true
 coqdoc: true
 doi: 10.2168/LMCS-8(1:16)2012
+plugin: true
 
 synopsis: Coq library and tactic for deciding Kleene algebras
 
@@ -47,14 +48,11 @@ supported_coq_versions:
   opam: '{= "dev"}'
 
 supported_ocaml_versions:
-    text: 4.05.0 or later
-    opam: '{>= "4.05.0"}'
-
-tested_coq_nix_versions:
-- version_or_url: https://github.com/coq/coq-on-cachix/tarball/master
+    text: 4.09.0 or later
+    opam: '{>= "4.09.0"}'
 
 tested_coq_opam_versions:
-- version: dev
+- version: 'dev'
 
 namespace: ATBR
 

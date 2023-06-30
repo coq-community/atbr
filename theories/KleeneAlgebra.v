@@ -145,7 +145,7 @@ Section Props1.
 End Props1.
 
 (** hints *)
-Global Hint Extern 1 (equal _ _ _ _) => apply star_compat; instantiate: compat algebra.
+Global Hint Extern 1 (equal _ _ _ _) => apply star_compat : compat algebra.
 Global Hint Extern 0 (equal _ _ _ _) => apply star_make_left: algebra.
 Global Hint Extern 0 (equal _ _ _ _) => apply star_make_right: algebra.
 Global Hint Extern 0 (equal _ _ _ _) => apply star_one: algebra.
@@ -153,8 +153,8 @@ Global Hint Extern 0 (equal _ _ _ _) => apply star_zero: algebra.
 Global Hint Extern 0 (leq _ _ _ _) => apply a_leq_star_a: algebra.
 Global Hint Extern 0 (leq _ _ _ _) => apply one_leq_star_a: algebra.
 
-Hint Rewrite @star_zero @star_one using ti_auto : simpl.
-Hint Rewrite @star_mon_is_one using ti_auto : simpl.
+#[global] Hint Rewrite @star_zero @star_one using ti_auto : simpl.
+#[global] Hint Rewrite @star_mon_is_one using ti_auto : simpl.
 
 
 (** dual Kleene algebra *)

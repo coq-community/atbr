@@ -116,13 +116,13 @@ End Def.
 (** Import this module to work with homogeneous binary relations *)
 Module Load.
 
-  Existing Instance rel_Graph.
-  Existing Instance rel_SemiLattice_Ops.
-  Existing Instance rel_Monoid_Ops.
-  Existing Instance rel_Converse_Op.
-  Existing Instance rel_SemiLattice.
-  Existing Instance rel_Star_Op.
-  Existing Instance rel_KleeneAlgebra.
+  #[global] Existing Instance rel_Graph.
+  #[global] Existing Instance rel_SemiLattice_Ops.
+  #[global] Existing Instance rel_Monoid_Ops.
+  #[global] Existing Instance rel_Converse_Op.
+  #[global] Existing Instance rel_SemiLattice.
+  #[global] Existing Instance rel_Star_Op.
+  #[global] Existing Instance rel_KleeneAlgebra.
   
   Canonical Structure rel_Graph.
   

@@ -168,14 +168,14 @@ Module RegExp.
   
   Module Load.
   
-    Existing Instance re_Graph.
-    Existing Instance re_SemiLattice_Ops.
-    Existing Instance re_Monoid_Ops.
-    Existing Instance re_SemiLattice.
-    Existing Instance re_Star_Op.
-    Existing Instance re_SemiRing.
-    Existing Instance re_Monoid.
-    Existing Instance re_KleeneAlgebra.
+    #[global] Existing Instance re_Graph.
+    #[global] Existing Instance re_SemiLattice_Ops.
+    #[global] Existing Instance re_Monoid_Ops.
+    #[global] Existing Instance re_SemiLattice.
+    #[global] Existing Instance re_Star_Op.
+    #[global] Existing Instance re_SemiRing.
+    #[global] Existing Instance re_Monoid.
+    #[global] Existing Instance re_KleeneAlgebra.
     
     Canonical Structure re_Graph.
     
@@ -564,7 +564,7 @@ Module RegExp.
         (* star_destruct_left lr *)
         eexists; eauto. eval_injection.
         apply star_destruct_left; unfold leq. 
-        destruct (proj1 IHsequal _ _ (x0*x1+x1)) as [ y1 ? Hy1 ]; auto.
+        destruct (proj1 IHsequal _ _ (x0*x4+x4)) as [ y1 ? Hy1 ]; auto.
         rewrite Hy1. eval_injection. reflexivity.
   
         (* star_destruct_left rl *)

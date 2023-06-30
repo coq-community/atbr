@@ -35,7 +35,7 @@ Global Hint Extern 0 (equal _ _ _ _) => first [
 ]: algebra.
 
 (* Hint Resolve @dot_ann_left @dot_ann_right @dot_distr_left @dot_distr_right: algebra. *)
-Hint Rewrite @dot_ann_left @dot_ann_right using ti_auto: simpl.
+#[global] Hint Rewrite @dot_ann_left @dot_ann_right using ti_auto: simpl.
 
 
 (** Free, syntactic, model of semirings, to obtain write reflexive tactics *)

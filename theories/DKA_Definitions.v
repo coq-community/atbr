@@ -113,7 +113,7 @@ Module MAUT.
   
   Infix " [==] " := equal (at level 80).
 
-  Instance equal_equiv : Equivalence equal. 
+  #[global] Instance equal_equiv : Equivalence equal. 
   Proof.
     constructor.
     intro x; destruct x. constructor; reflexivity.
@@ -132,7 +132,7 @@ Module MAUT.
      transitivity V; assumption.
   Qed.
   
-  Instance eval_compat : Proper (equal ==> Classes.equal tt tt) eval.
+  #[global] Instance eval_compat : Proper (equal ==> Classes.equal tt tt) eval.
   Proof.
     intros A B H. destruct H. auto with compat. 
   Qed.

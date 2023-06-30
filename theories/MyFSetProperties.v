@@ -68,18 +68,18 @@ Module MySetProps (X : FSetInterface.S).
      intro H'. apply mem_1 in H'. rewrite H in H'. discriminate.
   Qed.
 
-  Instance mem_type_view : Type_View mem := { type_view := mem_spec }.
+  #[global] Instance mem_type_view : Type_View mem := { type_view := mem_spec }.
 
   Ltac mem_analyse := repeat type_view mem.
 
   Lemma mem_false_not_in: forall x s, mem x s = false <-> ~ In x s.
   Proof. intros. mem_analyse; intuition discriminate. Qed. 
 
-  Hint Rewrite mem_false_not_in : mem_prop.
-  Hint Rewrite <- mem_iff : mem_prop.
+  #[global] Hint Rewrite mem_false_not_in : mem_prop.
+  #[global] Hint Rewrite <- mem_iff : mem_prop.
   Ltac mem_prop := autorewrite with mem_prop in *.
 
-  Hint Rewrite singleton_b union_b add_b mem_add : bool_simpl.
+  #[global] Hint Rewrite singleton_b union_b add_b mem_add : bool_simpl.
 
   (** set_induction_below *)
   Section ListViewBelow.

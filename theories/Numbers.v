@@ -129,14 +129,14 @@ Module NumUtils (N : NUM).
   Bind Scope num_scope with num.
   
   (* TODO: the following instances could be in the standard library *)
-  Instance le_preorder: PreOrder le.
+  #[global] Instance le_preorder: PreOrder le.
   Proof.
     constructor.
     intros x; unfold Pos.le. rewrite le_nat_spec. auto with arith.
     intros x y z Hxy Hyz. rewrite le_nat_spec in *. apply (le_trans _ (nat_of_num y)); auto. 
   Qed.
 
-  Instance lt_transitive: Transitive lt.
+  #[global] Instance lt_transitive: Transitive lt.
   Proof.
     intros x y z Hxy Hyz. rewrite lt_nat_spec in *. apply (lt_trans _ (nat_of_num y)); auto. 
   Qed.
@@ -174,7 +174,7 @@ Module NumUtils (N : NUM).
     rewrite <- match_pi1, H. apply match_pi1. 
   Qed.
   
-  Instance fold_num_compat' {A} {R} `{E: Equivalence A R}: 
+  #[global] Instance fold_num_compat' {A} {R} `{E: Equivalence A R}: 
   Proper (pointwise_relation num (R ==> R) ==> pointwise_relation num (R ==> R)) (@fold_num A).
   Proof.
     intros f g H n. induction n using num_peano_rec; intros a b H'; simpl. 
@@ -182,7 +182,7 @@ Module NumUtils (N : NUM).
     rewrite 2fold_num_S. apply IHn, H, H'.
   Qed.
     
-  Instance fold_num_compat T: Proper 
+  #[global] Instance fold_num_compat T: Proper 
     (pointwise_relation num (pointwise_relation T (@eq T))
       ==>
      pointwise_relation num (pointwise_relation T (@eq T))) (@fold_num T).
@@ -196,9 +196,9 @@ Module NumUtils (N : NUM).
 
   (** * num_analyse : destroys the boolean expressions *)
 
-  Instance eqb_view : Type_View eqb := { type_view := eq_spec }.
-  Instance leb_view : Type_View leb := { type_view := le_spec }.
-  Instance ltb_view : Type_View ltb := { type_view := lt_spec }.
+  #[global] Instance eqb_view : Type_View eqb := { type_view := eq_spec }.
+  #[global] Instance leb_view : Type_View leb := { type_view := le_spec }.
+  #[global] Instance ltb_view : Type_View ltb := { type_view := lt_spec }.
     
   Ltac num_analyse := 
     repeat first [ type_view eqb | type_view leb | type_view ltb ].
@@ -230,7 +230,7 @@ Module NumUtils (N : NUM).
      rewrite eqb_false in H. auto.
   Qed.
 
-  Hint Rewrite 
+  #[global] Hint Rewrite 
     leb_true leb_false 
     ltb_true ltb_false
     eqb_true eqb_false : num_prop.
@@ -241,7 +241,7 @@ Module NumUtils (N : NUM).
   Proof. intro. num_prop. reflexivity. Qed.
   Lemma leb_refl: forall x, leb x x = true.
   Proof. intro. num_prop. reflexivity. Qed.
-  Hint Rewrite  eqb_refl leb_refl id_nat id_num: bool_simpl.
+  #[global] Hint Rewrite  eqb_refl leb_refl id_nat id_num: bool_simpl.
 
 
   (** * num_lia : injects every prop about nums into equivalent props about nats, then call lia*)
@@ -259,9 +259,9 @@ Module NumUtils (N : NUM).
     rewrite id_num. reflexivity.
   Qed.
 
-  Hint Rewrite eq_nat_spec le_nat_spec lt_nat_spec S_nat_spec max_spec : num_lia.
-  Hint Rewrite nat_of_num_comm num_of_nat_comm : num_lia .
-  Hint Rewrite id_nat id_num : num_lia.
+  #[global] Hint Rewrite eq_nat_spec le_nat_spec lt_nat_spec S_nat_spec max_spec : num_lia.
+  #[global] Hint Rewrite nat_of_num_comm num_of_nat_comm : num_lia .
+  #[global] Hint Rewrite id_nat id_num : num_lia.
 
   Ltac num_simpl := autorewrite with num_lia in *.
   Ltac num_lia := num_simpl; intuition (subst; lia).
@@ -281,7 +281,7 @@ Module NumUtils (N : NUM).
     rewrite set_eq_spec in e. subst. bool_simpl. reflexivity.
     rewrite set_eq_spec in n. symmetry. num_prop. auto.
   Qed.
-  Hint Rewrite numseteqb_eq_nat_bool : bool_simpl.
+  #[global] Hint Rewrite numseteqb_eq_nat_bool : bool_simpl.
 
   Lemma le_antisym: forall n m: num, n <= m -> m <= n -> n = m.
   Proof. intros. num_lia. Qed. 
@@ -503,7 +503,7 @@ Global   Hint Extern 0 (Pos_as_OTA.compare _ _ = Eq) => apply Pos_as_OT.eq_refl 
 
   Lemma pcompare_prop: forall x y, Pos_as_OTA.compare x y = Eq <-> x = y. 
   Proof. intros. intuition; psubst; trivial. Qed. 
-  Hint Rewrite pcompare_prop : num_prop.
+  #[global] Hint Rewrite pcompare_prop : num_prop.
 
   (* specifications of the equalities on maps and sets *)
   Lemma set_eq_spec : forall x y, NumSet.E.eq x y <-> x = y. 

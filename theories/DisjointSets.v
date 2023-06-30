@@ -46,14 +46,14 @@ Module Type DISJOINTSETS (N : NUM).
   Parameter IsWF : T -> Prop.
   Class WF t: Prop := { wf: IsWF t }.
 
-  Declare Instance empty_WF : WF empty.
-  Declare Instance test_and_unify_WF `{WF} x y: WF (snd (test_and_unify t x y)).
-  Declare Instance equiv_WF `{WF} x y : WF (snd (equiv t x y)).
-  Declare Instance union_WF `{WF} x y : WF (union t x y).
+  #[global] Declare Instance empty_WF : WF empty.
+  #[global] Declare Instance test_and_unify_WF `{WF} x y: WF (snd (test_and_unify t x y)).
+  #[global] Declare Instance equiv_WF `{WF} x y : WF (snd (equiv t x y)).
+  #[global] Declare Instance union_WF `{WF} x y : WF (union t x y).
   
   Parameter sameclass: T -> relation num.
   Axiom sameclass_equiv : forall `{WF} x y, (fst (equiv t x y) = true <-> sameclass t x y).
-  Declare Instance sameclass_Equivalence `{WF}: Equivalence (sameclass t).
+  #[global] Declare Instance sameclass_Equivalence `{WF}: Equivalence (sameclass t).
 
   Axiom sameclass_empty : forall x y, sameclass empty x y -> x = y.
   Axiom sameclass_union : forall `{WF} a b x y, 
@@ -71,21 +71,21 @@ Module DSUtils (Import N : NUM) (Import M: DISJOINTSETS N).
 
   Definition le (s t : T): Prop := inclusion _ (sameclass s) (sameclass t).
 
-  Instance le_PreOrder : PreOrder le.
+  #[global] Instance le_PreOrder : PreOrder le.
   Proof. constructor; repeat intro; auto. Qed.
 
   Definition eq s t := same_relation _ (sameclass s) (sameclass t). 
-  Instance eq_Equivalence : Equivalence eq.
+  #[global] Instance eq_Equivalence : Equivalence eq.
   Proof. 
     unfold eq, same_relation. constructor; repeat intro.
     split; apply le_PreOrder. 
     tauto. 
     split; apply (@PreOrder_Transitive _ _ le_PreOrder) with y; intuition. 
   Qed.
-  Instance sameclass_compat : Proper (eq ==> same_relation num) sameclass.
+  #[global] Instance sameclass_compat : Proper (eq ==> same_relation num) sameclass.
   Proof. intros s t H. exact H. Qed.
 
-  Instance sameclass_compat' : Proper (eq ==> @Logic.eq num ==> @Logic.eq num ==> iff) sameclass.
+  #[global] Instance sameclass_compat' : Proper (eq ==> @Logic.eq num ==> @Logic.eq num ==> iff) sameclass.
   Proof. split; intros; subst; apply H; trivial. Qed.
 
   Module Notations.
@@ -166,7 +166,7 @@ Module DSUtils (Import N : NUM) (Import M: DISJOINTSETS N).
     intros. rewrite <- sameclass_class_of. reflexivity. 
   Qed.
 
-  Instance class_of_compat `{WF} : Proper (sameclass t ==> NumSet.Equal) (class_of t). 
+  #[global] Instance class_of_compat `{WF} : Proper (sameclass t ==> NumSet.Equal) (class_of t). 
   Proof. 
     intros x y Hxy z. 
     setoid_rewrite <- sameclass_class_of.

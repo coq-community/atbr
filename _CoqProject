@@ -1,7 +1,7 @@
+-generate-meta-for-package coq-atbr
 -R theories ATBR
 -I src
 
--arg -w -arg +default
 -arg -w -arg -variable-collision
 -arg -w -arg -projection-no-head-constant
 -arg -w -arg -undo-batch-mode
@@ -51,7 +51,7 @@ theories/DKA_Merge.v
 theories/DKA_DFA_Language.v
 theories/DKA_DFA_Equiv.v
 theories/DecideKleeneAlgebra.v
-theories/StrictKleeneAlgebra.v
+#theories/StrictKleeneAlgebra.v
 theories/ATBR.v
 theories/ATBR_Matrices.v
 theories/Examples.v
