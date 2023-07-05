@@ -29,6 +29,8 @@ Require Import Common.
 Require Import BoolView.
 Require Import MyFSets MyFSetProperties MyFMapProperties FSetPositive FMapPositive.
 
+Local Ltac Tauto.intuition_solver ::= auto with bool lia.
+
 Set Implicit Arguments.
 
 (** * The [NUM] interface  *)

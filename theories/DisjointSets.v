@@ -31,6 +31,8 @@ Require Import MyFSets.
 Require Import BoolView.
 Require Import Numbers.
 
+Local Ltac Tauto.intuition_solver ::= auto with exfalso crelations.
+
 Module Type DISJOINTSETS (N : NUM).
   Import N.
 

@@ -138,7 +138,7 @@ Section comb.
   Instance complete_WF : forall {tar} `{DS.WF tar} l, DS.WF (tar +++ l).  
   Proof. 
     intros tar Hwf l; revert tar Hwf.
-    induction l; simpl; intuition. 
+    induction l; simpl; intuition auto with typeclass_instances.
   Qed.
 
 End comb.
