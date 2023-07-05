@@ -42,6 +42,8 @@ Require Import FSets.
 Require Import Common.
 Require Import BoolView.
 
+Local Ltac Tauto.intuition_solver ::= auto with crelations.
+
 
 Module MySetProps (X : FSetInterface.S).
   
@@ -116,7 +118,7 @@ Module MySetProps (X : FSetInterface.S).
     Qed.
     Next Obligation.
       assert (In x s). apply min_elt_1. auto.
-      set_iff. intro.  intuition. 
+      set_iff. intro.  intuition.
     Qed.
     Next Obligation.
       unfold Below. intros. 

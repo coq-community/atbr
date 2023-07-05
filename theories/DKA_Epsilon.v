@@ -32,6 +32,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Local Ltac Tauto.intuition_solver ::= auto with map.
 
 
 Section fold'.

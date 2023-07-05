@@ -41,6 +41,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Local Ltac Tauto.intuition_solver ::= auto with bool exfalso.
 
 
 (** Algebraic, not really efficient, presentation of the construction algorithm *)

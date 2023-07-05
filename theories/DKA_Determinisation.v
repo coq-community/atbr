@@ -568,7 +568,7 @@ Section S.
 
      apply sum_zero. intros m Hm. apply xif_false. simpl.
      rewrite <- H. rewrite bool_prop_iff. bool_connectors. 
-     rewrite H. StateSetProps.mem_prop. intuition; try discriminate.
+     rewrite H. StateSetProps.mem_prop. intuition auto with exfalso; try discriminate.
      rewrite <- H. rewrite <- StateSetProps.exists_iff by trivial. eexists; StateSetProps.mem_prop; eauto. 
   Qed.
 
