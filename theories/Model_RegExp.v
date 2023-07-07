@@ -100,7 +100,7 @@ Module RegExp.
                | H: is_zero ?x = _ |- _ => rewrite (Is_zero H) in * || rewrite H in *
                | H: is_one  ?x = _ |- _ => rewrite (Is_one H) in * || rewrite H in *
                | H: ?x = ?x |- _ => clear H
-               | H: ?x <> ?y |- _ => solve [elimtype False; apply H; trivial]
+               | H: ?x <> ?y |- _ => solve [exfalso; apply H; trivial]
              end;
       repeat match goal with 
                | |- context[is_zero ?x] => leaf x; let Z := fresh "Z" in case_eq (is_zero x); intro Z
