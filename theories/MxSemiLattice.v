@@ -31,14 +31,14 @@ Section Defs.
   Definition mx_plus n m (M N: MX n m): MX n m := box n m (fun i j => !M i j + !N i j).
   Definition mx_zero n m: MX n m := box n m (fun _ _ => 0).
 
-  Global Instance mx_SemiLattice_Ops: SemiLattice_Ops (mx_Graph A) := {
+  #[global] Instance mx_SemiLattice_Ops: SemiLattice_Ops (mx_Graph A) := {
     plus := mx_plus;
     zero := mx_zero }.
 
   Definition mx_point n m i j (x: X A A) : MX n m :=
     box n m (fun i' j' => xif (eq_nat_bool i i' && eq_nat_bool j j') x 0).
 
-  Global Instance mx_SemiLattice: SemiLattice (mx_Graph A).
+  #[global] Instance mx_SemiLattice: SemiLattice (mx_Graph A).
   Proof. constructor; repeat intro; simpl in *; auto with algebra. Qed.
 
 End Defs.
@@ -69,7 +69,7 @@ Section Props.
     simpl. intros. destruct_blocks; reflexivity.
   Qed.
 
-  Global Instance mx_blocks_incr x y n m:
+  #[global] Instance mx_blocks_incr x y n m:
   Proper (
     mx_leq x y ==>
     mx_leq x m ==>
@@ -166,7 +166,7 @@ Section Props.
     simpl; intros. destruct_blocks; nat_analyse; trivial.
   Qed.
 
-  Global Instance mx_point_compat n m i j: 
+  #[global] Instance mx_point_compat n m i j: 
   Proper (equal A A ==> mx_equal n m) (mx_point n m i j).
   Proof. 
     repeat intro. simpl. nat_analyse; trivial. 
@@ -174,5 +174,5 @@ Section Props.
 
 End Props.
 
-Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_point_compat: compat algebra.
+#[global] Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_point_compat: compat algebra.
 

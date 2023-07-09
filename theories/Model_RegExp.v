@@ -321,8 +321,8 @@ Module RegExp.
     Proof. 
       induction x; constructor; assumption.
     Qed.
-    Local Hint Resolve sequal_refl : core.
-    Local Hint Constructors sequal : core.
+    #[local] Hint Resolve sequal_refl : core.
+    #[local] Hint Constructors sequal : core.
     
     Lemma sequal_clean_zero_equiv x : sequal (clean x) zero -> is_zero (clean x) = true.
     Proof.
@@ -381,7 +381,7 @@ Module RegExp.
       | e_star: forall A x x', @eval A A x x' -> @eval A A (RegExp.star x) (x'#)
       | e_var: forall i, eval (RegExp.var i) (unpack (val i)).
       Arguments eval : clear implicits.
-      Local Hint Constructors eval : core.
+      #[local] Hint Constructors eval : core.
     
       (** evaluation of erased terms *)
       Lemma eval_erase_feval: forall n m a, eval n m (erase a) (feval a).
@@ -546,10 +546,8 @@ Module RegExp.
         intros x y H.
         cut ((forall A B x', eval A B x x' -> exists2 y', eval A B y y' & x'==y')
                 /\ (forall A B y', eval A B y y' -> exists2 x', eval A B x x' & y'==x')); [tauto| ].
-        Unset Regular Subst Tactic.
         induction H; (apply and_idem || split); intros A B xe Hx; 
           eval_inversion; try solve [split_IHeval; eexists; [eauto; fail | eval_injection; auto with algebra ]].
-        Set Regular Subst Tactic.
   
         (* dot_distr_left *)
         destruct (eval_type_inj_left H4 H5) as [HB | Hz]; [ destruct HB | rewrite Hz in H; discriminate ].

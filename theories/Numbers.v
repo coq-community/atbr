@@ -29,7 +29,7 @@ Require Import Common.
 Require Import BoolView.
 Require Import MyFSets MyFSetProperties MyFMapProperties FSetPositive FMapPositive.
 
-Local Ltac Tauto.intuition_solver ::= auto with bool lia.
+#[local] Ltac Tauto.intuition_solver ::= auto with bool lia.
 
 Set Implicit Arguments.
 
@@ -479,7 +479,7 @@ Module Positive <: NUM.
   Module NumSet' := FSetPositive.PositiveSet. Module NumSet := FSetHide NumSet'.
   Module NumMap' := FMapPositive.PositiveMap. Module NumMap := FMapHide NumMap'.
 
-  Local Open Scope positive_scope.
+  #[local] Open Scope positive_scope.
   Definition triangle k i := (*  k*(k-1)/2 + i  *)
     match k with
       | 1 => i
@@ -501,7 +501,7 @@ Module Positive <: NUM.
             end); subst.
 
   (* and this hints to automatically prove some trivial facts, by reflexivity *)
-Global   Hint Extern 0 (Pos_as_OTA.compare _ _ = Eq) => apply Pos_as_OT.eq_refl : core.
+#[global]   Hint Extern 0 (Pos_as_OTA.compare _ _ = Eq) => apply Pos_as_OT.eq_refl : core.
 
   Lemma pcompare_prop: forall x y, Pos_as_OTA.compare x y = Eq <-> x = y. 
   Proof. intros. intuition; psubst; trivial. Qed. 

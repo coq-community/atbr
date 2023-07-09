@@ -74,7 +74,7 @@ Section ISR.
     intros. switch. apply dot_distr_left_c.
   Qed.
 
-  Global Instance conv_incr A B:
+  #[global] Instance conv_incr A B:
   Proper ((leq A B) ==> (leq B A)) (conv A B).
   Proof.
     unfold leq.
@@ -144,7 +144,7 @@ Section KA.
     rewrite <- star_make_left_c at 2. semiring_reflexivity. 
   Qed.
 
-  Global Instance CKA_KA: KleeneAlgebra G.
+  #[global] Instance CKA_KA: KleeneAlgebra G.
   Proof.
     constructor. apply CISR_ISR. 
     apply star_make_left_c.

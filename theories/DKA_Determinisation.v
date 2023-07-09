@@ -429,7 +429,7 @@ Section S.
   (** we need this lemma to use the [StateSetProps.exists_iff] from the FSet library *)
   Lemma final_compat: SetoidList.compat_bool NumSet.E.eq (fun s => StateSet.mem s finaux).
   Proof.  intros x y H. rewrite H. reflexivity. Qed.
-  Local Hint Resolve final_compat : core.
+  #[local] Hint Resolve final_compat : core.
 
       
   (** two auxiliary lemmas about [table_finals], to obtain the characterisation [mem_table_finals] below *)

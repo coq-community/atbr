@@ -41,7 +41,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Local Ltac Tauto.intuition_solver ::= auto with bool exfalso.
+#[local] Ltac Tauto.intuition_solver ::= auto with bool exfalso.
 
 
 (** Algebraic, not really efficient, presentation of the construction algorithm *)
@@ -93,7 +93,7 @@ Module Algebraic.
   
   Section protect.
 
-  Local Instance equal_equiv : Equivalence equal. 
+  #[local] Instance equal_equiv : Equivalence equal. 
   Proof.
     constructor.
      intros [x X]. constructor. reflexivity.
@@ -104,33 +104,33 @@ Module Algebraic.
      constructor. transitivity M; assumption.
   Qed.
 
-  Local Instance to_MAUT_compat i f : Proper (equal ==> MAUT.equal) (to_MAUT i f).
+  #[local] Instance to_MAUT_compat i f : Proper (equal ==> MAUT.equal) (to_MAUT i f).
   Proof.
     intros [m M] [n N] H.
     destruct H. 
     constructor; auto with compat. 
   Qed.
 
-  Local Instance eval_compat i f : Proper (equal ==> Classes.equal tt tt) (eval i f).
+  #[local] Instance eval_compat i f : Proper (equal ==> Classes.equal tt tt) (eval i f).
   Proof.
     intros M N H. apply MAUT.eval_compat, to_MAUT_compat, H.
   Qed.
 
-  Local Instance add_compat' : Proper (Classes.equal tt tt ==> (@eq nat) ==> @eq nat ==> equal ==> equal) add.
+  #[local] Instance add_compat' : Proper (Classes.equal tt tt ==> (@eq nat) ==> @eq nat ==> equal ==> equal) add.
   Proof.
     intros a b Hab i i' Hi j j' Hj M N H. destruct H. constructor. subst. auto with compat. 
   Qed.
-  Local Instance add_compat a i j : Proper (equal ==> equal) (add a i j).
+  #[local] Instance add_compat a i j : Proper (equal ==> equal) (add a i j).
   Proof.
     intros M N H. destruct H. constructor. auto with compat. 
   Qed.
 
-  Local Instance incr_compat : Proper (equal ==> equal) incr.
+  #[local] Instance incr_compat : Proper (equal ==> equal) incr.
   Proof.
     intros M N H. destruct H. constructor. auto with compat.
   Qed.
 
-  Local Instance build_compat a i f : Proper (equal ==> equal) (build a i f).
+  #[local] Instance build_compat a i f : Proper (equal ==> equal) (build a i f).
   Proof.
     unfold Proper, respectful. revert i f.
     induction a; intros i f M N H; simpl; unfold add_one, add_var; auto with compat.
@@ -165,11 +165,11 @@ Module Algebraic.
   Proof. intros. apply belong_add. trivial. Qed.
   Lemma belong_add_var: forall i j n A s, belong s A -> belong s (add_var i j n A).
   Proof. intros. apply belong_add. trivial. Qed.
-  Local Hint Resolve belong_incr belong_incr' belong_add belong_add_one belong_add_var : core.
+  #[local] Hint Resolve belong_incr belong_incr' belong_add belong_add_one belong_add_var : core.
 
   Lemma belong_build: forall a i j A s, belong s A -> belong s (build a i j A).
   Proof. induction a; simpl; intros; auto. Qed.
-  Local Hint Resolve belong_build : core.
+  #[local] Hint Resolve belong_build : core.
 
   Lemma add_comm : forall a b i f s t M, add a i f (add b s t M) [=0=] add b s t (add a i f M).
   Proof.
@@ -435,11 +435,11 @@ Module Correctness.
   Proof. intros. destruct A. assumption. Qed.
   Lemma belong_add_var: forall i j n A s, belong s A -> belong s (add_var i j n A).
   Proof. intros. destruct A. assumption. Qed.
-  Local Hint Resolve belong_incr belong_incr' belong_add_one belong_add_var : core.
+  #[local] Hint Resolve belong_incr belong_incr' belong_add_one belong_add_var : core.
 
   Lemma belong_build: forall a i j A s, belong s A -> belong s (build a i j A).
   Proof. induction a; simpl; intros; auto. Qed.
-  Local Hint Resolve belong_build : core.
+  #[local] Hint Resolve belong_build : core.
   
   Lemma epsilonbrel_add_one: forall i j A s t, 
     epsilonbrel (add_one i j A) s t = epsilonbrel A s t || eq_state_bool i s && eq_state_bool j t.
@@ -528,11 +528,11 @@ Module Correctness.
      destruct A. simpl. num_simpl. apply Max.le_max_l.
      destruct A. simpl. auto.
   Qed.
-  Local Hint Resolve bounded_incr bounded_add_one bounded_add_var : core.
+  #[local] Hint Resolve bounded_incr bounded_add_one bounded_add_var : core.
 
   Lemma bounded_build: forall a i j A, belong i A -> belong j A -> bounded A -> bounded (build a i j A).
   Proof. induction a; simpl; intros; auto. Qed.
-  Local Hint Resolve bounded_build : core.
+  #[local] Hint Resolve bounded_build : core.
 
   Lemma bounded_empty: bounded empty.
   Proof.
@@ -642,7 +642,7 @@ Opaque equal.
   Qed.
 Transparent equal.
 
-  Local Hint Resolve 
+  #[local] Hint Resolve 
     Algebraic.equal_equiv Algebraic.eval_compat Algebraic.to_MAUT_compat
     Algebraic.add_compat Algebraic.build_compat Algebraic.incr_compat
     : typeclass_instances.
@@ -752,7 +752,7 @@ Transparent equal.
     end.
      
 
-  Local Hint Constructors non_strict : core.
+  #[local] Hint Constructors non_strict : core.
   Lemma epsilon_rt_build: forall a i j A s t, 
     bounded A ->
     belong i A -> belong j A ->

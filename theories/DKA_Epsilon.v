@@ -32,7 +32,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Local Ltac Tauto.intuition_solver ::= auto with map.
+#[local] Ltac Tauto.intuition_solver ::= auto with map.
 
 
 Section fold'.
@@ -355,7 +355,7 @@ Proof.
     apply equal_leq. refine (star_make_right m _ _ Hi Hj).
 Qed.
 
-Local Opaque star dot plus zero one equal leq guard .
+#[local] Opaque star dot plus zero one equal leq guard .
 
 Lemma mem_set_closure: forall f i p,
   StateSet.mem i (set_closure f p) = StateSet.exists_ (fun j => StateSet.mem i (f j)) p.
@@ -411,7 +411,7 @@ Proof.
   symmetry. apply rt_closure_star. 
   intros. apply Hb.
 
-  Local Transparent dot plus zero one equal. 
+  #[local] Transparent dot plus zero one equal. 
 
   (* m' = n*j' *)
   mx_intros i j Hi Hj. simpl. unfold labelling. fold_regex.

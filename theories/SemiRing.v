@@ -27,7 +27,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Set Asymmetric Patterns.
 
-Global Hint Extern 0 (equal _ _ _ _) => first [ 
+#[global] Hint Extern 0 (equal _ _ _ _) => first [ 
     apply dot_ann_left
   | apply dot_ann_right
   | apply dot_distr_left
@@ -235,8 +235,8 @@ endtests*)
     Lemma equal_refl: forall x, equal x x.
     Proof. induction x; constructor; assumption. Qed.
   
-    Local Hint Constructors equal : core.
-    Local Hint Resolve equal_refl : core.
+    #[local] Hint Constructors equal : core.
+    #[local] Hint Resolve equal_refl : core.
   
     Instance equivalence_equal: Equivalence equal.
     Proof. 
@@ -465,7 +465,7 @@ endtests*)
     Proof. 
       induction x; constructor; assumption.
     Qed.
-    Local Hint Resolve sequal_refl : core.
+    #[local] Hint Resolve sequal_refl : core.
     
     Lemma sequal_clean_zero_equiv x : sequal (clean0 x) zero -> is_zero (clean0 x) = true.
     Proof.
@@ -522,7 +522,7 @@ endtests*)
     | e_plus: forall A B x y x' y', @eval A B x x' -> @eval A B y y' -> @eval A B (U.plus x y) (x'+y')
     | e_var: forall i, eval (U.var i) (unpack (val i)).
     Arguments eval : clear implicits.
-    Local Hint Constructors eval : core.
+    #[local] Hint Constructors eval : core.
 
     (** evaluation of erased terms *)
     Lemma eval_erase_feval: forall n m a, eval n m (erase a) (feval a).
@@ -828,7 +828,7 @@ Section Props.
 
   Context `{ISR: IdemSemiRing}.
 
-  Global Instance dot_incr A B C: 
+  #[global] Instance dot_incr A B C: 
   Proper ((leq A B) ==> (leq B C) ==> (leq A C)) (dot A B C).
   Proof.
     unfold leq; intros x y E x' y' E'.
@@ -890,7 +890,7 @@ Lemma sum_distr_left `{ISR: IdemSemiRing}: forall A B C (x: X B A) (f: nat -> X 
 Proof. exact (@sum_distr_right _ _ _ (@Dual.IdemSemiRing _ _ _ ISR)). Qed.
 
 
-Global Hint Extern 2 (leq _ _ _ _) => first [ 
+#[global] Hint Extern 2 (leq _ _ _ _) => first [ 
     apply dot_incr
 ]: compat algebra.
 

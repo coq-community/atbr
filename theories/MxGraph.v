@@ -68,7 +68,7 @@ Notation "M == [ n , m ]  N" := (@equal (mx_Graph _) n m M N) (at level 80) : A_
 
 Lemma plus_minus : forall m n, S (m+n)-n = S m.
 Proof. intros. lia. Qed.
-Global Opaque minus. 
+#[global] Opaque minus. 
 
 Lemma lt_n_1 n: ~ (S n<1)%nat.
 Proof. lia. Qed.
@@ -116,10 +116,10 @@ Section Props.
   Lemma mx_force_id n m (M: MX n m): mx_force M == M.
   Proof. repeat intro; unfold mx_force. simpl. rewrite Force.id2_id by assumption. reflexivity. Qed.
 
-  Global Instance mx_force_compat n m: Proper (mx_equal n m ==> mx_equal n m) (@mx_force n m).
+  #[global] Instance mx_force_compat n m: Proper (mx_equal n m ==> mx_equal n m) (@mx_force n m).
   Proof. intros M N H. rewrite 2 mx_force_id. assumption. Qed.
 
-  Global Instance box_compat n m: 
+  #[global] Instance box_compat n m: 
   Proper (pointwise_relation nat (pointwise_relation nat (equal A A)) ==> mx_equal n m) (box n m).
   Proof. intros. intros f g H. mx_intros i j Hi Hj. apply H. Qed.
 
@@ -138,13 +138,13 @@ Section Props.
       Definition mx_sub10 := mx_sub x 0 n y M.
       Definition mx_sub11 := mx_sub x y n m M.
     End Def.
-    Global Instance mx_sub00_compat: Proper (mx_equal (x+n) (y+m) ==> mx_equal x y) mx_sub00.
+    #[global] Instance mx_sub00_compat: Proper (mx_equal (x+n) (y+m) ==> mx_equal x y) mx_sub00.
     Proof. repeat intro. simpl. apply H; auto with lia. Qed.
-    Global Instance mx_sub01_compat: Proper (mx_equal (x+n) (y+m) ==> mx_equal x m) mx_sub01.
+    #[global] Instance mx_sub01_compat: Proper (mx_equal (x+n) (y+m) ==> mx_equal x m) mx_sub01.
     Proof. repeat intro. simpl. apply H; auto with lia. Qed.
-    Global Instance mx_sub10_compat: Proper (mx_equal (x+n) (y+m) ==> mx_equal n y) mx_sub10.
+    #[global] Instance mx_sub10_compat: Proper (mx_equal (x+n) (y+m) ==> mx_equal n y) mx_sub10.
     Proof. repeat intro. simpl. apply H; auto with lia. Qed.
-    Global Instance mx_sub11_compat: Proper (mx_equal (x+n) (y+m) ==> mx_equal n m) mx_sub11.
+    #[global] Instance mx_sub11_compat: Proper (mx_equal (x+n) (y+m) ==> mx_equal n m) mx_sub11.
     Proof. repeat intro. simpl. apply H; auto with lia. Qed.
   End Subs.
 
@@ -169,7 +169,7 @@ Section Props.
           | S i, S j => !Q i j
         end). 
 
-    Global Instance mx_blocks_compat:
+    #[global] Instance mx_blocks_compat:
     Proper (
       mx_equal x y ==>
       mx_equal x m ==>
@@ -256,11 +256,11 @@ Section Props.
   Definition mx_of_scal (x: X A A): MX 1 1 := box 1 1 (fun _ _ => x).
   Definition mx_to_scal (M: MX 1 1): X A A := !M O O.
   
-  Global Instance mx_of_scal_compat: 
+  #[global] Instance mx_of_scal_compat: 
   Proper (equal A A ==> mx_equal 1 1) mx_of_scal.
   Proof. repeat intro. simpl. trivial. Qed.
   
-  Global Instance mx_to_scal_compat: 
+  #[global] Instance mx_to_scal_compat: 
   Proper (mx_equal 1 1 ==> equal A A) mx_to_scal.
   Proof. repeat intro. simpl. apply H; auto. Qed.
 
@@ -283,7 +283,7 @@ Section Props.
   (** transposition  *)
   Definition mx_transpose n m (M : MX n m): MX m n := box m n (fun i j => !M j i).
   
-  Global Instance mx_transpose_compat n m: 
+  #[global] Instance mx_transpose_compat n m: 
   Proper (mx_equal n m ==> mx_equal m n) (@mx_transpose n m).
   Proof. repeat intro. simpl. apply H; trivial. Qed.
 
@@ -296,16 +296,16 @@ Section Props.
 
 End Props.
 
-Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub00_compat: compat algebra.
-Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub01_compat: compat algebra.
-Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub10_compat: compat algebra.
-Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub11_compat: compat algebra.
-Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_transpose_compat: compat algebra.
-Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_force_compat: compat algebra.
-Global Hint Extern 4 (mx_equal_ _ _ _ _ _) => apply mx_blocks_compat: compat algebra.
-Global Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_of_scal_compat: compat algebra.
-Global Hint Extern 1 (equal _ _ _ _) => apply mx_to_scal_compat: compat algebra.
-Global Hint Extern 5 (equal _ _ _ _) => apply mx_equal_compat : compat algebra.
+#[global] Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub00_compat: compat algebra.
+#[global] Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub01_compat: compat algebra.
+#[global] Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub10_compat: compat algebra.
+#[global] Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_sub11_compat: compat algebra.
+#[global] Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_transpose_compat: compat algebra.
+#[global] Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_force_compat: compat algebra.
+#[global] Hint Extern 4 (mx_equal_ _ _ _ _ _) => apply mx_blocks_compat: compat algebra.
+#[global] Hint Extern 1 (mx_equal_ _ _ _ _ _) => apply mx_of_scal_compat: compat algebra.
+#[global] Hint Extern 1 (equal _ _ _ _) => apply mx_to_scal_compat: compat algebra.
+#[global] Hint Extern 5 (equal _ _ _ _) => apply mx_equal_compat : compat algebra.
 
 (* Hint Resolve @equal_compat: compat algebra.  *)
   

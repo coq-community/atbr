@@ -101,7 +101,7 @@ Section F.
     intros A B x y Hxy. inversion_clear Hxy. assumption.
   Qed.
 
-  Global Instance oMonoid_Ops: Monoid_Ops oGraph := {
+  #[global] Instance oMonoid_Ops: Monoid_Ops oGraph := {
     dot A B C x y := 
       match x,y with 
         | Some x, Some y => Some (x*y)
@@ -110,7 +110,7 @@ Section F.
     one A := Some 1
   }.
 
-  Global Instance oSemiLattice_Ops: SemiLattice_Ops oGraph := {
+  #[global] Instance oSemiLattice_Ops: SemiLattice_Ops oGraph := {
     plus A B x y := 
       match x,y with 
         | None,y => y 
@@ -120,7 +120,7 @@ Section F.
     zero A B := None
   }.
 
-  Global Instance oStar_Op: Star_Op oGraph := {
+  #[global] Instance oStar_Op: Star_Op oGraph := {
     star A x := 
       match x with 
         | None => Some 1
@@ -163,7 +163,7 @@ Section F.
       apply dot_distr_right.
   Qed.
 
-  Global Instance oKleeneAlgebra: KleeneAlgebra oGraph.
+  #[global] Instance oKleeneAlgebra: KleeneAlgebra oGraph.
   Proof.
     constructor; eauto with typeclass_instances.
      intros A [a|]; simpl; constructor; try reflexivity.

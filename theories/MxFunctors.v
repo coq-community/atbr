@@ -45,12 +45,12 @@ Section Defs.
     (fun n => n)
     (fun n m M => box n m (fun i j => F _ _ (!M i j))).
 
-  Global Instance mxgraph_functor {HF: graph_functor F}: graph_functor mxF.
+  #[global] Instance mxgraph_functor {HF: graph_functor F}: graph_functor mxF.
   Proof.
     constructor. repeat intro. simpl. apply functor_compat. auto.
   Qed.
 
-  Global Instance mxsemilattice_functor {HF: semilattice_functor F}: semilattice_functor mxF. 
+  #[global] Instance mxsemilattice_functor {HF: semilattice_functor F}: semilattice_functor mxF. 
   Proof.
     constructor. 
     apply mxgraph_functor.
@@ -58,7 +58,7 @@ Section Defs.
     repeat intro; simpl. apply functor_zero.
   Qed.
   
-  Global Instance mxsemiring_functor {SL1: SemiLattice G1} {SL2: SemiLattice G2} 
+  #[global] Instance mxsemiring_functor {SL1: SemiLattice G1} {SL2: SemiLattice G2} 
     {HF: semiring_functor F}: semiring_functor mxF.
   Proof.
     constructor. constructor.
@@ -100,7 +100,7 @@ Section Defs.
       mx_to_scal (mxF _ _ M).
   Proof. reflexivity. Qed.
 
-  Global Instance mxkleene_functor {KA1: KleeneAlgebra G1} {KA2: KleeneAlgebra G2} 
+  #[global] Instance mxkleene_functor {KA1: KleeneAlgebra G1} {KA2: KleeneAlgebra G2} 
     {HF: kleene_functor F}: kleene_functor mxF.
   Proof.
     constructor. 

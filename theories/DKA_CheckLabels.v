@@ -39,7 +39,7 @@ Infix " [=] " := NumSet.Equal (at level 80).
 
 Section protect.
 
-Local Instance collect_compat a: Proper (NumSet.Equal ==> NumSet.Equal) (collect a).
+#[local] Instance collect_compat a: Proper (NumSet.Equal ==> NumSet.Equal) (collect a).
 Proof.
   induction a; simpl; intros ? ? H; rewrite H; reflexivity. 
 Qed.
@@ -86,7 +86,7 @@ Qed.
 Lemma NumSetEqual_refl: forall x, x [=] x.
 Proof. reflexivity. Qed.
 
-Local Hint Resolve collect_compat' collect_idem collect_com NumSetEqual_refl : core.
+#[local] Hint Resolve collect_compat' collect_idem collect_com NumSetEqual_refl : core.
 
 Notation clean := RegExp.Clean.rewrite.
 

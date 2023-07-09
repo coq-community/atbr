@@ -97,7 +97,7 @@ Lemma and_neutral_left: forall (A B: Prop), A -> (A/\B <-> B). Proof. tauto. Qed
 Lemma compare_compat: SetoidList.compat_op eq NumSet.Equal (fun x acc => NumSet.add (pi0 x) acc).
 Proof. repeat intro. subst. rewrite H0. reflexivity. Qed.
 
-Local Opaque equal dot star plus one zero eq_state_bool leq NumSet.add.
+#[local] Opaque equal dot star plus one zero eq_state_bool leq NumSet.add.
 Lemma eval_left: forall (A B: DFA.t), bounded A ->
   eval (change_initial (merge_DFAs A B) (pi0 (initial A))) == eval A.
 Proof.

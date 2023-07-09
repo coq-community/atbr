@@ -42,7 +42,7 @@ Require Import FSets.
 Require Import Common.
 Require Import BoolView.
 
-Local Ltac Tauto.intuition_solver ::= auto with crelations.
+#[local] Ltac Tauto.intuition_solver ::= auto with crelations.
 
 
 Module MySetProps (X : FSetInterface.S).
