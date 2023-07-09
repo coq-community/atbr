@@ -10,21 +10,21 @@
     procedure for Kleene algebras [kleene_reflexivity]. *)
 
 
-Require Import Common.
-Require Import Classes.
-Require Import Graph.
-Require Import Converse.
-Require Import DKA_Definitions.
-Require        DKA_CheckLabels.
-Require        DKA_Construction.
-Require        DKA_Epsilon.
-Require        DKA_Determinisation.
-Require        DKA_Merge.
-Require        DKA_DFA_Equiv. 
-Require        StrictStarForm.
-Require        Reification.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require Import Graph.
+From ATBR Require Import Converse.
+From ATBR Require Import DKA_Definitions.
+From ATBR Require DKA_CheckLabels.
+From ATBR Require DKA_Construction.
+From ATBR Require DKA_Epsilon.
+From ATBR Require DKA_Determinisation.
+From ATBR Require DKA_Merge.
+From ATBR Require DKA_DFA_Equiv. 
+From ATBR Require StrictStarForm.
+From ATBR Require Reification.
 
-Require Import List.
+From Coq Require Import List.
 
 Definition word := list positive.
 Inductive CounterExample: Set :=

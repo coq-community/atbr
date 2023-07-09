@@ -10,9 +10,9 @@
    In particular, the tactic [ac_rewrite] allows to rewrite closed
    equations modulo associativity and commutativity *)
 
-Require Import Common.
-Require Import Classes.
-Require Import Graph.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require Import Graph.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

@@ -25,9 +25,10 @@
     relations. (See [BoolView.v] for more details)
 *)
 
-Require Import Common.
-Require Import BoolView.
-Require Import MyFSets MyFSetProperties MyFMapProperties FSetPositive FMapPositive.
+From ATBR Require Import Common.
+From ATBR Require Import BoolView.
+From ATBR Require Import MyFSets MyFSetProperties MyFMapProperties.
+From Coq Require Import FSetPositive FMapPositive.
 
 #[local] Ltac Tauto.intuition_solver ::= auto with bool lia.
 

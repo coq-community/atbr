@@ -8,7 +8,7 @@
 
 (** * Examples about uses of the ATBR library *)
 
-Require Import ATBR.
+From ATBR Require Import ATBR.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -202,7 +202,7 @@ End Tactics.
   our setting.  *)
 
 
-Require ATBR_Matrices.
+From ATBR Require ATBR_Matrices.
 Section Matrices.
 
   Import ATBR_Matrices.
@@ -280,7 +280,7 @@ End Matrices.
      *)
 
 
-Require Model_Relations.
+From ATBR Require Model_Relations.
 Section Concrete.
 
   Import Model_Relations.
@@ -319,8 +319,9 @@ End Concrete.
     declared in Model_StdRelations, so that one can use our tactics to
     reason about these.  *)
 
-Require Relations.
-Require Model_StdRelations.
+From Coq Require Relations.
+From ATBR Require Model_StdRelations.
+
 Section Concrete'.
 
   Import Relations.

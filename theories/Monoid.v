@@ -10,10 +10,10 @@
    In particular, [monoid_rewrite] does closed rewriting modulo
    associativity *)
 
-Require Import Common.
-Require Import Classes.
-Require Import Graph.
-Require Import BoolView.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require Import Graph.
+From ATBR Require Import BoolView.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -210,7 +210,7 @@ Tactic Notation "monoid_rewrite" "<-" constr(H) :=
 (*begintests
 Section monoid_rewrite_tests.
 
-  Require Import SemiLattice.
+  From ATBR Require Import SemiLattice.
   Context `{ISR: IdemSemiRing}.
 
   Variable A: T.

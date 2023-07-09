@@ -16,22 +16,22 @@
       map ([Delta])
     *)
 
-Require Import Common.
-Require Import Classes.
-Require Import Graph.
-Require Import Monoid.
-Require Import SemiLattice.
-Require Import SemiRing.
-Require Import KleeneAlgebra.
-Require Import MxGraph.
-Require Import MxSemiLattice.
-Require Import MxSemiRing.
-Require Import MxKleeneAlgebra.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require Import Graph.
+From ATBR Require Import Monoid.
+From ATBR Require Import SemiLattice.
+From ATBR Require Import SemiRing.
+From ATBR Require Import KleeneAlgebra.
+From ATBR Require Import MxGraph.
+From ATBR Require Import MxSemiLattice.
+From ATBR Require Import MxSemiRing.
+From ATBR Require Import MxKleeneAlgebra.
 
-Require Import DKA_Definitions.
-Require Import DKA_StateSetSets.
-Require Import Numbers.
-Require Import Utils_WF.
+From ATBR Require Import DKA_Definitions.
+From ATBR Require Import DKA_StateSetSets.
+From ATBR Require Import Numbers.
+From ATBR Require Import Utils_WF.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

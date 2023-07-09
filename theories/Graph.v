@@ -8,8 +8,8 @@
 
 (** Basic properties, definitions and hints about the [Classes.Graph] base-class *)
 
-Require Import Common.
-Require Import Classes.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

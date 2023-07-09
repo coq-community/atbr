@@ -9,5 +9,5 @@
 (** Import this file to gain access to all algebraic structures and
    tools, including those about matrices *)
 
-Require Export ATBR.
-Require Export MxGraph MxSemiLattice MxSemiRing MxKleeneAlgebra.
+From ATBR Require Export ATBR.
+From ATBR Require Export MxGraph MxSemiLattice MxSemiRing MxKleeneAlgebra.

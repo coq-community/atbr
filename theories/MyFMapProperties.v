@@ -8,9 +8,9 @@
 
 (** Handler for FMap properties, provides the [find_tac] tactic. *)
 
-Require Import FMaps.
-Require Import Common.
-Require Import BoolView.
+From Coq Require Import FMaps.
+From ATBR Require Import Common.
+From ATBR Require Import BoolView.
 
 Module MyMapProps (X : FMapInterface.S).
   Include FMapFacts.Properties X.    

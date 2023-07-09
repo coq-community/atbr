@@ -8,11 +8,11 @@
 
 (** Basic definitions for matrices: definition of their [Graph] *)
 
-Require Import Common.
-Require Import Classes.
-Require Import Graph.
-Require        List.
-Require        Force.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require Import Graph.
+From Coq Require List.
+From ATBR Require Force.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

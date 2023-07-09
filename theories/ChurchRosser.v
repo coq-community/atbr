@@ -11,7 +11,7 @@
    Calculating Church-Rosser Proofs in Kleene Algebra</a>#.
 *)
 
-Require Import ATBR.
+From ATBR Require Import ATBR.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

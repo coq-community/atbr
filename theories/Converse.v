@@ -13,11 +13,11 @@
    - [switch] add converses on both sides of an (in)equation, and pushes converses down to leaves
    *)
 
-Require Import Common.
-Require Import Classes.
-Require Import Graph.
-Require Import SemiLattice.
-Require Import SemiRing.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require Import Graph.
+From ATBR Require Import SemiLattice.
+From ATBR Require Import SemiRing.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

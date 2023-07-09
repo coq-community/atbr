@@ -10,9 +10,9 @@
    extension of the [kleene_reflexivity] tactic to these structures,
    using a faithful embedding. *)
 
-Require Import Common.
-Require Import Classes.
-Require Import DecideKleeneAlgebra.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require Import DecideKleeneAlgebra.
 Set Implicit Arguments.
 Unset Printing Implicit Defensive.
 

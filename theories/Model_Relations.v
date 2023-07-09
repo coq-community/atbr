@@ -8,9 +8,9 @@
 
 (** Model of heterogeneous binary relations *)
 
-Require Import Common.
-Require Import Classes.
-Require        Converse.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require        Converse.
 Set Implicit Arguments.
 Unset Strict Implicit.
 
