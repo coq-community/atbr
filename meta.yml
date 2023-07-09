@@ -6,6 +6,8 @@ community: true
 action: true
 coqdoc: true
 doi: 10.2168/LMCS-8(1:16)2012
+branch: 'v8.15'
+plugin: true
 
 synopsis: Coq library and tactic for deciding Kleene algebras
 

@@ -11,7 +11,7 @@ Follow the instructions on https://github.com/coq-community/templates to regener
 [![coqdoc][coqdoc-shield]][coqdoc-link]
 [![DOI][doi-shield]][doi-link]
 
-[docker-action-shield]: https://github.com/coq-community/atbr/workflows/Docker%20CI/badge.svg?branch=master
+[docker-action-shield]: https://github.com/coq-community/atbr/workflows/Docker%20CI/badge.svg?branch=v8.15
 [docker-action-link]: https://github.com/coq-community/atbr/actions?query=workflow:"Docker%20CI"
 
 [contributing-shield]: https://img.shields.io/badge/contributions-welcome-%23f7931e.svg
