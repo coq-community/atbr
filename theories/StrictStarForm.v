@@ -14,18 +14,19 @@
     Definition of the corresponding [kleene_ssf] tactic.
    *)
 
-Require Import Common.
-Require Import Classes.
-Require Import Graph.
-Require Import SemiLattice.
-Require Import Monoid.
-Require Import SemiRing.
-Require Import KleeneAlgebra.
-Require Import Model_RegExp. 
-        Import RegExp.Load.
-Require        Reification.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require Import Graph.
+From ATBR Require Import SemiLattice.
+From ATBR Require Import Monoid.
+From ATBR Require Import SemiRing.
+From ATBR Require Import KleeneAlgebra.
+From ATBR Require Import Model_RegExp. 
+Import RegExp.Load.
+From ATBR Require Reification.
+From Coq Require Import Bool.
 
-Require Import Bool. Open Scope lazy_bool_scope.
+Open Scope lazy_bool_scope.
 
 
 (* A regexp is [strict] if it does not accept the empty word *)

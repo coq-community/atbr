@@ -8,12 +8,12 @@
 
 (** Properties of matrices over a semilattice (in particular, they form a semilattice)  *)
 
-Require Import Common.
-Require Import Classes.
-Require Import Graph.
-Require Import MxGraph.
-Require Import SemiLattice.
-Require Import BoolView.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require Import Graph.
+From ATBR Require Import MxGraph.
+From ATBR Require Import SemiLattice.
+From ATBR Require Import BoolView.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

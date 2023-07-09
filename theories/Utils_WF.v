@@ -9,7 +9,7 @@
 (** Several results to ease the definition and the analysis of
    (well-founded) recursive functions *)
 
-Require Import Common.
+From ATBR Require Import Common.
 Set Implicit Arguments.
 
 (** Trick to compute with well-founded recursions: lazily add 2^n
@@ -216,7 +216,9 @@ End powerfix.
 
 (** Another way to construct well-founded relations: start with a well-founded one (e.g., the empty one), 
    and progressively add pairs satisfying some acyclicity property w.r.t. the current relation *)
-Require Relations.
+
+From Coq Require Relations.
+
 Section add_pair.
   Import Relations.
 

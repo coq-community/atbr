@@ -13,12 +13,12 @@
     this set.
     *)
 
-Require Import Common.
-Require Import Classes.
-Require Import Graph.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require Import Graph.
 
-Require Import DKA_Definitions.
-Require Import StrictStarForm.
+From ATBR Require Import DKA_Definitions.
+From ATBR Require Import StrictStarForm.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

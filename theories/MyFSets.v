@@ -12,9 +12,9 @@
    TODO: Coq standard library has evolved in v8.3, so that (parts of)
    this file might no longer be useful.  *)
 
-Require Export FMaps FSets.
-Require Import List.
-Require Import NArith.
+From Coq Require Export FMaps FSets.
+From Coq Require Import List.
+From Coq Require Import NArith.
 
 (** Functors to perform "transparent sealing". *)
 Module FSetHide (X : FSetInterface.S).

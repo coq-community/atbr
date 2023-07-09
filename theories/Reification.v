@@ -10,9 +10,10 @@
 (** Inductives (syntax) and evaluation functions for reifying the various classes from [Classes] *)
 
 
-Require Import Common Classes.
-Require Import FMapPositive.
-Require Import Eqdep.
+From ATBR Require Import Common Classes.
+From Coq Require Import FMapPositive.
+From Coq Require Import Eqdep.
+
 Set Implicit Arguments.
 Unset Strict Implicit.
 Set Asymmetric Patterns.

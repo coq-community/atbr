@@ -8,11 +8,10 @@
 
 (** Model of homegeneous binary relations, from Coq standard library *)
 
-Require Import Common.
-Require Import Classes.
-Require        Converse.
-
-Require Import Relations.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require Converse.
+From Coq Require Import Relations.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -137,7 +136,7 @@ Module Load.
     change (clos_refl_trans A) with (@star (@rel_Graph A) rel_Star_Op tt).
     
   (*begintests
-  Require Import DecideKleeneAlgebra.
+  From ATBR Require Import DecideKleeneAlgebra.
   Goal forall A (R S: relation A), same_relation _
     (clos_refl_trans _ (union _ R S))
     (comp (clos_refl_trans _ R) 

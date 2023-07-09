@@ -13,15 +13,15 @@
    - [semiring_cleanassoc] just normalizes parentheses
    *)
 
-Require Import MyFSets MyFSetProperties.
+From ATBR Require Import MyFSets MyFSetProperties.
 
-Require Import Common.
-Require Import Classes.
-Require Import Graph.
-Require Import Monoid.
-Require Import SemiLattice.
-Require Import Numbers.
-Require Import Reification.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require Import Graph.
+From ATBR Require Import Monoid.
+From ATBR Require Import SemiLattice.
+From ATBR Require Import Numbers.
+From ATBR Require Import Reification.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -809,7 +809,7 @@ Section tests.
     Show Proof.
   Qed.
 
-  Require Import SemiLattice.
+  From ATBR Require Import SemiLattice.
   Goal a*b == c*c -> c*a*(1+b+0)*(0*a+b+1)*a+0 == c*c*c*(1+b)*a+c*a*a.
     intro H.
     semiring_clean.

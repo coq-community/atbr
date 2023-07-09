@@ -8,10 +8,10 @@
 
 (** Functors and homomorphisms between algebraic structures *)
 
-Require Import Common.
-Require Import Classes.
-Require Import SemiLattice.
-Require Import KleeneAlgebra.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require Import SemiLattice.
+From ATBR Require Import KleeneAlgebra.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

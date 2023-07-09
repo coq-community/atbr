@@ -38,9 +38,9 @@
    acc) m]), one will use [set_induction_below] and rewrite the lemma
    [fold_add_below] *)
 
-Require Import FSets.
-Require Import Common.
-Require Import BoolView.
+From Coq Require Import FSets.
+From ATBR Require Import Common.
+From ATBR Require Import BoolView.
 
 #[local] Ltac Tauto.intuition_solver ::= auto with crelations.
 

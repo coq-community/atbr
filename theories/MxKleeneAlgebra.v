@@ -8,16 +8,16 @@
 
 (** Properties of matrices over a Kleene algebra (in particular, they form a typed Kleene algebra)  *)
 
-Require Import Common.
-Require Import Classes.
-Require Import Graph.
-Require Import Monoid.
-Require Import SemiLattice.
-Require Import SemiRing.
-Require Import KleeneAlgebra.
-Require Import MxGraph.
-Require Import MxSemiLattice.
-Require Import MxSemiRing.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require Import Graph.
+From ATBR Require Import Monoid.
+From ATBR Require Import SemiLattice.
+From ATBR Require Import SemiRing.
+From ATBR Require Import KleeneAlgebra.
+From ATBR Require Import MxGraph.
+From ATBR Require Import MxSemiLattice.
+From ATBR Require Import MxSemiRing.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

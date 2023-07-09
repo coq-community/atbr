@@ -8,13 +8,13 @@
 
 (** Properties about sets of sets, and maps over sets *)
 
-Require Import Utils_WF.
-Require Import DisjointSets.
-Require Import DKA_Definitions.
-Require Import MyFSets.
-Require Import MyFSetProperties.
-Require Import MyFMapProperties.
-Require Import Common.
+From ATBR Require Import Utils_WF.
+From ATBR Require Import DisjointSets.
+From ATBR Require Import DKA_Definitions.
+From ATBR Require Import MyFSets.
+From ATBR Require Import MyFSetProperties.
+From ATBR Require Import MyFMapProperties.
+From ATBR Require Import Common.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

@@ -8,11 +8,12 @@
 
 (** Languages form a model of Kleene algebras *)
 
-Require Import Common.
-Require Import Classes.
-Require Import MxGraph.
-Require        Converse.
-Require Import List.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require Import MxGraph.
+From ATBR Require Converse.
+From Coq Require Import List.
+
 Set Implicit Arguments.
 Unset Strict Implicit.
 

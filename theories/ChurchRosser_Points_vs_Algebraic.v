@@ -11,11 +11,8 @@
     Church-Rosser proof. The corresponding .v file is #<a
     href="ChurchRosser_Points_vs_Algebraic.v">here</a>#. *)
 
-Require Import ATBR.
-Require Import Relations.
-
-Goal True. Abort.
-
+From ATBR Require Import ATBR.
+From Coq Require Import Relations.
 
 (** * Standard proof: binary relations relate points to points *)
 Section CR_points.

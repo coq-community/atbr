@@ -12,10 +12,12 @@
    example, given a matrix [R] coding for the cost for moving from one
    state to another one, [R# i j] gives the cost of the shortest path
    from i to j. *)
-Require Import Common.
-Require Import Classes.
-Require Import NPeano.
-Require        Converse.
+
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From Coq Require Import NPeano.
+From ATBR Require Converse.
+
 Set Implicit Arguments.
 Unset Strict Implicit.
 

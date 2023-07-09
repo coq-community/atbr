@@ -8,7 +8,7 @@
 
 (** This module defines all classes of our algebraic hierarchy *)
 
-Require Import Common.
+From ATBR Require Import Common.
 
 (** * Graph : base class of the hierarchy
    

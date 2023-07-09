@@ -9,12 +9,12 @@
 (** Import this file to gain access to all algebraic structures and tools.
     To work with matrices, import file Matrices.v *)
 
-Require Export Common.
-Require Export Classes.
-Require Export Graph.
-Require Export Monoid.
-Require Export SemiLattice.
-Require Export SemiRing.
-Require Export KleeneAlgebra.
-Require Export Converse.
-Require Export DecideKleeneAlgebra.
+From ATBR Require Export Common.
+From ATBR Require Export Classes.
+From ATBR Require Export Graph.
+From ATBR Require Export Monoid.
+From ATBR Require Export SemiLattice.
+From ATBR Require Export SemiRing.
+From ATBR Require Export KleeneAlgebra.
+From ATBR Require Export Converse.
+From ATBR Require Export DecideKleeneAlgebra.

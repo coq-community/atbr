@@ -1,5 +1,5 @@
 -generate-meta-for-package coq-atbr
--R theories ATBR
+-Q theories ATBR
 -I src
 
 -arg -w -arg -variable-collision

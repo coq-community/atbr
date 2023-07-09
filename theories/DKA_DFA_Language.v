@@ -13,30 +13,29 @@
    procedure.
    *)
 
-Require Import List.
+From Coq Require Import List.
 
-Require Import Common.
-Require Import Classes.
-Require Import Graph.
-Require Import Monoid.
-Require Import SemiLattice.
-Require Import SemiRing.
-Require Import KleeneAlgebra.
-Require Import MxGraph.
-Require Import MxSemiLattice.
-Require Import MxSemiRing.
-Require Import MxKleeneAlgebra.
-Require Import Functors.
-Require Import MxFunctors.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require Import Graph.
+From ATBR Require Import Monoid.
+From ATBR Require Import SemiLattice.
+From ATBR Require Import SemiRing.
+From ATBR Require Import KleeneAlgebra.
+From ATBR Require Import MxGraph.
+From ATBR Require Import MxSemiLattice.
+From ATBR Require Import MxSemiRing.
+From ATBR Require Import MxKleeneAlgebra.
+From ATBR Require Import Functors.
+From ATBR Require Import MxFunctors.
 
-Require Import DKA_Definitions.
-Require Import Model_Languages.
-        Import Model_Languages.Load.
+From ATBR Require Import DKA_Definitions.
+From ATBR Require Import Model_Languages.
+Import Model_Languages.Load.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
-
 
 Notation language := (LX label).
 Notation LMX n m := (LMX label n m).

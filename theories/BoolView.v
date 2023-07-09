@@ -30,9 +30,9 @@
    
 *)
 
-Require Import Common.
-Require Export Bool.
-Require Import Equality Program Sumbool Peano.
+From ATBR Require Import Common.
+From Coq Require Export Bool.
+From Coq Require Import Equality Program Sumbool Peano.
 
 #[local] Ltac Tauto.intuition_solver ::= auto with exfalso lia.
 

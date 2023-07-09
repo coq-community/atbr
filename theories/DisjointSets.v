@@ -26,10 +26,10 @@
 
    *)
 
-Require Import Common.
-Require Import MyFSets.
-Require Import BoolView.
-Require Import Numbers.
+From ATBR Require Import Common.
+From ATBR Require Import MyFSets.
+From ATBR Require Import BoolView.
+From ATBR Require Import Numbers.
 
 #[local] Ltac Tauto.intuition_solver ::= auto with exfalso crelations.
 

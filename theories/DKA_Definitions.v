@@ -15,27 +15,26 @@
     We also define useful notations, generic functions, and lemmas.  
 *)
 
-Require Import Common.
-Require Import Classes.
-Require Import Graph.
-Require Import Monoid.
-Require Import SemiLattice.
-Require Import SemiRing.
-Require Import KleeneAlgebra.
-Require Import MxGraph.
-Require Import MxSemiLattice.
-Require Import MxSemiRing.
-Require Import MxKleeneAlgebra.
-Require Export BoolView.
-Require Export Model_RegExp.
-        Export RegExp.Load.
-
-Require Import MyFSets.
-Require Import MyFSetProperties.
-Require Import MyFMapProperties.
-Require FMapAVL.
-
-Require Numbers. Export Numbers.PositiveUtils.
+From ATBR Require Import Common.
+From ATBR Require Import Classes.
+From ATBR Require Import Graph.
+From ATBR Require Import Monoid.
+From ATBR Require Import SemiLattice.
+From ATBR Require Import SemiRing.
+From ATBR Require Import KleeneAlgebra.
+From ATBR Require Import MxGraph.
+From ATBR Require Import MxSemiLattice.
+From ATBR Require Import MxSemiRing.
+From ATBR Require Import MxKleeneAlgebra.
+From ATBR Require Export BoolView.
+From ATBR Require Export Model_RegExp.
+Export RegExp.Load.
+From ATBR Require Import MyFSets.
+From ATBR Require Import MyFSetProperties.
+From ATBR Require Import MyFMapProperties.
+From Coq Require FMapAVL.
+From ATBR Require Numbers.
+Export Numbers.PositiveUtils.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
