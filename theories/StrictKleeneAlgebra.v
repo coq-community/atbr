@@ -168,10 +168,10 @@ Section F.
     constructor; eauto with typeclass_instances.
      intros A [a|]; simpl; constructor; try reflexivity.
       apply star_make_left.
-     intros A B [a|] [c|] Hac; unfold Classes.leq in *; simpl in *; try constructor. 
+     intros A B [a|] [c|] Hac; simpl in *; try constructor.
       apply star_destruct_left. inversion_clear Hac. assumption.
       rewrite dot_neutral_left. apply plus_idem.
-     intros A B [a|] [c|] Hac; unfold Classes.leq in *; simpl in *; try constructor. 
+     intros A B [a|] [c|] Hac; simpl in *; try constructor.
       apply star_destruct_right. inversion_clear Hac. assumption.
       rewrite dot_neutral_right. apply plus_idem.
   Qed.
