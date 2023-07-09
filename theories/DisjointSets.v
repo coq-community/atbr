@@ -31,7 +31,7 @@ Require Import MyFSets.
 Require Import BoolView.
 Require Import Numbers.
 
-Local Ltac Tauto.intuition_solver ::= auto with exfalso crelations.
+#[local] Ltac Tauto.intuition_solver ::= auto with exfalso crelations.
 
 Module Type DISJOINTSETS (N : NUM).
   Import N.
@@ -683,17 +683,17 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
       eapply rsucc.  eauto. rewrite <- D_repr. auto.
     Qed.    
   
-    Global Instance empty_WF : WF empty.
+    #[global] Instance empty_WF : WF empty.
     Proof.
       constructor; exists O; [apply DO; cbn; map_iff; auto| auto].
     Qed.
   
-    Global Instance find_WF `{WF} x: WF (snd (find t x )).
+    #[global] Instance find_WF `{WF} x: WF (snd (find t x )).
     Proof. 
       case find_spec; auto.
     Qed.
   
-    Global Instance equiv_WF `{WF} x y: WF (snd (equiv t x y)).
+    #[global] Instance equiv_WF `{WF} x y: WF (snd (equiv t x y)).
     Proof.
       unfold equiv.
       repeat (case find_spec; auto; intros).
@@ -705,7 +705,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
       case compare_spec; intro; simpl; apply boundage_link; auto; apply H.
     Qed. 
     
-    Global Instance union_WF `{WF} x y: WF (union t x y).
+    #[global] Instance union_WF `{WF} x y: WF (union t x y).
     Proof.
       unfold union.
       repeat (case find_spec; auto; intros).
@@ -714,7 +714,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
       assert (repr (p t'0) rx rx). rewrite Heq0 in *.  eauto. apply link_WF;  auto.
     Qed.
   
-    Global Instance test_and_unify_WF `{WF} x y: WF (snd (test_and_unify t x y)).
+    #[global] Instance test_and_unify_WF `{WF} x y: WF (snd (test_and_unify t x y)).
     Proof.
       unfold test_and_unify. 
       repeat (case find_spec; auto; intros). 
@@ -758,7 +758,7 @@ Module PosDisjointSets <: DISJOINTSETS Positive.
       rewrite <- H in *. firstorder.      
     Qed.
     
-    Global Instance sameclass_Equivalence `{WF} : Equivalence (sameclass t).
+    #[global] Instance sameclass_Equivalence `{WF} : Equivalence (sameclass t).
     Proof. 
       unfold sameclass, Equiv. repeat constructor; repeat intro.
       destruct (repr_helper x) as [x0]. exists x0; auto. 

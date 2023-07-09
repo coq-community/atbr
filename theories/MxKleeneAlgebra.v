@@ -25,7 +25,7 @@ Unset Printing Implicit Defensive.
 
 Section PreDefs.
 
-  Local Transparent equal.
+  #[local] Transparent equal.
 
   Context `{KA: KleeneAlgebra}.
   Variable A: T.
@@ -301,7 +301,7 @@ Section Defs.
   Notation MX n m := (MX_ A n m).
   Notation SMX n := (MX_ A n n).
 
-  Global Instance mx_Star_Op: Star_Op (mx_Graph A) := { star n := @star_rec _ _ _ _ _ _ }.
+  #[global] Instance mx_Star_Op: Star_Op (mx_Graph A) := { star n := @star_rec _ _ _ _ _ _ }.
 
 
   Lemma mx_star_compat n (M N: MX n n): M==N -> M# == N# .
@@ -395,7 +395,7 @@ Section Defs.
 
 
 
-  Global Instance mx_KleeneAlgebra: KleeneAlgebra (mx_Graph A).
+  #[global] Instance mx_KleeneAlgebra: KleeneAlgebra (mx_Graph A).
   Proof.
     constructor; intros.
     apply mx_SemiRing.

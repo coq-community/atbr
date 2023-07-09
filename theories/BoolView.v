@@ -34,7 +34,7 @@ Require Import Common.
 Require Export Bool.
 Require Import Equality Program Sumbool Peano.
 
-Local Ltac Tauto.intuition_solver ::= auto with exfalso lia.
+#[local] Ltac Tauto.intuition_solver ::= auto with exfalso lia.
 
                                (***********)
                                (* analyse *)

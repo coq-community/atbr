@@ -47,7 +47,7 @@ Section equal.
   (** boolean test *)
   Definition xif (b: bool) (x y: X A B) := if b then x else y.
 
-  Global Instance xif_compat: Proper (@eq bool ==> equal A B ==> equal A B ==> equal A B) xif.
+  #[global] Instance xif_compat: Proper (@eq bool ==> equal A B ==> equal A B ==> equal A B) xif.
   Proof. intros c b ->; repeat intro. destruct b; auto. Qed.
 
   Lemma xif_spec: forall b x y z, (b=true -> x==z) -> (b=false -> y==z) -> xif b x y == z.    
@@ -87,21 +87,21 @@ Section leq.
   Context `{SL: SemiLattice}.
   Variables A B: T.
 
-  Global Instance leq_refl: Reflexive (leq A B).
+  #[global] Instance leq_refl: Reflexive (leq A B).
   Proof. intro. apply plus_idem. Qed.
 
-  Global Instance leq_trans: Transitive (leq A B).
+  #[global] Instance leq_trans: Transitive (leq A B).
   Proof. 
     intros x y z E E'; unfold leq in *.
     rewrite <- E', plus_assoc, E; reflexivity. 
   Qed.
 
-  Global Instance equal_leq: subrelation (equal A B) (leq A B).
+  #[global] Instance equal_leq: subrelation (equal A B) (leq A B).
   Proof.
     intros x y E; unfold leq; rewrite E; apply plus_idem.
   Qed.
 
-  Global Instance equal_geq: subrelation (equal A B) (Basics.flip (leq A B)).
+  #[global] Instance equal_geq: subrelation (equal A B) (Basics.flip (leq A B)).
   Proof. repeat intro; apply equal_leq; symmetry; auto. Qed.
 
   Definition leq_antisym: Antisymmetric _ _ (leq A B).
@@ -110,15 +110,15 @@ Section leq.
 End leq.
 
 
-Global Hint Resolve equal_refl : core.
-Global Hint Immediate equal_sym : core.
+#[global] Hint Resolve equal_refl : core.
+#[global] Hint Immediate equal_sym : core.
  
 (* BUG : If we add [equal_refl_fit] as hints, they are added as eapply ...*)
 
-Global Hint Resolve equal_refl_f1 equal_refl_f2 : core.
+#[global] Hint Resolve equal_refl_f1 equal_refl_f2 : core.
 (* Hint Resolve @equal_refl_f1t @equal_refl_f2t *)
 
-Global Hint Extern 1 (equal ?A ?B (?f _ ?t) (?f _ ?t)) => apply @equal_refl_f1t : core.
-Global Hint Extern 2 (equal ?A ?B (?f _ _ ?t) (?f _ _ ?t)) => apply @equal_refl_f2t : core.
+#[global] Hint Extern 1 (equal ?A ?B (?f _ ?t) (?f _ ?t)) => apply @equal_refl_f1t : core.
+#[global] Hint Extern 2 (equal ?A ?B (?f _ _ ?t) (?f _ _ ?t)) => apply @equal_refl_f2t : core.
 
-Global Hint Extern 3 (_ == _) => apply @xif_compat : core.
+#[global] Hint Extern 3 (_ == _) => apply @xif_compat : core.

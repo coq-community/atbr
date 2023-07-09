@@ -36,7 +36,7 @@ Section Defs.
   Definition mx_one n: MX n n := 
     box n n (fun i j => if eq_nat_bool i j then 1 else 0).
 
-  Global Instance mx_Monoid_Ops: Monoid_Ops (mx_Graph A) := {
+  #[global] Instance mx_Monoid_Ops: Monoid_Ops (mx_Graph A) := {
     dot := mx_dot;
     one := mx_one }.
 
@@ -73,14 +73,14 @@ Section Defs.
       nat_analyse; semiring_reflexivity.
   Qed.
   
-  Global Program Instance mx_Monoid: Monoid (mx_Graph A) := {
+  #[global] Program Instance mx_Monoid: Monoid (mx_Graph A) := {
     dot_assoc := mx_dot_assoc;
     dot_neutral_left := mx_dot_neutral_left;
     dot_neutral_right := mx_dot_neutral_right
   }. 
   Obligation 1. repeat intro. simpl. auto with compat. Qed.
   
-  Global Instance mx_SemiRing: IdemSemiRing (mx_Graph A).
+  #[global] Instance mx_SemiRing: IdemSemiRing (mx_Graph A).
   Proof.
     constructor; repeat intro; simpl.
     exact mx_Monoid.
@@ -159,11 +159,11 @@ Section Props1.
   Definition dot_scal_left n m (v: X A A) (M: MX n m): MX n m := 
     box n m (fun i j => v * !M i j).
 
-  Global Instance dot_scal_right_compat n m:
+  #[global] Instance dot_scal_right_compat n m:
   Proper (mx_equal n m ==> equal A A  ==> mx_equal n m) (@dot_scal_right n m).
   Proof. repeat intro. simpl. auto with compat. Qed.
   
-  Global Instance dot_scal_left_compat n m:
+  #[global] Instance dot_scal_left_compat n m:
   Proper (equal A A ==> mx_equal n m ==> mx_equal n m) (@dot_scal_left n m).
   Proof. repeat intro. simpl. auto with compat. Qed.
 
@@ -174,8 +174,8 @@ Infix "*'" := dot_scal_right (at level 40): A_scope.
 
 
 
-Global Hint Extern 2 (mx_equal_ _ _ _ _ _) => apply dot_scal_left_compat: compat algebra.
-Global Hint Extern 2 (mx_equal_ _ _ _ _ _) => apply dot_scal_right_compat: compat algebra.
+#[global] Hint Extern 2 (mx_equal_ _ _ _ _ _) => apply dot_scal_left_compat: compat algebra.
+#[global] Hint Extern 2 (mx_equal_ _ _ _ _ _) => apply dot_scal_right_compat: compat algebra.
 
 Section Props2.
 

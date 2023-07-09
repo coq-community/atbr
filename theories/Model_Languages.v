@@ -78,8 +78,8 @@ Section Def.
  
      intros ? ? ? ? L M N x. simpl. unfold lang_comp. 
       split; intros [u Hu [v Hv ->]].
-       destruct Hv as [v' Hv [w Hw ->]]. repeat eexists; eauto. symmetry. apply app_ass.
-       destruct Hu as [v' Hv' [w Hw ->]]. repeat eexists; eauto. apply app_ass.
+       destruct Hv as [v' Hv [w Hw ->]]. repeat eexists; eauto. apply app_assoc.
+       destruct Hu as [v' Hv' [w Hw ->]]. repeat eexists; eauto. symmetry. apply app_assoc.
      
      intros ? ? L x. simpl. unfold lang_comp.
       split; intro H.
@@ -133,7 +133,7 @@ Section Def.
     revert u Hu v Hv. induction n; intros u Hu v Hv.
      rewrite Hu. trivial.
      destruct Hu as [x Hx [y Hy ->]].
-     rewrite app_ass. apply IHn; trivial.
+     rewrite <- app_assoc. apply IHn; trivial.
      apply -> lang_leq; eauto. repeat eexists; trivial. 
   Qed.
 

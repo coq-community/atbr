@@ -42,7 +42,7 @@ Require Import FSets.
 Require Import Common.
 Require Import BoolView.
 
-Local Ltac Tauto.intuition_solver ::= auto with crelations.
+#[local] Ltac Tauto.intuition_solver ::= auto with crelations.
 
 
 Module MySetProps (X : FSetInterface.S).
@@ -258,9 +258,9 @@ Module MySetProps (X : FSetInterface.S).
     Lemma fold_left_id : forall A (s y : list A), List.fold_left (fun acc x => acc ++x::nil) s y = y ++ s. 
     Proof.
       intros A.
-      induction s. simpl. intros. rewrite <- app_nil_end. reflexivity.
+      induction s. simpl. intros. rewrite app_nil_r. reflexivity.
       simpl. intros. rewrite IHs. 
-      rewrite <- ass_app. 
+      rewrite <- app_assoc. 
       reflexivity.
     Qed.
     

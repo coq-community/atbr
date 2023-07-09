@@ -86,7 +86,7 @@ Lemma compat_split s: compat_bool StateSet.Equal (fun p => StateSet.mem s p).
 Proof. intros ? ? H. rewrite H. trivial. Qed.
 Lemma compat_negsplit s: compat_bool StateSet.Equal (fun p => negb (StateSet.mem s p)).
 Proof. intros ? ? H. rewrite H. trivial. Qed.
-Local Hint Resolve compat_split compat_negsplit : core.
+#[local] Hint Resolve compat_split compat_negsplit : core.
 
 Ltac solve_p1 := intros ? ? H'; rewrite H'; reflexivity.
 
@@ -227,7 +227,7 @@ Proof.
 Qed.
   
 Section protect.
-(* Local Hint Resolve @DS.union_WF @DS.empty_WF: typeclass_instances. *)
+(* #[local] Hint Resolve @DS.union_WF @DS.empty_WF: typeclass_instances. *)
 
 Lemma measure_union_idem: forall `{DS.WF} size x y, {{t}} x y -> 
   measure size (DS.union t x y) = measure size t.

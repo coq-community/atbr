@@ -169,7 +169,7 @@ Arguments ConverseKleeneAlgebra G {Mo} {SLo} {Ko} {Co}.
 
 Module Dual. Section Protect.
   
-  Local Transparent equal.
+  #[local] Transparent equal.
 
   Context (G: Graph).
   Context {Mo: Monoid_Ops G} {SLo: SemiLattice_Ops G} {Ko: Star_Op G} {Co: Converse_Op G}.

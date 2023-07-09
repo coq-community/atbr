@@ -77,7 +77,7 @@ Qed.
 
 Section comb.
 
-  Local Hint Resolve DS.union_WF DS.empty_WF: typeclass_instances.
+  #[local] Hint Resolve DS.union_WF DS.empty_WF: typeclass_instances.
 
   Inductive combine_no_length X Y : list X -> list Y -> Type :=
   |cnl_nil : combine_no_length nil nil
@@ -164,7 +164,7 @@ Section correctness.
 
   Definition prog (t t' : DS.T) := forall R, diag {{t}} {{t +++ R}} -> diag {{t'}} {{t' +++ R}}.
 
-  Local Hint Resolve DS.union_WF DS.empty_WF: typeclass_instances.
+  #[local] Hint Resolve DS.union_WF DS.empty_WF: typeclass_instances.
   Existing Instance complete_WF.
   
   Instance preorder_prog : PreOrder prog.

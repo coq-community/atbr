@@ -153,7 +153,7 @@ Proof.
    apply plus_make_right.
 Qed.
 
-Local Open Scope num_scope.
+#[local] Open Scope num_scope.
 
 Section accept.
 

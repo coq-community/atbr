@@ -17,8 +17,6 @@ Require Export Setoid Morphisms.
 
 Set Implicit Arguments.
 
-Global Set Warnings "+intuition-auto-with-star".
-
 Bind Scope nat_scope with nat.
 
 (** Functional composition *)
@@ -64,9 +62,9 @@ Create HintDb algebra discriminated.
 
 Ltac rsimpl := simpl; autorewrite with simpl using ti_auto.
 
-Global Hint Extern 9 (@eq nat ?x ?y) => abstract lia: lia.
-Global Hint Extern 9 (Peano.le ?x ?y) => abstract lia: lia.
-Global Hint Extern 9 (Peano.lt ?x ?y) => abstract lia: lia.
+#[global] Hint Extern 9 (@eq nat ?x ?y) => abstract lia: lia.
+#[global] Hint Extern 9 (Peano.le ?x ?y) => abstract lia: lia.
+#[global] Hint Extern 9 (Peano.lt ?x ?y) => abstract lia: lia.
 
 (** Tactic to use when apply does not smartly unify *)
 Ltac rapply H := first 

@@ -23,16 +23,16 @@ Lemma plus_neutral_right `{SemiLattice} A B: forall (x: X A B), x+0 == x.
 Proof. intros. rewrite plus_com; apply plus_neutral_left. Qed.
 
 (** Hints  *)
-Global Hint Extern 0 (leq _ _ _ _) => apply leq_refl : core.
+#[global] Hint Extern 0 (leq _ _ _ _) => apply leq_refl : core.
 
-Global Hint Extern 0 (equal _ _ _ _) => first [
+#[global] Hint Extern 0 (equal _ _ _ _) => first [
     apply plus_assoc
   | apply plus_com
   | apply plus_idem
   | apply plus_neutral_left
   | apply plus_neutral_right
 ]: algebra.
-Global Hint Extern 2 (equal _ _ _ _) => first [
+#[global] Hint Extern 2 (equal _ _ _ _) => first [
     apply plus_compat
 ]: compat algebra.
 
@@ -223,7 +223,7 @@ Section Props1.
   Qed.
     
 
-  Global Instance plus_incr:
+  #[global] Instance plus_incr:
   Proper ((leq A B) ==> (leq A B) ==> (leq A B)) (plus A B).
   Proof. 
     unfold leq; intros x x' Hx y y' Hy.
@@ -253,7 +253,7 @@ Section Props1.
     reflexivity.
   Qed.
 
-  Global Instance sum_compat' i k: 
+  #[global] Instance sum_compat' i k: 
   Proper ((pointwise_relation nat (equal A B)) ==> (equal A B)) (sum i k).
   Proof. repeat intro; auto using sum_compat. Qed.
    
@@ -383,7 +383,7 @@ Section Props1.
     reflexivity.
   Qed.
     
-  Global Instance sum_incr' i k: 
+  #[global] Instance sum_incr' i k: 
   Proper ((pointwise_relation nat (leq A B)) ==> (leq A B)) (sum i k).
   Proof. repeat intro; auto using sum_incr. Qed.
 
@@ -462,20 +462,20 @@ endtests*)
 
 (** Hints  *)
 
-Global Hint Extern 1 (equal _ _ _ _) => first [ 
+#[global] Hint Extern 1 (equal _ _ _ _) => first [ 
     apply sum_compat
 ]: compat algebra.
 
-Global Hint Extern 0 (leq _ _ _ _) => first [ 
+#[global] Hint Extern 0 (leq _ _ _ _) => first [ 
   apply plus_destruct_leq
   | apply plus_make_left
   | apply plus_make_right
   | apply zero_inf
 ]: algebra.
-Global Hint Extern 1 (leq _ _ _ _) => first [ 
+#[global] Hint Extern 1 (leq _ _ _ _) => first [ 
     apply sum_incr
 ]: compat algebra.
-Global Hint Extern 2 (leq _ _ _ _) => first [ 
+#[global] Hint Extern 2 (leq _ _ _ _) => first [ 
     apply plus_incr
 ]: compat algebra.
 

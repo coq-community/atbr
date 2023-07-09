@@ -71,7 +71,7 @@ Section Props1.
   Context `{KA: KleeneAlgebra}.
   Variable A: T. 
 
-  Global Instance star_incr: 
+  #[global] Instance star_incr: 
   Proper ((leq A A) ==> (leq A A)) (star A).
   Proof.
     intros a b H.
@@ -79,7 +79,7 @@ Section Props1.
     rewrite H. rewrite star_make_left. reflexivity.
   Qed.
 
-  Global Instance star_compat: Proper ((equal A A) ==> (equal A A)) (star A).
+  #[global] Instance star_compat: Proper ((equal A A) ==> (equal A A)) (star A).
   Proof.
     intros a b H. apply leq_antisym; apply star_incr; apply equal_leq; auto. 
   Qed.
@@ -145,13 +145,13 @@ Section Props1.
 End Props1.
 
 (** hints *)
-Global Hint Extern 1 (equal _ _ _ _) => apply star_compat : compat algebra.
-Global Hint Extern 0 (equal _ _ _ _) => apply star_make_left: algebra.
-Global Hint Extern 0 (equal _ _ _ _) => apply star_make_right: algebra.
-Global Hint Extern 0 (equal _ _ _ _) => apply star_one: algebra.
-Global Hint Extern 0 (equal _ _ _ _) => apply star_zero: algebra.
-Global Hint Extern 0 (leq _ _ _ _) => apply a_leq_star_a: algebra.
-Global Hint Extern 0 (leq _ _ _ _) => apply one_leq_star_a: algebra.
+#[global] Hint Extern 1 (equal _ _ _ _) => apply star_compat : compat algebra.
+#[global] Hint Extern 0 (equal _ _ _ _) => apply star_make_left: algebra.
+#[global] Hint Extern 0 (equal _ _ _ _) => apply star_make_right: algebra.
+#[global] Hint Extern 0 (equal _ _ _ _) => apply star_one: algebra.
+#[global] Hint Extern 0 (equal _ _ _ _) => apply star_zero: algebra.
+#[global] Hint Extern 0 (leq _ _ _ _) => apply a_leq_star_a: algebra.
+#[global] Hint Extern 0 (leq _ _ _ _) => apply one_leq_star_a: algebra.
 
 #[global] Hint Rewrite @star_zero @star_one using ti_auto : simpl.
 #[global] Hint Rewrite @star_mon_is_one using ti_auto : simpl.
@@ -239,9 +239,9 @@ Section Props2.
    
 End Props2.
 
-Global Hint Extern 1 (leq _ _ _ _) => apply star_incr: compat algebra.
-Global Hint Extern 0 (equal _ _ _ _) => apply star_idem: algebra.
-Global Hint Extern 0 (equal _ _ _ _) => apply star_trans: algebra.
+#[global] Hint Extern 1 (leq _ _ _ _) => apply star_incr: compat algebra.
+#[global] Hint Extern 0 (equal _ _ _ _) => apply star_idem: algebra.
+#[global] Hint Extern 0 (equal _ _ _ _) => apply star_trans: algebra.
 
 
 (** more properties, by duality  *)
