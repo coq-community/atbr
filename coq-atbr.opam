@@ -3,7 +3,7 @@
 
 opam-version: "2.0"
 maintainer: "palmskog@gmail.com"
-version: "dev"
+version: "8.13.dev"
 
 homepage: "https://github.com/coq-community/atbr"
 dev-repo: "git+https://github.com/coq-community/atbr.git"
@@ -22,11 +22,11 @@ Note that the initial authors consider this library to be superseded
 by the Relation Algebra library, which is based on derivatives
 rather than automata: https://github.com/damien-pous/relation-algebra"""
 
-build: [make "-j%{jobs}%" ]
+build: [make "-j%{jobs}%"]
 install: [make "install"]
 depends: [
   "ocaml" {>= "4.05.0"}
-  "coq" {= "dev"}
+  "coq" {>= "8.13" & < "8.14"}
 ]
 
 tags: [
