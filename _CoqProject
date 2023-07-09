@@ -51,7 +51,7 @@ theories/DKA_Merge.v
 theories/DKA_DFA_Language.v
 theories/DKA_DFA_Equiv.v
 theories/DecideKleeneAlgebra.v
-#theories/StrictKleeneAlgebra.v
+theories/StrictKleeneAlgebra.v
 theories/ATBR.v
 theories/ATBR_Matrices.v
 theories/Examples.v
