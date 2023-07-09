@@ -17,8 +17,6 @@ Require Export Setoid Morphisms.
 
 Set Implicit Arguments.
 
-#[global] Set Warnings "+intuition-auto-with-star".
-
 Bind Scope nat_scope with nat.
 
 (** Functional composition *)
