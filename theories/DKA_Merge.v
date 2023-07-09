@@ -82,7 +82,7 @@ Proof.
     apply below_max_pi0. apply HA, Hp.
 Qed.
 
-Arguments Classes.equal : simpl never.
+#[local] Arguments Classes.equal : simpl never.
 
 Lemma sum_collapse': forall k f b (j: state), (j<k)%nat -> 
   sum 0 k (fun i => xif (eqb (state_of_nat i) j && b i) (f i) (0: regex)) == xif (b j) (f j) 0.
