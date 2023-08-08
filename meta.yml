@@ -7,6 +7,7 @@ action: true
 coqdoc: true
 doi: 10.2168/LMCS-8(1:16)2012
 plugin: true
+branch: 'v8.18'
 
 synopsis: Coq library and tactic for deciding Kleene algebras
 
@@ -44,15 +45,15 @@ license:
   identifier: LGPL-3.0-or-later
 
 supported_coq_versions:
-  text: master (use the corresponding branch or release for other Coq versions)
-  opam: '{= "dev"}'
+  text: 8.18 (use the corresponding branch or release for other Coq versions)
+  opam: '{>= "8.18" & < "8.19"}'
 
 supported_ocaml_versions:
     text: 4.09.0 or later
     opam: '{>= "4.09.0"}'
 
 tested_coq_opam_versions:
-- version: 'dev'
+- version: '8.18'
 
 namespace: ATBR
 
