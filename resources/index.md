@@ -1,5 +1,8 @@
 ---
+# This file was generated from `meta.yml`, please do not edit manually.
+# Follow the instructions on https://github.com/coq-community/templates to regenerate.
 title: ATBR
+lang: en
 header-includes:
   - |
     <style type="text/css"> body {font-family: Arial, Helvetica; margin-left: 5em; font-size: large;} </style>
@@ -10,7 +13,7 @@ header-includes:
 ---
 
 <div style="text-align:left"><img src="https://github.githubassets.com/images/modules/logos_page/Octocat.png" height="25" style="border:0px">
-[View the project on GitHub](https://github.com/coq-community/atbr)
+<a href="https://github.com/coq-community/atbr">View the project on GitHub</a>
 <img src="https://github.githubassets.com/images/modules/logos_page/Octocat.png" height="25" style="border:0px"></div>
 
 ## About
@@ -34,22 +37,19 @@ The current stable release of ATBR can be [downloaded from GitHub](https://githu
 
 ## Documentation
 
-The coqdoc presentations of releases can be browsed online:
 
-- [v8.11.0](docs/v8.11.0/coqdoc/toc.html)
-- [v8.10.0](docs/v8.10.0/coqdoc/toc.html)
-
-Other related publications, if any, are listed below.
+Related publications, if any, are listed below.
 
 - [Deciding Kleene Algebras in Coq](https://arxiv.org/abs/1105.4537) doi:[10.2168/LMCS-8(1:16)2012](https://doi.org/10.2168/LMCS-8(1:16)2012)
 
 ## Help and contact
 
 - Report issues on [GitHub](https://github.com/coq-community/atbr/issues)
-- Chat with us on [Gitter](https://gitter.im/coq-community/Lobby)
+- Chat with us on [Zulip](https://coq.zulipchat.com/#narrow/stream/237663-coq-community-devs.20.26.20users)
 - Discuss with us on Coq's [Discourse](https://coq.discourse.group) forum
 
 ## Authors and contributors
 
-- Thomas Braibant
-- Damien Pous
+- Thomas Braibant (initial)
+- Damien Pous (initial)
+
