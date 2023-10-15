@@ -85,12 +85,12 @@ Ltac destruct_blocks :=
 Ltac mx_intros i j Hi Hj :=
   apply mx_equal'; intros i j Hi Hj;
   match type of Hi with
-    | i < 0%nat => elim (lt_n_O _ Hi)
+    | i < 0%nat => elim (Nat.nlt_0_r _ Hi)
     | i < 1%nat => destruct i; [clear Hi | elim (lt_n_1 Hi)]
     | _ => idtac
   end;
   match type of Hj with
-    | j < 0%nat => elim (lt_n_O _ Hj)
+    | j < 0%nat => elim (Nat.nlt_0_r _ Hj)
     | j < 1%nat => destruct j; [clear Hj | elim (lt_n_1 Hj)]
     | _ => idtac
   end.

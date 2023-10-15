@@ -85,14 +85,15 @@ Section protect.
   Instance mp_ConverseSemiRing: ConverseIdemSemiRing mp_Graph.
   Proof.
     constructor; simpl; eauto with typeclass_instances. 
-     destruct x; trivial. destruct y; trivial. destruct z; trivial. simpl. rewrite Plus.plus_assoc. reflexivity. 
+     destruct x; trivial. destruct y; trivial. destruct z; trivial. simpl.
+     rewrite Nat.add_assoc. reflexivity. 
      destruct x; reflexivity. 
-     destruct x; trivial. destruct y; trivial. simpl. rewrite plus_comm. reflexivity. 
+     destruct x; trivial. destruct y; trivial. simpl. rewrite Nat.add_comm. reflexivity. 
      destruct y; reflexivity.
      destruct x; trivial. destruct y; trivial. simpl. rewrite min_comm. reflexivity. 
      destruct y; reflexivity.
      destruct x; trivial. destruct y; trivial; destruct z; trivial. simpl. 
-     rewrite Min.plus_min_distr_r. reflexivity. 
+     rewrite Nat.add_min_distr_r. reflexivity. 
   Qed.
   
   Definition mp_IdemSemiRing: IdemSemiRing mp_Graph := Converse.CISR_ISR.  

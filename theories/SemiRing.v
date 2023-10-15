@@ -317,7 +317,7 @@ endtests*)
         (plus (VLSet_to_X b) (dot (VLst_to_X a) y))
         (VLSet_to_X (norm_aux' n b a y)))%nat.
     Proof.
-      induction n; split; intros; try elim (lt_n_O _ H); 
+      induction n; split; intros; try elim (Nat.nlt_0_r _ H); 
         destruct IHn as [IHnorm_aux IHnorm_aux'].
   
       (* norm_aux *)

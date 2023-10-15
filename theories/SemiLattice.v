@@ -183,7 +183,7 @@ Section FSumDef.
     sum i (S k) f == sum i k f + f (i+k)%nat.
   Proof. 
     revert i; induction k; intro i.
-    simpl. rewrite plus_0_r; apply plus_com.
+    simpl. rewrite Nat.add_0_r; apply plus_com.
     change (sum i (S (S k)) f) with (f i + sum (S i) (S k) f).
     rewrite IHk, plus_assoc. simpl. auto with compat.
   Qed.

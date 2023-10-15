@@ -202,35 +202,35 @@ Section Props2.
   Proof.
     simpl. intros. destruct_blocks.
   
-    rewrite (plus_comm m), sum_cut. 
+    rewrite (Nat.add_comm m), sum_cut. 
     apply plus_compat.
     apply sum_compat; intros. 
     destruct_blocks. reflexivity. lia_false.
-    rewrite (plus_comm m), sum_shift. 
+    rewrite (Nat.add_comm m), sum_shift. 
     apply sum_compat; intros.
     destruct_blocks. reflexivity.
 
-    rewrite (plus_comm m), sum_cut. 
+    rewrite (Nat.add_comm m), sum_cut. 
     apply plus_compat.
     apply sum_compat; intros. 
     destruct_blocks. reflexivity. lia_false.
-    rewrite (plus_comm m), sum_shift. 
+    rewrite (Nat.add_comm m), sum_shift. 
     apply sum_compat; intros.
     destruct_blocks. reflexivity.
 
-    rewrite (plus_comm m), sum_cut. 
+    rewrite (Nat.add_comm m), sum_cut. 
     apply plus_compat.
     apply sum_compat; intros. 
     destruct_blocks. reflexivity. lia_false.
-    rewrite (plus_comm m), sum_shift. 
+    rewrite (Nat.add_comm m), sum_shift. 
     apply sum_compat; intros.
     destruct_blocks. reflexivity.
 
-    rewrite (plus_comm m), sum_cut. 
+    rewrite (Nat.add_comm m), sum_cut. 
     apply plus_compat.
     apply sum_compat; intros. 
     destruct_blocks. reflexivity. lia_false.
-    rewrite (plus_comm m), sum_shift. 
+    rewrite (Nat.add_comm m), sum_shift. 
     apply sum_compat; intros.
     destruct_blocks. reflexivity.
   Qed.

@@ -249,7 +249,7 @@ Module Algebraic.
     rewrite mx_point_blocks11 by trivial.
     setoid_rewrite mx_point_blocks01 at 2; trivial.
     cbn.
-    rewrite 2minus_diag.
+    rewrite 2 Nat.sub_diag.
     set (U := mx_point 1 n 0 i (1: regex)).
     set (V := mx_point n 1 f 0 (1: regex)).
     set (Y := mx_point n 1 s 0 (a: regex)).
@@ -522,9 +522,10 @@ Module Correctness.
   Proof.
     intros i j n A Hi Hj [Hd He]. split; auto.
     intros s a t Hst. apply delta_add_var in Hst as [Hst|[-> [-> ->]]]; split; auto; simpl.
-     specialize (Hd _ _ _ Hst). destruct A. simpl. num_simpl. eapply lt_le_trans. apply Hd. apply Max.le_max_r.
+     specialize (Hd _ _ _ Hst). destruct A. simpl. num_simpl. eapply Nat.lt_le_trans.
+     apply Hd. apply Nat.le_max_r.
      specialize (Hd _ _ _ Hst). intuition.
-     destruct A. simpl. num_simpl. apply Max.le_max_l.
+     destruct A. simpl. num_simpl. apply Nat.le_max_l.
      destruct A. simpl. auto.
   Qed.
   #[local] Hint Resolve bounded_incr bounded_add_one bounded_add_var : core.
@@ -581,7 +582,7 @@ Module Correctness.
   Qed.
 
   Lemma leb_S: forall n, leb (S n) xH = false.
-  Proof. intros. case le_spec; intro H; trivial. num_simpl. elim (lt_n_O _ H). Qed.
+  Proof. intros. case le_spec; intro H; trivial. num_simpl. elim (Nat.nlt_0_r _ H). Qed.
   Hint Rewrite leb_S : bool_simpl.
 
   Lemma labelling_add_var : forall n A i j s t c, 
@@ -602,7 +603,7 @@ Module Correctness.
   Lemma psurj A: A = mk (size A) (epsilonmap A) (deltamap A) (max_label A).
   Proof. destruct A. reflexivity. Qed.
 
-  Opaque Max.max.
+  Opaque Nat.max.
   Lemma commute_add_var: forall n i f A, 
     bounded A -> belong i A -> belong f A ->
     Algebraic.add_var (nat_of_state i) (nat_of_state f) n (preNFA_to_preMAUT A)
@@ -612,14 +613,14 @@ Module Correctness.
     rewrite <- plus_assoc. apply plus_compat; trivial.
     fold (add_var i f n (mk (size A) (epsilonmap A) (deltamap A) (max_label A))).
     rewrite labelling_add_var.
-    rewrite (@labelling_crop (Max.max (Datatypes.S (nat_of_num n)) (max_label A))); auto with arith.
+    rewrite (@labelling_crop (Nat.max (Datatypes.S (nat_of_num n)) (max_label A))); auto with arith.
     setoid_rewrite eqb_eq_nat_bool. setoid_rewrite id_nat.
     unfold labelling. num_simpl.
     nat_analyse; simpl; fold_regex; try semiring_reflexivity. 
     num_analyse; simpl; fold_regex; try semiring_reflexivity. 
-    elim n0. clear. num_simpl. apply Max.le_max_l. 
+    elim n0. clear. num_simpl. apply Nat.le_max_l.
   Qed.
-  Transparent Max.max.
+  Transparent Nat.max.
 
   Lemma not_true_eq_false: forall b, ~ b = true -> b = false.
   Proof. intros [ ]; tauto. Qed.
@@ -927,7 +928,7 @@ Lemma build_max_label: forall a i e f A, i < max_label A -> i < max_label (build
 Proof.
   induction a; intros i e f A Hi; rewrite (psurj A); simpl; auto.
    rewrite max_label_add_one. auto.
-   num_simpl. eauto 2 using Max.le_max_r with arith.
+   num_simpl. eauto 2 using Nat.le_max_r with arith.
 Qed.
 
 Lemma collect_max_label: 
@@ -941,7 +942,7 @@ Proof.
    eapply IHa2 in Hi as [Hi|Hi]. left. apply build_max_label, Hi. auto. 
    rewrite max_label_add_one. auto. 
    revert Hi. NumSetProps.set_iff. intuition.
-   subst. left. destruct A; simpl. num_simpl. eauto using Max.le_max_l with arith.
+   subst. left. destruct A; simpl. num_simpl. eauto using Nat.le_max_l with arith.
 Qed.
 
 Lemma max_label_collect: 
@@ -958,7 +959,7 @@ Proof.
    eapply IHa2 in Hi as [[j ? ?]|Hi]. left. exists j; auto using collect_incr_2. right. assumption. 
    eapply IHa in Hi as [Hi|Hi]; auto.
    revert Hi. rewrite max_label_add_one, max_label_incr. auto. 
-   revert Hi. rewrite max_label_add_var. num_simpl. apply Max.max_case; auto.
+   revert Hi. rewrite max_label_add_var. num_simpl. apply Nat.max_case; auto.
    intro Hi. left. exists (nat_of_num p). auto with arith. num_simpl. auto with set.
 Qed.
 
@@ -981,8 +982,9 @@ Proof.
 
   clear. intros a b H. apply inf_leq. intros c Hc.
   apply max_label_collect in Hc as [[d ? Hd]|?]. 
-   rewrite H in Hd. eapply collect_max_label in Hd as [Hd|?].
-    eapply le_lt_trans. eassumption. unfold statesetelt_of_nat in Hd. rewrite id_nat in Hd. eassumption.
-    NumSetProps.setdec.
-    simpl in *. compute in H0. lia_false.
+  rewrite H in Hd. eapply collect_max_label in Hd as [Hd|?].
+  eapply Nat.le_lt_trans. eassumption. unfold statesetelt_of_nat in Hd.
+  rewrite id_nat in Hd. eassumption.
+  NumSetProps.setdec.
+  simpl in *. compute in H0. lia_false.
 Qed.
