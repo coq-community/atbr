@@ -53,17 +53,15 @@ Definition compare_DFAs T (equiv: DFA.t -> state -> state -> option T) A B :=
 
 Lemma below_max_pi0: forall n m m', below n m -> below (pi0 n) (max (pi0 m) (pi1 m')).
 Proof.
-  intros. rewrite lt_nat_spec, max_spec. eapply lt_le_trans. 2: apply Max.le_max_l. 
+  intros. rewrite lt_nat_spec, max_spec. eapply Nat.lt_le_trans. 2: apply Nat.le_max_l.
   rewrite <- lt_nat_spec. apply lt_pi0. assumption.
 Qed.
 
 Lemma below_max_pi1: forall n m m', below n m' -> below (pi1 n) (max (pi0 m) (pi1 m')).
 Proof.
-  intros. rewrite lt_nat_spec, max_spec. eapply lt_le_trans. 2: apply Max.le_max_r. 
+  intros. rewrite lt_nat_spec, max_spec. eapply Nat.lt_le_trans. 2: apply Nat.le_max_r.
   rewrite <- lt_nat_spec. apply lt_pi1. assumption.
 Qed.
-
- 
 
 Lemma merge_bounded: forall A B, bounded A -> bounded B -> bounded (merge_DFAs A B).
 Proof.
@@ -71,8 +69,8 @@ Proof.
   intros a i. simpl. case_eq (pimatch i); intros p Hp.
    apply below_max_pi0. apply (bounded_delta HA). 
    apply below_max_pi1. apply (bounded_delta HB). 
-   rewrite lt_nat_spec. apply le_lt_trans with (nat_of_state (pi0 (delta A 0 0))).
-    apply le_O_n. rewrite <- lt_nat_spec. rapply below_max_pi0. apply (bounded_delta HA). 
+   rewrite lt_nat_spec. apply Nat.le_lt_trans with (nat_of_state (pi0 (delta A 0 0))).
+    apply Nat.le_0_l. rewrite <- lt_nat_spec. rapply below_max_pi0. apply (bounded_delta HA).
   unfold finaux, merge_DFAs.
   apply NumSetProps.Props.fold_rec_nodep. apply NumSetProps.Props.fold_rec_nodep.
    intro i. NumSetProps.setdec.

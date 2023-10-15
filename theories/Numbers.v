@@ -82,7 +82,7 @@ Module Type NUM.
 
   (* specification of operations and predicates, w.r.t. nat *)
   Axiom S_nat_spec : forall n, nat_of_num (S n) = Datatypes.S (nat_of_num n).
-  Axiom max_spec : forall n m, nat_of_num (max n m) = Max.max (nat_of_num n) (nat_of_num m).
+  Axiom max_spec : forall n m, nat_of_num (max n m) = Nat.max (nat_of_num n) (nat_of_num m).
   Axiom le_nat_spec : forall n m, n <= m <-> (nat_of_num n <= nat_of_num m)%nat.
   Axiom lt_nat_spec : forall n m, n <  m <-> (nat_of_num n <  nat_of_num m)%nat.
 
@@ -136,12 +136,12 @@ Module NumUtils (N : NUM).
   Proof.
     constructor.
     intros x; unfold Pos.le. rewrite le_nat_spec. auto with arith.
-    intros x y z Hxy Hyz. rewrite le_nat_spec in *. apply (le_trans _ (nat_of_num y)); auto. 
+    intros x y z Hxy Hyz. rewrite le_nat_spec in *. apply (Nat.le_trans _ (nat_of_num y)); auto. 
   Qed.
 
   #[global] Instance lt_transitive: Transitive lt.
   Proof.
-    intros x y z Hxy Hyz. rewrite lt_nat_spec in *. apply (lt_trans _ (nat_of_num y)); auto. 
+    intros x y z Hxy Hyz. rewrite lt_nat_spec in *. apply (Nat.lt_trans _ (nat_of_num y)); auto. 
   Qed.
 
   Lemma num_peano_rec : 
@@ -431,12 +431,12 @@ Module Positive <: NUM.
     lia.
   Qed.
 
-  Lemma max_spec : forall n m, nat_of_num (max n m) = Max.max (nat_of_num n) (nat_of_num m).
+  Lemma max_spec : forall n m, nat_of_num (max n m) = Nat.max (nat_of_num n) (nat_of_num m).
   Proof.
     intros n m. unfold max, Pos.max. fold (compare n m). destruct (compare_spec n m).
-     rewrite Max.max_r; trivial. apply lt_le_weak. rewrite <- lt_nat_spec. assumption.
-     subst. rewrite Max.max_r; trivial. 
-     rewrite Max.max_l; trivial. apply lt_le_weak. rewrite <- lt_nat_spec. assumption.
+     rewrite Nat.max_r; trivial. apply Nat.lt_le_incl. rewrite <- lt_nat_spec. assumption.
+     subst. rewrite Nat.max_r; trivial. 
+     rewrite Nat.max_l; trivial. apply Nat.lt_le_incl. rewrite <- lt_nat_spec. assumption.
   Qed.
 
 

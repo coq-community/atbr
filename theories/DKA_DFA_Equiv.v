@@ -389,11 +389,11 @@ Section correctness.
        constructor.
         intros l Hl. apply Htar. rewrite <- add_lists_S. apply Htar''. assumption. 
         apply (ci_sameclass Htar'').
-        transitivity tar''. apply Htar''. apply Htar.   
-        apply le_trans with (measure tar''). apply Htar. apply Htar''.
+        transitivity tar''. apply Htar''. apply Htar.
+        apply Nat.le_trans with (measure tar''). apply Htar. apply Htar''.
        apply Htar.
       apply Htar'', Hxy.
-      eapply le_lt_trans. apply Htar''. apply Hsize. 
+      eapply Nat.le_lt_trans. apply Htar''. apply Hsize. 
 
     clear IHn. intro Hr.
     destruct (IH _ Hr) as [IH1 IH2]; clear Hr IH. 
@@ -405,8 +405,8 @@ Section correctness.
      apply IH1. apply diag_ok; ti_auto. 
 
      transitivity (DS.union tarjan x y). apply DSUtils.le_union. apply IH1.
-     apply le_trans with (measure (DS.union tarjan x y)). 
-     apply IH1. apply (measure_union_strict (size:=size)) in Hn; auto using lt_le_weak; num_lia.
+     apply Nat.le_trans with (measure (DS.union tarjan x y)). 
+     apply IH1. apply (measure_union_strict (size:=size)) in Hn; auto using Nat.lt_le_incl; num_lia.
      apply IH1. apply in_union.
   Qed.
 

@@ -286,7 +286,7 @@ Section Props1.
     intros until n.
     rewrite <- (iter_once a) at 4.
     rewrite <- iter_split.
-    rewrite plus_comm.
+    rewrite Nat.add_comm.
     reflexivity.
   Qed.
   
