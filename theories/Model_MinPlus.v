@@ -15,7 +15,6 @@
 
 From ATBR Require Import Common.
 From ATBR Require Import Classes.
-From Coq Require Import NPeano.
 From ATBR Require Converse.
 
 Set Implicit Arguments.
@@ -136,4 +135,3 @@ Module Load.
             change mp_empty with (@zero mp_Graph mp_SemiLattice_Ops tt tt).
     
 End Load.
-
