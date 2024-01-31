@@ -182,7 +182,7 @@ Section correctness.
 
   Class invariant tarjan : Prop := 
     {
-      i_wf_tarjan :> DS.WF tarjan ; 
+      i_wf_tarjan :: DS.WF tarjan ;
       i_final : forall x y, {{tarjan}} x y -> final x = final y 
     }.
 

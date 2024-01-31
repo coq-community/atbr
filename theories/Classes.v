@@ -25,7 +25,7 @@ Class Graph := {
   T: Type;
   X: T -> T -> Type;
   equal: forall A B, relation (X A B);
-  equal_:> forall A B, Equivalence (equal A B)
+  equal_:: forall A B, Equivalence (equal A B)
 }.
 
 (*Arguments equal : simpl never.*)
@@ -91,14 +91,14 @@ Section Structures.
   Context {Mo: Monoid_Ops G} {SLo: SemiLattice_Ops G} {Ko: Star_Op G} {Co: Converse_Op G}.
 
   Class Monoid := {
-    dot_compat:> forall A B C, Proper (equal A B ==> equal B C ==> equal A C) (dot A B C);
+    dot_compat:: forall A B C, Proper (equal A B ==> equal B C ==> equal A C) (dot A B C);
     dot_assoc: forall A B C D (x: X A B) y (z: X C D), x*(y*z) == (x*y)*z;
     dot_neutral_left:  forall A B (x: X A B), 1*x == x;
     dot_neutral_right:  forall A B (x: X B A), x*1 == x
   }.
   
   Class SemiLattice := {
-    plus_compat:> forall A B, Proper (equal A B ==> equal A B ==> equal A B) (plus A B);
+    plus_compat:: forall A B, Proper (equal A B ==> equal A B ==> equal A B) (plus A B);
     plus_neutral_left: forall A B (x: X A B), 0+x == x;
     plus_idem: forall A B (x: X A B), x+x == x;
     plus_assoc: forall A B (x y z: X A B), x+(y+z) == (x+y)+z;
@@ -106,8 +106,8 @@ Section Structures.
   }.
  
   Class IdemSemiRing := {
-    ISR_Monoid :> Monoid;
-    ISR_SemiLattice :> SemiLattice;
+    ISR_Monoid :: Monoid;
+    ISR_SemiLattice :: SemiLattice;
     dot_ann_left:  forall A B C (x: X B C), zero A B * x == 0;
     dot_ann_right: forall A B C (x: X C B), x * zero B A == 0;
     dot_distr_left:  forall A B C (x y: X A B) (z: X B C), (x+y)*z == x*z + y*z;
@@ -115,7 +115,7 @@ Section Structures.
   }.
 
   Class KleeneAlgebra := {
-    KA_ISR :> IdemSemiRing;
+    KA_ISR :: IdemSemiRing;
     star_make_left: forall A (a:X A A), 1 + a#*a == a#;
     star_destruct_left: forall A B (a: X A A) (c: X A B), a*c <== c  ->  a#*c <== c;
     star_destruct_right: forall A B (a: X A A) (c: X B A), c*a <== c  ->  c*a# <== c
@@ -127,12 +127,12 @@ Section Structures.
   (* TODO: introduce an intermediate ConverseMonoid class *)
 
   Class ConverseIdemSemiRing := {
-    CISR_SL :> SemiLattice;
+    CISR_SL :: SemiLattice;
     dot_compat_c: forall A B C, Proper (equal A B ==> equal B C ==> equal A C) (dot A B C);
     dot_assoc_c: forall A B C D (x: X A B) y (z: X C D), x*(y*z) == (x*y)*z;
     dot_neutral_left_c:  forall A B (x: X A B), 1*x == x;
 
-    conv_compat:> forall A B, Proper (equal A B ==> equal B A) (conv A B);
+    conv_compat:: forall A B, Proper (equal A B ==> equal B A) (conv A B);
     conv_invol: forall A B (x: X A B), x`` == x;
     conv_dot:  forall A B C (x: X A B) (y: X B C), (x*y)` == y`*x`;
     conv_plus:  forall A B (x y: X A B), (x+y)` == y`+x`;
@@ -141,7 +141,7 @@ Section Structures.
   }.
   
   Class ConverseKleeneAlgebra := {
-    CKA_CISR :> ConverseIdemSemiRing;
+    CKA_CISR :: ConverseIdemSemiRing;
     star_make_left_c: forall A (a:X A A), 1 + a#*a == a#;
     star_destruct_left_c: forall A B (a: X A A) (c: X A B), a*c <== c  ->  a#*c <== c
   }.

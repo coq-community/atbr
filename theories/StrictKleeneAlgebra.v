@@ -41,9 +41,9 @@ Delimit Scope SA_scope with SA.
 
 (** Strict Kleene Algebras axioms *)
 Class StrictKleeneAlgebra {G: Graph} {Ops: SKA_Ops G} := {
-  dot_compat:> 
+  dot_compat::
     forall A B C, Proper (equal A B ==> equal B C ==> equal A C) (dot A B C);
-  plus_compat:> 
+  plus_compat::
     forall A B, Proper (equal A B ==> equal A B ==> equal A B) (plus A B);
   dot_assoc: forall A B C D (x: X A B) y (z: X C D), x*(y*z) == (x*y)*z;
   dot_neutral_left:  forall A B (x: X A B), 1*x == x;

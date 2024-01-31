@@ -36,13 +36,13 @@ Section Defs.
     forall A B y, exists x, F A B x == y.
   
   Class monoid_functor {Mo1: Monoid_Ops G1} {Mo2: Monoid_Ops G2} (F: functor G1 G2) := {
-    monoid_graph_functor :> graph_functor F;
+    monoid_graph_functor :: graph_functor F;
     functor_dot : forall A B C x y, F A C (x*y) == F A B x * F B C y;
     functor_one : forall A, F A A 1 == 1
   }.
   
   Class semilattice_functor {SLo1: SemiLattice_Ops G1} {SL2: SemiLattice_Ops G2} (F: functor G1 G2) := {
-    semilattice_graph_functor :> graph_functor F;
+    semilattice_graph_functor :: graph_functor F;
     functor_plus : forall A B x y, F A B (x+y) == F A B x + F A B y;
     functor_zero : forall A B, F A B 0 == 0
   }.
@@ -71,8 +71,8 @@ Section Defs.
     {Ko1: Star_Op G1} {Ko2: Star_Op G2}.
 
   Class semiring_functor (F: functor G1 G2) := {
-    semiring_monoid_functor :> monoid_functor F;
-    semiring_semilattice_functor :> semilattice_functor F
+    semiring_monoid_functor :: monoid_functor F;
+    semiring_semilattice_functor :: semilattice_functor F
   }.
   
   Lemma functor_star_leq {KA1: KleeneAlgebra G1} {KA2: KleeneAlgebra G2} 
@@ -88,7 +88,7 @@ Section Defs.
   Qed.
 
   Class kleene_functor (F: functor G1 G2) := {
-    kleene_semiring :> semiring_functor F;
+    kleene_semiring :: semiring_functor F;
     functor_star: forall A a, F A A (a#) == (F A A a) #
   }.
   
