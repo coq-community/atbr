@@ -3,7 +3,7 @@ name: Docker CI
 on:
   push:
     branches:
-      - master
+      - v8.20
     paths-ignore:
       - 'resources/**'
   pull_request:
@@ -19,7 +19,7 @@ jobs:
     strategy:
       matrix:
         image:
-          - 'coqorg/coq:dev'
+          - 'coqorg/coq:8.20'
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
